@@ -1,10 +1,17 @@
-CMakeCache.txt
-CMakeFiles
-Makefile
-cmake_install.cmake
-install_manifest.txt
 *.swp
 *.o
 bin/
 build/
 *.rom
+
+# Build Systems Files
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+.swiftpm
+
+# Operating System Files
+.DS_Store
+__MACOSX
