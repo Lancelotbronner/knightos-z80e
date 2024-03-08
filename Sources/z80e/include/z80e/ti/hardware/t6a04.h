@@ -1,8 +1,8 @@
 #pragma once
 
-typedef struct ti_bw_lcd ti_bw_lcd_t;
+#include <stdint.h>
 
-#include <z80e/ti/asic.h>
+#include <z80e/ti/types.h>
 #include <z80e/debugger/hooks.h>
 
 struct ti_bw_lcd {

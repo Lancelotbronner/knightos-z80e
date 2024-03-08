@@ -1,6 +1,8 @@
 #pragma once
 
-#include <z80e/core/cpu.h>
+#include <stdint.h>
+
+#include <z80e/ti/types.h>
 
 z80iodevice_t init_keyboard();
 void free_keyboard(void *keyboard);

@@ -1,9 +1,6 @@
 #pragma once
 
-typedef struct ti_interrupts ti_interrupts_t;
-
-#include <z80e/core/cpu.h>
-#include <z80e/ti/asic.h>
+#include <z80e/ti/types.h>
 
 struct ti_interrupts {
 	asic_t *asic;

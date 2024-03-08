@@ -62,7 +62,7 @@ struct asic {
 	int battery_remove_check;
 	int clock_rate;
 
-	z80cpu_t* cpu;
+	z80cpu_t cpu;
 	runloop_state_t *runloop;
 	ti_mmu_t* mmu;
 	ti_interrupts_t *interrupts;

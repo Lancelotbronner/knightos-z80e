@@ -2,7 +2,9 @@
 
 #include <stdint.h>
 
-typedef struct {
+#include <z80e/ti/types.h>
+
+struct z80registers {
 	union {
 		uint16_t AF;
 		struct {
@@ -61,7 +63,7 @@ typedef struct {
 	};
 	uint8_t I, R;
 	uint16_t WZ;
-} z80registers_t;
+};
 
 typedef enum {
 	FLAG_S =  1 << 7,

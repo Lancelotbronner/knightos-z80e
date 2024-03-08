@@ -1,7 +1,8 @@
 #pragma once
 
-#include <z80e/ti/asic.h>
 #include <stdint.h>
+
+#include <z80e/ti/types.h>
 
 struct crystal_timer {
     asic_t *asic;

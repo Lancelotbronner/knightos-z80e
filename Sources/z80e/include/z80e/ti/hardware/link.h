@@ -1,7 +1,8 @@
 #pragma once
 
-#include <z80e/ti/asic.h>
 #include <stdbool.h>
+
+#include <z80e/ti/types.h>
 
 typedef struct {
 	asic_t *asic;

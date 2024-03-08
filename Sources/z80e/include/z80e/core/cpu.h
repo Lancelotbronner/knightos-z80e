@@ -2,13 +2,10 @@
 
 #include <stdint.h>
 
+#include <z80e/ti/types.h>
 #include <z80e/core/registers.h>
-#include <z80e/log/log.h>
-
-typedef struct z80cpu z80cpu_t;
-typedef struct z80iodevice z80iodevice_t;
-
 #include <z80e/debugger/hooks.h>
+#include <z80e/log/log.h>
 
 struct z80iodevice {
 	void *device;
@@ -44,8 +41,7 @@ uint16_t cpu_read_register_word(z80cpu_t *, registers);
 uint8_t cpu_write_register_byte(z80cpu_t *, registers, uint8_t);
 uint16_t cpu_write_register_word(z80cpu_t *, registers, uint16_t);
 
-z80cpu_t* cpu_init(log_t *log);
-void cpu_free(z80cpu_t *cpu);
+void cpu_init(z80cpu_t *cpu, log_t *log);
 uint8_t cpu_read_byte(z80cpu_t *cpu, uint16_t address);
 void cpu_write_byte(z80cpu_t *cpu, uint16_t address, uint8_t value);
 uint16_t cpu_read_word(z80cpu_t *cpu, uint16_t address);

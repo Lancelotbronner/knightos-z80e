@@ -1,6 +1,6 @@
 #pragma once
 
-#include <z80e/ti/asic.h>
+#include <z80e/ti/types.h>
 
 typedef struct {
 	asic_t *asic;
