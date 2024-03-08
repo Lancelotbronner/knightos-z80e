@@ -34,7 +34,6 @@ struct z80cpu {
 	log_t *log;
 };
 
-
 uint8_t cpu_read_register_byte(z80cpu_t *, registers);
 uint16_t cpu_read_register_word(z80cpu_t *, registers);
 
@@ -42,8 +41,9 @@ uint8_t cpu_write_register_byte(z80cpu_t *, registers, uint8_t);
 uint16_t cpu_write_register_word(z80cpu_t *, registers, uint16_t);
 
 void cpu_init(z80cpu_t *cpu, log_t *log);
-uint8_t cpu_read_byte(z80cpu_t *cpu, uint16_t address);
-void cpu_write_byte(z80cpu_t *cpu, uint16_t address, uint8_t value);
-uint16_t cpu_read_word(z80cpu_t *cpu, uint16_t address);
-void cpu_write_word(z80cpu_t *cpu, uint16_t address, uint16_t value);
-int cpu_execute(z80cpu_t *cpu, int cycles);
+z80iodevice_t * _Nonnull cpu_device( z80cpu_t * _Nonnull cpu, unsigned char i);
+uint8_t cpu_read_byte(z80cpu_t * _Nonnull cpu, uint16_t address);
+void cpu_write_byte(z80cpu_t * _Nonnull cpu, uint16_t address, uint8_t value);
+uint16_t cpu_read_word(z80cpu_t * _Nonnull cpu, uint16_t address);
+void cpu_write_word(z80cpu_t * _Nonnull cpu, uint16_t address, uint16_t value);
+int cpu_execute(z80cpu_t * _Nonnull cpu, int cycles);

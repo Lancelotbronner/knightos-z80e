@@ -32,6 +32,10 @@ void cpu_init(z80cpu_t* cpu, log_t *log) {
 		cpu->devices[i] = nullDevice;
 }
 
+z80iodevice_t *cpu_device(z80cpu_t *cpu, unsigned char i) {
+	return &cpu->devices[i];
+}
+
 uint16_t cpu_read_register_word(z80cpu_t *cpu, registers reg_to_read) {
 	uint16_t return_value = 0;
 	switch(reg_to_read) {

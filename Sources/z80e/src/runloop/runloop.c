@@ -18,7 +18,7 @@
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #endif
-#ifdef APPLE
+#ifdef __APPLE__
 #include <mach/mach_time.h>
 #define ORWL_NANO (+1.0E-9)
 #define ORWL_GIGA UINT64_C(1000000000)
@@ -31,7 +31,7 @@ long long get_time_nsec() {
 #ifdef EMSCRIPTEN
 	return emscripten_get_now() * 1000000;
 #else
-#ifdef APPLE
+#ifdef __APPLE__
 	if (!orwl_timestart) {
 		mach_timebase_info_data_t tb = { 0 };
 		mach_timebase_info(&tb);

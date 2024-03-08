@@ -37,7 +37,10 @@ let package = Package(
 		.testTarget(
 			name: "z80eTests",
 			dependencies: ["z80e"],
-			path: "Tests/z80e"),
+			path: "Tests/z80e",
+			resources: [
+				.copy("zex")
+			]),
 	],
 	cLanguageStandard: .c2x
 )

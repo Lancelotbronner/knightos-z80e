@@ -18,10 +18,6 @@ if (MINGW OR MSYS)
   Message(STATUS "Building in MinGW or MSYS environment, disabling link socket")
 endif()
 
-if(APPLE)
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAPPLE")
-endif()
-
 add_subdirectory(libz80e libz80e)
 add_subdirectory(frontends/libz80e frontends/libz80e)
 
