@@ -39,8 +39,8 @@ struct ti_mmu {
 	log_t *log;
 };
 
-ti_mmu_t *ti_mmu_init(ti_device_type, log_t *);
-void ti_mmu_free(ti_mmu_t *mmu);
+void ti_mmu_init(ti_mmu_t *, ti_device_type, log_t *);
+void ti_mmu_deinit(ti_mmu_t *mmu);
 uint8_t ti_read_byte(void *memory, uint16_t address);
 void ti_write_byte(void *memory, uint16_t address, uint8_t value);
 void mmu_force_write(void *memory, uint16_t address, uint8_t value);

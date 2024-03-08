@@ -221,7 +221,7 @@ int command_step_over(struct debugger_state *state, int argc, char **argv) {
 		state->print(state, "%s - set a breakpoint for the instruction after the current one\n", argv[0]);
 		return 0;
 	}
-	command_step_over_dism_extra_t extra = { state->asic->mmu, state };
+	command_step_over_dism_extra_t extra = { &state->asic->mmu, state };
 	struct disassemble_memory mem = { step_over_read_byte, state->asic->cpu.registers.PC, &extra };
 
 	if (state->debugger->flags.echo) {

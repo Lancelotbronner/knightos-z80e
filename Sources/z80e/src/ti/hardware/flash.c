@@ -19,7 +19,7 @@ uint8_t read_zero(void *device) {
 void write_control_port(void *device, uint8_t data) {
 	flash_state_t *state = device;
 	// TODO: check permissions
-	state->asic->mmu->flash_unlocked = data & 1;
+	state->asic->mmu.flash_unlocked = data & 1;
 }
 
 void write_exclusion_port(void *device, uint8_t data) {

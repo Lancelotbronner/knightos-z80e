@@ -64,7 +64,7 @@ struct asic {
 
 	z80cpu_t cpu;
 	runloop_state_t *runloop;
-	ti_mmu_t* mmu;
+	ti_mmu_t mmu;
 	ti_interrupts_t *interrupts;
 	z80_hardware_timers_t *timers;
 	z80_link_socket_t *link;

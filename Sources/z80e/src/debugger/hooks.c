@@ -93,7 +93,7 @@ struct hook_info {
 hook_info_t *create_hook_set(asic_t *asic) {
 	hook_info_t *info = malloc(sizeof(hook_info_t));
 	info->cpu = &asic->cpu;
-	info->mmu = asic->mmu;
+	info->mmu = &asic->mmu;
 
 	info->cpu->hook = info;
 	info->mmu->hook = info;

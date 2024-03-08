@@ -21,7 +21,7 @@ class z80eTestCase: XCTestCase {
 
 	func flash(_ data: [UInt8]) {
 		for i in data.indices {
-			device.mmu.pointee.flash[i] = data[i];
+			device.mmu.flash[i] = data[i];
 		}
 	}
 

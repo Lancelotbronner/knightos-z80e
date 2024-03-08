@@ -12,8 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
-ti_mmu_t* ti_mmu_init(ti_device_type device_type, log_t *log) {
-	ti_mmu_t *mmu = malloc(sizeof(ti_mmu_t));
+void ti_mmu_init(ti_mmu_t *mmu, ti_device_type device_type, log_t *log) {
 	switch (device_type) {
 	case TI83p:
 	case TI73:
@@ -50,10 +49,9 @@ ti_mmu_t* ti_mmu_init(ti_device_type device_type, log_t *log) {
 	return mmu;
 }
 
-void ti_mmu_free(ti_mmu_t *mmu) {
+void ti_mmu_deinit(ti_mmu_t *mmu) {
 	free(mmu->ram);
 	free(mmu->flash);
-	free(mmu);
 }
 
 void chip_reset(ti_mmu_t *mmu, uint32_t address, uint8_t value) {

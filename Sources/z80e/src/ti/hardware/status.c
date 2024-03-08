@@ -25,7 +25,7 @@ uint8_t read_status(void *_status) {
 
 	value |= status->asic->device != TI73 ? 0x02 : 0x00;
 
-	if (status->asic->mmu->flash_unlocked) {
+	if (status->asic->mmu.flash_unlocked) {
 		value |= 0x04;
 	}
 

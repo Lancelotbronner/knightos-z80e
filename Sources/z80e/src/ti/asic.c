@@ -97,8 +97,8 @@ asic_t *asic_init(ti_device_type type, log_t *log) {
 	asic_t* device = calloc(1, sizeof(asic_t));
 	device->log = log;
 	cpu_init(&device->cpu, log);
-	device->mmu = ti_mmu_init(type, log);
-	device->cpu.memory = (void*)device->mmu;
+	ti_mmu_init(&device->mmu, type, log);
+	device->cpu.memory = (void*)&device->mmu;
 	device->cpu.read_byte = ti_read_byte;
 	device->cpu.write_byte = ti_write_byte;
 	device->battery = BATTERIES_GOOD;
@@ -122,7 +122,7 @@ asic_t *asic_init(ti_device_type type, log_t *log) {
 }
 
 void asic_free(asic_t* device) {
-	ti_mmu_free(device->mmu);
+	ti_mmu_deinit(&device->mmu);
 	free_devices(device);
 	free(device);
 }

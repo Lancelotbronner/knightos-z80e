@@ -48,7 +48,9 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 	func test_ADD_HL() {
 		device.cpu.registers.A = 0x10;
 		device.cpu.registers.HL = 0x1000;
-		mmu_force_write(device.mmu, 0x1000, 0x20);
+		withUnsafeMutablePointer(to: &device.mmu) {
+			mmu_force_write(UnsafeMutableRawPointer($0), 0x1000, 0x20);
+		}
 		flash(ADD_A_HL);
 		let cycles = cpu_execute(&device.cpu, 7)
 		XCTAssertEqual(device.cpu.registers.A, 0x30)
