@@ -268,23 +268,23 @@ int main(int argc, char **argv) {
 			asic_free(device);
 			return 1;
 		}
-		int length;
+		long length;
 		fseek(file, 0L, SEEK_END);
 		length = ftell(file);
 		fseek(file, 0L, SEEK_SET);
-		if (!context.no_rom_check && length != device->mmu->settings.flash_pages * 0x4000) {
-			printf("Error: This file does not match the required ROM size of %d bytes, but it is %d bytes (use --no-rom-check to override).\n",
-					device->mmu->settings.flash_pages * 0x4000, length);
+		if (!context.no_rom_check && length != device->mmu.settings.flash_pages * 0x4000) {
+			printf("Error: This file does not match the required ROM size of %d bytes, but it is %ld bytes (use --no-rom-check to override).\n",
+				   device->mmu.settings.flash_pages * 0x4000, length);
 			fclose(file);
 			asic_free(device);
 			return 1;
 		}
-		length = fread(device->mmu->flash, 0x4000, device->mmu->settings.flash_pages, file);
+		length = fread(device->mmu.flash, 0x4000, device->mmu.settings.flash_pages, file);
 		fclose(file);
 	}
 
 	hook_add_lcd_update(device->hook, NULL, lcd_changed_hook);
-	asic_add_timer(device, 0, 60, lcd_timer_tick, device->cpu->devices[0x10].device);
+	asic_add_timer(device, 0, 60, lcd_timer_tick, device->cpu.devices[0x10].device);
 
 	if (device->debugger) {
 		tui_state_t state = { device->debugger };
@@ -305,7 +305,7 @@ int main(int argc, char **argv) {
 	}
 
 	if (context.print_state) {
-		print_state(&device->cpu->registers);
+		print_state(&device->cpu.registers);
 	}
 	asic_free(device);
 	return 0;

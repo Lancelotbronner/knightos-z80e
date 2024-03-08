@@ -74,20 +74,20 @@ int tui_disassemble_write(struct disassemble_memory *state, const char *format, 
 void tui_tick(tui_state_t *state) {
 	current_state = state;
 	asic_t *asic = state->debugger->asic;
-	struct tui_disasm disasm_custom = { asic->mmu, 0 };
+	struct tui_disasm disasm_custom = { &asic->mmu, 0 };
 	struct disassemble_memory disasm = { tui_disassemble_read, 0, &disasm_custom };
 	while (1) {
 		char prompt_buffer[80];
 		char *current_pointer = prompt_buffer;
-		ti_mmu_bank_state_t *st = &asic->mmu->banks[asic->cpu->registers.PC / 0x4000];
-		current_pointer += sprintf(prompt_buffer, "z80e [%c:%02X:0x%04X ", st->flash ? 'F' : 'R', st->page, asic->cpu->registers.PC);
+		ti_mmu_bank_state_t *st = &asic->mmu.banks[asic->cpu.registers.PC / 0x4000];
+		current_pointer += sprintf(prompt_buffer, "z80e [%c:%02X:0x%04X ", st->flash ? 'F' : 'R', st->page, asic->cpu.registers.PC);
 
 		disasm_custom.string_pointer = current_pointer;
-		disasm.current = asic->cpu->registers.PC;
+		disasm.current = asic->cpu.registers.PC;
 		parse_instruction(&disasm, tui_disassemble_write, state->debugger->flags.knightos);
 		current_pointer = disasm_custom.string_pointer;
 
-		sprintf(current_pointer, "] %s> ", asic->cpu->halted ? "HALT " : "");
+		sprintf(current_pointer, "] %s> ", asic->cpu.halted ? "HALT " : "");
 		char *result = readline(prompt_buffer);
 		if (result) {
 			int from_history = 0;
