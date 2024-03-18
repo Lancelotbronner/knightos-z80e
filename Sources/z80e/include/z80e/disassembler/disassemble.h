@@ -10,9 +10,9 @@ struct disassemble_memory {
 };
 
 
-typedef int (*write_pointer)(struct disassemble_memory *, const char *, ...);
+typedef int (*write_pointer_t)(struct disassemble_memory *, const char *, ...);
 
-uint16_t parse_instruction(struct disassemble_memory *, write_pointer, bool);
+uint16_t parse_instruction(struct disassemble_memory *, write_pointer_t, bool);
 
 void disassembler_init();
 

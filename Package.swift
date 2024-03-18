@@ -7,13 +7,13 @@ let package = Package(
 	name: "z80e",
 	products: [
 		.library(name: "z80e", targets: ["z80e"]),
-		.library(name: "z80ejs", targets: ["libz80e"]),
+		.library(name: "z80ejs", targets: ["z80ejs"]),
 	],
 	dependencies: [
 		.package(name: "scas", path: "../scas"),
 	],
 	targets: [
-		
+
 		.target(
 			name: "z80e",
 			dependencies: [
@@ -21,7 +21,7 @@ let package = Package(
 			]),
 
 		.target(
-			name: "libz80e",
+			name: "z80ejs",
 			dependencies: ["z80e"]),
 
 		.executableTarget(

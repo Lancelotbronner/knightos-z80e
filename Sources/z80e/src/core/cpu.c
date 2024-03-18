@@ -500,6 +500,41 @@ uint8_t read_cc(int i, struct ExecutionContext *context) {
 	return 0; // This should never happen
 }
 
+//MARK: - Flag Manipulation
+
+// S Z 5 H 3 PV N C
+#define __flag_s(a)  ((a) ? FLAG_S  : 0)
+#define __flag_5(a)  ((a) ? FLAG_5  : 0)
+#define __flag_h(a)  ((a) ? FLAG_H  : 0)
+#define __flag_3(a)  ((a) ? FLAG_3  : 0)
+#define __flag_pv(a) ((a) ? FLAG_PV : 0)
+#define __flag_c(a)  ((a) ? FLAG_C  : 0)
+
+#define _flag_carry_16(a) __flag_c((a) & 0x10000)
+#define _flag_carry_8(a)  __flag_c((a) & 0x100)
+
+#define _flag_sign_16(a)  __flag_s((a) & 0x8000)
+#define _flag_sign_8(a)   __flag_s((a) & 0x80)
+
+#define _flag_parity(a) __flag_pv(!parity(a))
+
+#define _flag_undef_8(a) ({ uint8_t _res = (a); __flag_5(_res & 0x20) | __flag_3(_res & 0x8);})
+#define _flag_undef_8_block(a) ({ uint8_t _res = (a); __flag_5(_res & 0x2) | __flag_3(_res & 0x8);})
+#define _flag_undef_16(a) ({ uint16_t _res = (a); __flag_5(_res & 0x2000) | __flag_3(_res & 0x800);})
+
+#define _flag_overflow_8_add(op1, op2, result) __flag_pv((op1 & 0x80) == (op2 & 0x80) && (op1 & 0x80) != (result & 0x80))
+#define _flag_overflow_8_sub(op1, op2, result) __flag_pv((op1 & 0x80) != (op2 & 0x80) && (op1 & 0x80) != (result & 0x80))
+#define _flag_overflow_16_add(op1, op2, result) __flag_pv((op1 & 0x8000) == (op2 & 0x8000) && (op1 & 0x8000) != (result & 0x8000))
+#define _flag_overflow_16_sub(op1, op2, result) __flag_pv((op1 & 0x8000) != (op2 & 0x8000) && (op1 & 0x8000) != (result & 0x8000))
+
+#define _flag_halfcarry_8_add(op1, op2, carry) __flag_h(((op1 & 0xf) + (op2 & 0xf) + carry) & 0x10)
+#define _flag_halfcarry_8_sub(op1, op2, carry) __flag_h(((op1 & 0xf) - (op2 & 0xf) - carry) & 0x10)
+#define _flag_halfcarry_16_add(op1, op2, carry) __flag_h(((op1 & 0xfff) + (op2 & 0xfff) + carry) & 0x1000)
+#define _flag_halfcarry_16_sub(op1, op2, carry) __flag_h(((op1 & 0xfff) - (op2 & 0xfff) - carry) & 0x1000)
+
+#define _flag_subtract(a)   ((a) ? FLAG_N : 0)
+#define _flag_zero(a)       ((a) ? 0 : FLAG_Z)
+
 void daa(struct ExecutionContext *context) {
 	z80registers_t *r = &context->cpu->registers;
 	uint8_t old = r->A;
@@ -894,12 +929,10 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 		if (cpu->IFF2 && !cpu->prefix) {
 			if (cpu->IFF_wait) {
 				cpu->IFF_wait = 0;
-			} else {
-				if (cpu->interrupt) {
-					cpu->halted = 0;
-					handle_interrupt(&context);
-					goto exit_loop;
-				}
+			} else if (cpu->interrupt) {
+				cpu->halted = 0;
+				handle_interrupt(&context);
+				goto exit_loop;
 			}
 		}
 		if (cpu->halted) {
@@ -926,9 +959,8 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 
 		if ((cpu->prefix & 0xFF) == 0xCB) {
 			int switch_opcode_data = cpu->prefix >> 8;
-			if (switch_opcode_data) {
+			if (switch_opcode_data)
 				context.opcode = cpu_read_byte(cpu, cpu->registers.PC--);
-			}
 
 			switch (context.x) {
 			case 0: // rot[y] r[z]

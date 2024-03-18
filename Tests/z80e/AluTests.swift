@@ -3,7 +3,7 @@ import z80e
 
 final class ArithmeticLogicUnitTests: z80eTestCase {
 
-	//MARK: - Add
+	//MARK: - ADD
 
 	/// `ADD A B`
 	let ADD_A_B: [UInt8] = [0x80]
@@ -23,7 +23,7 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	func test_ADD_carry() {
+	func test_ADD_C() {
 		device.cpu.registers.A = 0xF0;
 		device.cpu.registers.B = 0x20;
 		flash(ADD_A_B);
@@ -34,7 +34,7 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	func test_ADD_zeroAndCarry() {
+	func test_ADD_ZC() {
 		device.cpu.registers.A = 0xF0;
 		device.cpu.registers.B = 0x10;
 		flash(ADD_A_B)
@@ -60,7 +60,7 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 	/// `ADD A, 0x20`
 	let ADD_A_IMM: [UInt8] = [0xC6, 0x20]
 
-	func test_ADD_immediate() {
+	func test_ADD_IMM() {
 		device.cpu.registers.A = 0x10;
 		flash(ADD_A_IMM)
 		let cycles = cpu_execute(&device.cpu, 4)
@@ -68,12 +68,12 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	//MARK: - Add with Carry
+	//MARK: - ADC
 
 	/// `ADC A, B`
 	let ADC_A_B: [UInt8] = [0x88]
 
-	func test_ADC_withoutCarry() {
+	func test_ADC() {
 		device.cpu.registers.A = 0x10;
 		device.cpu.registers.B = 0x20;
 		flash(ADC_A_B)
@@ -85,7 +85,7 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	func test_ADC_withCarry() {
+	func test_ADC_C() {
 		device.cpu.registers.A = 0x10;
 		device.cpu.registers.B = 0x20;
 		device.cpu.registers.flags.C = 1;
@@ -98,7 +98,7 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	//MARK: - Subtract
+	//MARK: - SUB
 
 	/// `SUB A, B`
 	let SUB_A_B: [UInt8] = [0x90]
@@ -115,7 +115,7 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	func test_SUB_borrow() {
+	func test_SUB_C() {
 		device.cpu.registers.A = 0x10;
 		device.cpu.registers.B = 0x20;
 		flash(SUB_A_B)
@@ -127,12 +127,12 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	//MARK: - Subtract with Carry
+	//MARK: - SBC
 
 	/// `SBC A, B`
 	let SBC_A_B: [UInt8] = [0x98]
 
-	func test_SBC_withoutCarry() {
+	func test_SBC() {
 		device.cpu.registers.A = 0x20;
 		device.cpu.registers.B = 0x10;
 		flash(SBC_A_B)
@@ -144,7 +144,7 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	func test_SBC_withCarry() {
+	func test_SBC_C() {
 		device.cpu.registers.A = 0x10;
 		device.cpu.registers.B = 0x20;
 		device.cpu.registers.flags.C = 1;
@@ -157,7 +157,7 @@ final class ArithmeticLogicUnitTests: z80eTestCase {
 		XCTAssertEqual(cycles, 0)
 	}
 
-	//MARK: - And
+	//MARK: - AND
 
 	/// `AND A, B`
 	let AND_A_B: [UInt8] = [0xA0]

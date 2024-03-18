@@ -5,8 +5,7 @@
 #include <poll.h>
 #endif
 
-typedef struct asic asic_t;
-
+#include <z80e/ti/types.h>
 #include <z80e/core/cpu.h>
 #include <z80e/log/log.h>
 #include <z80e/ti/memory.h>

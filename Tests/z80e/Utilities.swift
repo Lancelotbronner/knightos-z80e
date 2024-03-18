@@ -25,6 +25,26 @@ class z80eTestCase: XCTestCase {
 		}
 	}
 
+	func read_byte(_ address: UInt16) -> UInt8 {
+		cpu_read_byte(&device.cpu, address)
+	}
+
+	func write_byte(_ address: UInt16, _ value: UInt8) {
+		cpu_write_byte(&device.cpu, address, value)
+	}
+
+	func read_word(_ address: UInt16) -> UInt16 {
+		cpu_read_word(&device.cpu, address)
+	}
+
+	func write_word(_ address: UInt16, _ value: UInt16) {
+		cpu_write_word(&device.cpu, address, value)
+	}
+
+	//MARK: - Test Device
+
+	var value: UInt8 = 0
+
 	//MARK: - Hooks
 
 	override func setUp() {
@@ -33,6 +53,14 @@ class z80eTestCase: XCTestCase {
 			return
 		}
 		_device = device
+
+		// Configure the default test device
+		cpu_device(&self.device.cpu, 0x12)[0] = z80iodevice(
+			device: Unmanaged<z80eTestCase>
+				.passUnretained(self)
+				.toOpaque(),
+			read_in: test_read,
+			write_out: test_write)
 	}
 
 	override func tearDown() {
@@ -41,9 +69,16 @@ class z80eTestCase: XCTestCase {
 
 }
 
-/* Replace RegularExpression for assertions
+private func test_read(_ device: UnsafeMutableRawPointer!) -> UInt8 {
+	let test = Unmanaged<z80eTestCase>
+		.fromOpaque(device)
+		.takeUnretainedValue()
+	return test.value
+}
 
-	.+?\b([a-zA-Z.]+?) != (.+?)\b.+
-
-	XCTAssertEqual($1, $2)
- */
+private func test_write(_ device: UnsafeMutableRawPointer!, _ value: UInt8) {
+	let test = Unmanaged<z80eTestCase>
+		.fromOpaque(device)
+		.takeUnretainedValue()
+	test.value = value
+}

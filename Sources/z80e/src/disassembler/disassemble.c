@@ -185,7 +185,7 @@ struct context {
 			uint8_t p : 2;
 		};
 	};
-	write_pointer write;
+	write_pointer_t write;
 };
 
 void parse_n(struct context *context) {
@@ -444,7 +444,7 @@ void parse_bli(int y, int z, struct context *context) {
 	}
 }
 
-uint16_t parse_instruction(struct disassemble_memory *memory, write_pointer write_p, bool knightos) {
+uint16_t parse_instruction(struct disassemble_memory *memory, write_pointer_t write_p, bool knightos) {
 	source_map_t *map;
 	source_map_entry_t *entry;
 	if (try_from_sourcemap(memory, &map, &entry)) {
@@ -477,7 +477,7 @@ uint16_t parse_instruction(struct disassemble_memory *memory, write_pointer writ
 	context.opcode = data;
 	memory->current++;
 	context.memory = memory;
-	write_pointer write = context.write = write_p;
+	write_pointer_t write = context.write = write_p;
 
 	if (context.prefix & 0xFF) {
 		switch (context.prefix & 0xFF) {
