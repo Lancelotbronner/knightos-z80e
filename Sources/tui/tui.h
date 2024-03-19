@@ -1,5 +1,4 @@
-#ifndef DEBUGGER_TUI_H
-#define DEBUGGER_TUI_H
+#pragma once
 
 #include <z80e/ti/asic.h>
 #include <z80e/debugger/debugger.h>
@@ -10,5 +9,3 @@ typedef struct {
 
 void tui_init(tui_state_t *state);
 void tui_tick(tui_state_t *state);
-
-#endif

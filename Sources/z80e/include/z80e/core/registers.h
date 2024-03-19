@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include <z80e/ti/types.h>
+#include <z80e/types.h>
 
 struct z80registers {
 	union {

@@ -8,8 +8,8 @@
 
 uint8_t read_mirror(void *device) {
 	flash_state_t *state = device;
-	z80iodevice_t port4 = state->asic->cpu.devices[0x04];
-	return port4.read_in(port4.device);
+	struct z80_device port4 = state->asic->cpu.devices[0x04];
+	return port4.read(port4.data);
 }
 
 uint8_t read_zero(void *device) {
@@ -45,14 +45,14 @@ void init_flash_ports(asic_t *asic) {
 	state->chip_size = 0x33;
 
 	uint8_t (*read_port)(void *) = asic->device == TI83p ? read_mirror : read_zero;
-	z80iodevice_t chip_control_port = { state, read_port, write_control_port };
-	z80iodevice_t chip_exclusion_port = { state, read_port, write_exclusion_port };
-	z80iodevice_t chip_size_port = { state, read_size_port, write_size_port };
+	struct z80_device chip_control_port = { state, read_port, write_control_port };
+	struct z80_device chip_exclusion_port = { state, read_port, write_exclusion_port };
+	struct z80_device chip_size_port = { state, read_size_port, write_size_port };
 
 	asic->cpu.devices[0x14] = chip_control_port;
 	asic->cpu.devices[0x21] = chip_size_port;
 }
 
 void free_flash_ports(asic_t *asic) {
-	free(asic->cpu.devices[0x22].device);
+	free(asic->cpu.devices[0x22].data);
 }

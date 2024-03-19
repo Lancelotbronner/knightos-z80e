@@ -1,5 +1,5 @@
 #pragma once
 
-#include <z80e/ti/types.h>
+#include <z80e/types.h>
 
-z80iodevice_t init_speed(asic_t *asic);
+struct z80_device init_speed(asic_t *asic);

@@ -27,12 +27,12 @@ struct ExecutionContext {
 
 void cpu_init(z80cpu_t* cpu, log_t *log) {
 	cpu->log = log;
-	z80iodevice_t nullDevice = { NULL, NULL, NULL };
+	struct z80_device nullDevice = { NULL, NULL, NULL };
 	for (int i = 0; i < 0x100; i++)
 		cpu->devices[i] = nullDevice;
 }
 
-z80iodevice_t *cpu_device(z80cpu_t *cpu, unsigned char i) {
+struct z80_device *cpu_device(z80cpu_t *cpu, unsigned char i) {
 	return &cpu->devices[i];
 }
 
@@ -235,20 +235,20 @@ void cpu_write_word(z80cpu_t *cpu, uint16_t address, uint16_t value) {
 }
 
 uint8_t cpu_port_in(z80cpu_t *cpu, uint8_t port) {
-	z80iodevice_t device = cpu->devices[port];
+	struct z80_device device = cpu->devices[port];
 	uint8_t val = 0;
-	if (device.read_in != NULL) {
-		val = device.read_in(device.device);
+	if (device.read) {
+		val = device_read(device);
 		val = hook_on_port_in(cpu->hook, port, val);
 	}
 	return val;
 }
 
 void cpu_port_out(z80cpu_t *cpu, uint8_t port, uint8_t val) {
-	z80iodevice_t device = cpu->devices[port];
-	if (device.write_out != NULL) {
+	struct z80_device device = cpu->devices[port];
+	if (device.write) {
 		val = hook_on_port_out(cpu->hook, port, val);
-		device.write_out(device.device, val);
+		device_write(device, val);
 	}
 }
 

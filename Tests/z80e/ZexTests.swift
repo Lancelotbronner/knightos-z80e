@@ -41,14 +41,14 @@ final class ZexTests: z80eTestCase {
 
 		for i in 0..<0x100 {
 			let _iodevice = cpu_device(&device.cpu, UInt8(i))
-			var iodevice: z80iodevice {
+			var iodevice: z80_device {
 				_read { yield _iodevice.pointee }
 				_modify { yield &_iodevice.pointee }
 			}
 
-			iodevice.write_out = cpu_reset;
-			iodevice.read_in = write_text;
-			iodevice.device = UnsafeMutableRawPointer(_device);
+			iodevice.write = cpu_reset;
+			iodevice.read = write_text;
+			iodevice.data = UnsafeMutableRawPointer(_device);
 		}
 
 		guard let file = fopen(url.path(percentEncoded: false), "rb") else {

@@ -163,10 +163,10 @@ void init_mapping_ports(asic_t *asic) {
 	state->bank_a_flash = 1;
 	state->bank_b_flash = 1; // horrible, isn't it?
 
-	z80iodevice_t device_status_port = { state, read_device_status_port, write_device_status_port };
-	z80iodevice_t ram_paging_port = { state, read_ram_paging_port, write_ram_paging_port };
-	z80iodevice_t bank_a_paging_port = { state, read_bank_a_paging_port, write_bank_a_paging_port };
-	z80iodevice_t bank_b_paging_port = { state, read_bank_b_paging_port, write_bank_b_paging_port };
+	struct z80_device device_status_port = { state, read_device_status_port, write_device_status_port };
+	struct z80_device ram_paging_port = { state, read_ram_paging_port, write_ram_paging_port };
+	struct z80_device bank_a_paging_port = { state, read_bank_a_paging_port, write_bank_a_paging_port };
+	struct z80_device bank_b_paging_port = { state, read_bank_b_paging_port, write_bank_b_paging_port };
 
 	asic->cpu.devices[0x04] = device_status_port;
 
@@ -181,5 +181,5 @@ void init_mapping_ports(asic_t *asic) {
 }
 
 void free_mapping_ports(asic_t *asic) {
-	free(asic->cpu.devices[0x06].device);
+	free(asic->cpu.devices[0x06].data);
 }

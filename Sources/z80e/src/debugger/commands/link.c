@@ -136,7 +136,7 @@ int handle_socket(struct debugger_state *state, int argc, char **argv) {
 }
 
 int handle_status(struct debugger_state *state) {
-	link_state_t *lstate = state->asic->cpu.devices[0x00].device;
+	link_state_t *lstate = state->asic->cpu.devices[0x00].data;
 	state->print(state, "Ready: %d\n", !lstate->assist.status.rx_ready);
 	state->print(state, "Tip: %d\n", lstate->us.tip);
 	state->print(state, "Ring: %d\n", lstate->us.ring);

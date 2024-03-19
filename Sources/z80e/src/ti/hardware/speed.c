@@ -27,7 +27,7 @@ void write_speed(void *_asic, uint8_t value) {
 	// TODO: set overclock
 }
 
-z80iodevice_t init_speed(asic_t *asic) {
-	z80iodevice_t device = { asic, read_speed, write_speed };
+struct z80_device init_speed(asic_t *asic) {
+	struct z80_device device = { asic, read_speed, write_speed };
 	return device;
 }

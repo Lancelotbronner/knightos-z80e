@@ -6,57 +6,55 @@
 #include <z80e/core/cpu.h>
 #include <z80e/ti/hardware/interrupts.h>
 
-typedef struct {
-	asic_t *asic;
-} status_t;
+void status_init(status_t status, asic_t *asic) {
+	status->asic = asic;
+}
 
-uint8_t read_status(void *_status) {
-	status_t *status = (status_t*)_status;
+//MARK: - Memory Management
+
+status_t status_new(asic_t *asic) {
+	status_t status = malloc(sizeof(status_t));
+	status_init(status, asic);
+	return status;
+}
+
+void status_delete(status_t status) {
+	free(status);
+}
+
+//MARK: - Device Management
+
+uint8_t status_read(status_t status) {
 	uint8_t value = 0x00;
 	if (status->asic->battery_remove_check) {
-		if (status->asic->battery != BATTERIES_REMOVED) {
+		if (status->asic->battery != BATTERIES_REMOVED)
 			value |= 0x01;
-		}
-	} else {
-		if (status->asic->battery == BATTERIES_GOOD) {
-			value |= 0x01;
-		}
-	}
+	} else if (status->asic->battery == BATTERIES_GOOD)
+		value |= 0x01;
 
 	value |= status->asic->device != TI73 ? 0x02 : 0x00;
 
-	if (status->asic->mmu.flash_unlocked) {
+	if (status->asic->mmu.flash_unlocked)
 		value |= 0x04;
-	}
 
-	if (status->asic->device != TI73 && status->asic->device != TI83p) {
+	if (status->asic->device != TI73 && status->asic->device != TI83p)
 		value |= 0x80;
-	}
-	if (status->asic->device != TI73 && status->asic->device != TI83p) {
+
+	if (status->asic->device != TI73 && status->asic->device != TI83p)
 		value |= 0x40; // link assist available
-	}
-	if (status->asic->device == TI84p || status->asic->device == TI84pSE || status->asic->device == TI84pCSE) {
+
+	if (status->asic->device == TI84p || status->asic->device == TI84pSE || status->asic->device == TI84pCSE)
 		value |= 0x20;
-	}
+
 	return value;
 }
 
-void write_status(void *_status, uint8_t value) {
-	status_t *status = (status_t*)_status;
-	if (status->asic->device == TI83p || status->asic->device == TI73) {
+void status_write(status_t status, uint8_t value) {
+	if (status->asic->device == TI83p || status->asic->device == TI73)
 		return;
-	}
-
 	write_acknowledged_interrupts(status->asic->interrupts, value);
 }
 
-z80iodevice_t init_status(asic_t *asic) {
-	status_t *state = malloc(sizeof(status_t));
-	state->asic = asic;
-	z80iodevice_t device = { state, read_status, write_status };
-	return device;
-}
-
-void free_status(z80iodevice_t status) {
-	free(status.device);
+struct z80_device status_device(status_t status) {
+	return (struct z80_device){ status, (read_t)status_read, (write_t)status_write };
 }

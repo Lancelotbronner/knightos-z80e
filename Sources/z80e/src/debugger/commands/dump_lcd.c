@@ -11,7 +11,7 @@ void dump_lcd_unicode_to_utf8(char *b, uint32_t c) {
 }
 
 int command_dump_lcd(debugger_state_t *state, int argc, char **argv) {
-	ti_bw_lcd_t *lcd = state->asic->cpu.devices[0x10].device;
+	ti_bw_lcd_t *lcd = state->asic->cpu.devices[0x10].data;
 	int cY;
 	int cX;
 

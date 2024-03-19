@@ -48,17 +48,17 @@ void init_crystal_timers(asic_t *asic) {
 	timer_2->asic = asic;
 	timer_3->asic = asic;
 
-	z80iodevice_t timer1_freq_port = { timer_1, read_timer_freq_port, write_timer_freq_port };
-	z80iodevice_t timer1_loop_port = { timer_1, read_timer_loop_port, write_timer_loop_port };
-	z80iodevice_t timer1_count_port = { timer_1, read_timer_counter_port, write_timer_counter_port };
+	struct z80_device timer1_freq_port = { timer_1, read_timer_freq_port, write_timer_freq_port };
+	struct z80_device timer1_loop_port = { timer_1, read_timer_loop_port, write_timer_loop_port };
+	struct z80_device timer1_count_port = { timer_1, read_timer_counter_port, write_timer_counter_port };
 
-	z80iodevice_t timer2_freq_port = { timer_2, read_timer_freq_port, write_timer_freq_port };
-	z80iodevice_t timer2_loop_port = { timer_2, read_timer_loop_port, write_timer_loop_port };
-	z80iodevice_t timer2_count_port = { timer_2, read_timer_counter_port, write_timer_counter_port };
+	struct z80_device timer2_freq_port = { timer_2, read_timer_freq_port, write_timer_freq_port };
+	struct z80_device timer2_loop_port = { timer_2, read_timer_loop_port, write_timer_loop_port };
+	struct z80_device timer2_count_port = { timer_2, read_timer_counter_port, write_timer_counter_port };
 
-	z80iodevice_t timer3_freq_port = { timer_3, read_timer_freq_port, write_timer_freq_port };
-	z80iodevice_t timer3_loop_port = { timer_3, read_timer_loop_port, write_timer_loop_port };
-	z80iodevice_t timer3_count_port = { timer_3, read_timer_counter_port, write_timer_counter_port };
+	struct z80_device timer3_freq_port = { timer_3, read_timer_freq_port, write_timer_freq_port };
+	struct z80_device timer3_loop_port = { timer_3, read_timer_loop_port, write_timer_loop_port };
+	struct z80_device timer3_count_port = { timer_3, read_timer_counter_port, write_timer_counter_port };
 
 	asic->cpu.devices[0x30] = timer1_freq_port;
 	asic->cpu.devices[0x31] = timer1_loop_port;
@@ -74,7 +74,7 @@ void init_crystal_timers(asic_t *asic) {
 }
 
 void free_crystal_timers(asic_t *asic) {
-	free(asic->cpu.devices[0x30].device);
-	free(asic->cpu.devices[0x33].device);
-	free(asic->cpu.devices[0x38].device);
+	free(asic->cpu.devices[0x30].data);
+	free(asic->cpu.devices[0x33].data);
+	free(asic->cpu.devices[0x38].data);
 }

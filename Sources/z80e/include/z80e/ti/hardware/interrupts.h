@@ -1,6 +1,6 @@
 #pragma once
 
-#include <z80e/ti/types.h>
+#include <z80e/types.h>
 
 struct ti_interrupts {
 	asic_t *asic;
@@ -45,7 +45,7 @@ enum {
 	INTERRUPT_THIRD_CRYSTAL = (1 << 7),
 };
 
-z80iodevice_t init_interrupts(asic_t *, ti_interrupts_t **result);
+struct z80_device init_interrupts(asic_t *, ti_interrupts_t **result);
 
 void ti_interrupts_interrupt(ti_interrupts_t *, int);
 void ti_interrupts_set_interrupt_enabled(ti_interrupts_t *, int, int);

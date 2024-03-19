@@ -23,10 +23,10 @@ int command_tap_key(debugger_state_t *state, int argc, char **argv) {
 		key = parse_expression_z80e(state, argv[1]);
 	}
 
-	depress_key(state->asic->cpu.devices[0x01].device, key);
+	keyboard_press(state->asic->cpu.devices[0x01].data, key);
 	char *_argv[] = { "run", "1000" };
 	command_run(state, 2, _argv);
-	release_key(state->asic->cpu.devices[0x01].device, key);
+	keyboard_release(state->asic->cpu.devices[0x01].data, key);
 	char *__argv[] = { "run" };
 	return command_run(state, 1, __argv);
 }

@@ -267,9 +267,9 @@ void sigint_handler(int sig) {
 
 void key_tap(asic_t *asic, int scancode, int down) {
 	if (down) {
-		depress_key(asic->cpu->devices[0x01].device, scancode);
+		keyboard_press(asic->cpu->devices[0x01].device, scancode);
 	} else {
-		release_key(asic->cpu->devices[0x01].device, scancode);
+		keyboard_release(asic->cpu->devices[0x01].device, scancode);
 	}
 }
 

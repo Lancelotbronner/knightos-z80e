@@ -20,7 +20,7 @@ int command_timer(struct debugger_state *state, int argc, char **argv) {
 		uint8_t port = parse_expression_z80e(state, argv[2]);
 		uint8_t val = parse_expression_z80e(state, argv[3]);
 
-		uint8_t *timer = state->asic->cpu.devices[port].device;
+		uint8_t *timer = state->asic->cpu.devices[port].data;
 		timer[(port - 0x30) % 3] = val;
 	}
 

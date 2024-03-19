@@ -23,6 +23,6 @@ int command_press_key(debugger_state_t *state, int argc, char **argv) {
 		key = parse_expression_z80e(state, argv[1]);
 	}
 
-	depress_key(state->asic->cpu.devices[0x01].device, key);
+	keyboard_press(state->asic->cpu.devices[0x01].data, key);
 	return 0;
 }

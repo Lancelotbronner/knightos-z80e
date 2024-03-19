@@ -55,12 +55,12 @@ class z80eTestCase: XCTestCase {
 		_device = device
 
 		// Configure the default test device
-		cpu_device(&self.device.cpu, 0x12)[0] = z80iodevice(
-			device: Unmanaged<z80eTestCase>
+		cpu_device(&self.device.cpu, 0x12)[0] = z80_device(
+			data: Unmanaged<z80eTestCase>
 				.passUnretained(self)
 				.toOpaque(),
-			read_in: test_read,
-			write_out: test_write)
+			read: test_read,
+			write: test_write)
 	}
 
 	override func tearDown() {

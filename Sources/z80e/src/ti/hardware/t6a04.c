@@ -33,13 +33,13 @@ void setup_lcd_display(asic_t *asic, hook_info_t *hook) {
 
 	lcd->hook = hook;
 	lcd->asic = asic;
-	asic->cpu.devices[0x10].device = lcd;
-	asic->cpu.devices[0x10].read_in = bw_lcd_status_read;
-	asic->cpu.devices[0x10].write_out = bw_lcd_status_write;
+	asic->cpu.devices[0x10].data = lcd;
+	asic->cpu.devices[0x10].read = bw_lcd_status_read;
+	asic->cpu.devices[0x10].write = bw_lcd_status_write;
 
-	asic->cpu.devices[0x11].device = lcd;
-	asic->cpu.devices[0x11].read_in = bw_lcd_data_read;
-	asic->cpu.devices[0x11].write_out = bw_lcd_data_write;
+	asic->cpu.devices[0x11].data = lcd;
+	asic->cpu.devices[0x11].read = bw_lcd_data_read;
+	asic->cpu.devices[0x11].write = bw_lcd_data_write;
 }
 
 uint8_t bw_lcd_read_screen(ti_bw_lcd_t *lcd, int Y, int X) {

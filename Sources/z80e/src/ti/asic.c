@@ -40,12 +40,12 @@ void plug_devices(asic_t *asic) {
 		unimplemented_device_t *d = malloc(sizeof(unimplemented_device_t));
 		d->asic = asic;
 		d->port = i;
-		z80iodevice_t device = { d, read_unimplemented_port, write_unimplemented_port };
+		struct z80_device device = { d, read_unimplemented_port, write_unimplemented_port };
 		asic->cpu.devices[i] = device;
 	}
 
-	asic->cpu.devices[0x01] = init_keyboard();
-	asic->cpu.devices[0x02] = init_status(asic);
+	asic->cpu.devices[0x01] = keyboard_device(keyboard_new());
+	asic->cpu.devices[0x02] = status_device(status_new(asic));
 	asic->cpu.devices[0x03] = init_interrupts(asic, &asic->interrupts);
 	setup_lcd_display(asic, asic->hook);
 
@@ -67,15 +67,15 @@ void asic_mirror_ports(asic_t *asic) {
 	case TI83p:
 		for (i = 0x08; i < 0x10; i++) {
 			asic->cpu.devices[i] = asic->cpu.devices[i & 0x07];
-			asic->cpu.devices[i].write_out = asic_null_write;
+			asic->cpu.devices[i].write = asic_null_write;
 		}
 		asic->cpu.devices[0x12] = asic->cpu.devices[0x10];
 		asic->cpu.devices[0x13] = asic->cpu.devices[0x11];
 		asic->cpu.devices[0x15] = asic->cpu.devices[0x05];
-		asic->cpu.devices[0x15].write_out = asic_null_write;
+		asic->cpu.devices[0x15].write = asic_null_write;
 		for (i = 0x17; i < 0x100; i++) {
 			asic->cpu.devices[i] = asic->cpu.devices[i & 0x07];
-			asic->cpu.devices[i].write_out = asic_null_write;
+			asic->cpu.devices[i].write = asic_null_write;
 		}
 		break;
 	default:
@@ -88,8 +88,8 @@ void asic_mirror_ports(asic_t *asic) {
 
 void free_devices(asic_t *asic) {
 	/* Link port unimplemented */
-	free_keyboard(asic->cpu.devices[0x01].device);
-	free_status(asic->cpu.devices[0x02]);
+	keyboard_delete(asic->cpu.devices[0x01].data);
+	status_delete(asic->cpu.devices[0x02].data);
 	free_mapping_ports(asic);
 }
 

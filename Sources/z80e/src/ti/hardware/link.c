@@ -131,11 +131,11 @@ void init_link_ports(asic_t *asic) {
 	state->asic = asic;
 	state->assist.status.tx_ready = state->assist.status.int_tx_ready = true;
 
-	z80iodevice_t link_port = { state, read_link_port, write_link_port };
-	z80iodevice_t link_assist_enable = { state, read_link_assist_enable_port, write_link_assist_enable_port };
-	z80iodevice_t link_assist_status = { state, read_link_assist_status_port, write_link_assist_status_port };
-	z80iodevice_t link_assist_rx_read = { state, read_link_assist_rx_port, write_link_assist_rx_port };
-	z80iodevice_t link_assist_tx_read = { state, read_link_assist_tx_port, write_link_assist_tx_port };
+	struct z80_device link_port = { state, read_link_port, write_link_port };
+	struct z80_device link_assist_enable = { state, read_link_assist_enable_port, write_link_assist_enable_port };
+	struct z80_device link_assist_status = { state, read_link_assist_status_port, write_link_assist_status_port };
+	struct z80_device link_assist_rx_read = { state, read_link_assist_rx_port, write_link_assist_rx_port };
+	struct z80_device link_assist_tx_read = { state, read_link_assist_tx_port, write_link_assist_tx_port };
 
 	asic->cpu.devices[0x00] = link_port;
 	asic->cpu.devices[0x08] = link_assist_enable;
@@ -145,17 +145,17 @@ void init_link_ports(asic_t *asic) {
 }
 
 void free_link_ports(asic_t *asic) {
-	free(asic->cpu.devices[0x00].device);
+	free(asic->cpu.devices[0x00].data);
 }
 
 bool link_recv_ready(asic_t *asic) {
-	link_state_t *state = asic->cpu.devices[0x00].device;
+	link_state_t *state = asic->cpu.devices[0x00].data;
 	return !state->assist.status.rx_ready;
 }
 
 bool link_recv_byte(asic_t *asic, uint8_t val) {
 	printf("Receiving %02X via link port\n", val);
-	link_state_t *state = asic->cpu.devices[0x00].device;
+	link_state_t *state = asic->cpu.devices[0x00].data;
 	if (!link_recv_ready(asic)) {
 		return false;
 	}
@@ -170,7 +170,7 @@ bool link_recv_byte(asic_t *asic, uint8_t val) {
 }
 
 int link_read_tx_buffer(asic_t *asic) {
-	link_state_t *state = asic->cpu.devices[0x00].device;
+	link_state_t *state = asic->cpu.devices[0x00].data;
 	if (state->assist.status.tx_active) {
 		state->assist.status.tx_active = false;
 		state->assist.status.tx_ready = state->assist.status.int_tx_ready = true;
