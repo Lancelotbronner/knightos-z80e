@@ -1,33 +1,37 @@
 #include <z80e/devices/keyboard.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <z80e/ti/asic.h>
-#include <z80e/cpu/z80.h>
+
+#include <z80e/device.h>
 
 //MARK: - Keyboard Management
 
 /* Key codes in z80e are group << 4 | bit. That is, 0x14 is bit 4 of group 1. */
 
-void keyboard_press(keyboard_device_t keyboard, uint8_t keycode) {
-	uint8_t group = keycode >> 4;
-	uint8_t mask = 1 << (keycode & 0xF);
+void keyboard_init(keyboard_device_t keyboard) {
+	*keyboard = (struct keyboard_device){
+		.mask = 0,
+		.keys = ~0,
+	};
+}
+
+void keyboard_press(keyboard_device_t keyboard, unsigned char keycode) {
+	unsigned char group = keycode >> 4;
+	unsigned char mask = 1 << (keycode & 0xF);
 	keyboard->groups[group] &= ~mask;
 }
 
-void keyboard_release(keyboard_device_t keyboard, uint8_t keycode) {
-	uint8_t group = keycode >> 4;
-	uint8_t mask = 1 << (keycode & 0xF);
+void keyboard_release(keyboard_device_t keyboard, unsigned char keycode) {
+	unsigned char group = keycode >> 4;
+	unsigned char mask = 1 << (keycode & 0xF);
 	keyboard->groups[group] |= mask;
 }
 
-//MARK: - Device Management
+//MARK: - Keyboard Device
 
-static uint8_t __keyboard_read(const device_t device) {
-	keyboard_device_t keyboard = (keyboard_device_t)device;
-	uint8_t mask = keyboard->group_mask;
+static unsigned char __keyboard_read(const device_t device) {
+	keyboard_device_t keyboard = device->data;
+	unsigned char mask = keyboard->mask;
 
-	uint8_t value = 0;
+	unsigned char value = 0;
 	for (int i = 7; i >= 0; i--) {
 		if (mask & 0x80)
 			value |= ~keyboard->groups[i];
@@ -36,21 +40,17 @@ static uint8_t __keyboard_read(const device_t device) {
 	return ~value;
 }
 
-static void __keyboard_write(const device_t device, uint8_t value) {
-	keyboard_device_t keyboard = (keyboard_device_t)device;
+static void __keyboard_write(const device_t device, unsigned char value) {
+	keyboard_device_t keyboard = device->data;
 	if (value == 0xFF) {
-		keyboard->group_mask = 0;
+		keyboard->mask = 0;
 		return;
 	}
-	keyboard->group_mask |= ~value;
+	keyboard->mask |= ~value;
 }
 
-void device_keyboard(device_t device) {
+void device_keyboard(device_t device, keyboard_device_t keyboard) {
+	device->data = keyboard;
 	device->read = __keyboard_read;
 	device->write = __keyboard_write;
-
-	keyboard_device_t keyboard = (keyboard_device_t)device;
-	for (int i = 0; i < 8; i++)
-		keyboard->groups[i] = 0xFF;
-	keyboard->group_mask = 0;
 }

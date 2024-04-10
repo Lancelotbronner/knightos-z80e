@@ -46,7 +46,7 @@ static void __unimplemented_write(device_t device, uint8_t value) {
 
 void device_unimplemented(device_t device, unsigned char port) {
 	assert(device);
-	device->value = port;
+	device->data = port;
 	device->read = __unimplemented_read;
 	device->write = __unimplemented_write;
 }

@@ -7,6 +7,8 @@
 
 #include <z80e/types.h>
 #include <z80e/cpu/z80.h>
+#include <z80e/devices/keyboard.h>
+#include <z80e/devices/mapping.h>
 #include <z80e/log/log.h>
 #include <z80e/ti/memory.h>
 #include <z80e/ti/ti.h>
@@ -63,10 +65,14 @@ struct asic {
 
 	z80cpu_t cpu;
 	runloop_state_t *runloop;
+
+	struct keyboard_device keyboard;
+	struct mapping_device mapping;
 	ti_mmu_t mmu;
 	ti_interrupts_t *interrupts;
 	z80_hardware_timers_t *timers;
 	z80_link_socket_t *link;
+
 	hook_info_t *hook;
 	log_t *log;
 	debugger_t *debugger;

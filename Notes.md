@@ -14,5 +14,6 @@ Here are some non-goal:
 
 ## Tasks
 
-- Devices should receive an `asic_t` pointer, most could be inlined within 8 bytes
+- Devices should receive an `asic_t` pointer, most could be inlined within 8 bytes (or within asic)
+- Review the mapping device and its relationship to the MMU
 - Investigate `cpu.prefix` and if it could be replaced by storing the opcodes into the `ExecutionContext` 

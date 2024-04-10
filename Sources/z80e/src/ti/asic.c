@@ -8,9 +8,9 @@
 #include <z80e/ti/memory.h>
 #include <z80e/ti/hardware/t6a04.h>
 #include <z80e/ti/hardware/speed.h>
-#include <z80e/ti/hardware/memorymapping.h>
 #include <z80e/devices/flash.h>
 #include <z80e/devices/keyboard.h>
+#include <z80e/devices/mapping.h>
 #include <z80e/devices/status.h>
 #include <z80e/ti/hardware/link.h>
 #include <z80e/ti/hardware/timers.h>
@@ -44,7 +44,8 @@ void plug_devices(asic_t *asic) {
 		asic->cpu.devices[i] = device;
 	}
 
-	device_keyboard(&asic->cpu.devices[0x01]);
+	keyboard_init(&asic->keyboard);
+	device_keyboard(&asic->cpu.devices[0x01], &asic->keyboard);
 	device_status(&asic->cpu.devices[0x02], asic);
 	asic->cpu.devices[0x03] = init_interrupts(asic, &asic->interrupts);
 	setup_lcd_display(asic, asic->hook);
@@ -55,7 +56,15 @@ void plug_devices(asic_t *asic) {
 	}
 
 	init_link_ports(asic);
-	init_mapping_ports(asic);
+
+	// Initialize memory mapping ports
+	mapping_init(&asic->mapping, asic);
+	device_mapping_status(&asic->cpu.devices[0x04], &asic->mapping);
+	if (asic->device != TI83p)
+		device_mapping_paging(&asic->cpu.devices[0x05], &asic->mapping);
+	device_mapping_bankA(&asic->cpu.devices[0x06], &asic->mapping);
+	device_mapping_bankB(&asic->cpu.devices[0x07], &asic->mapping);
+	mapping_reload(&asic->mapping);
 
 	// Initialize flash ports
 	device_flash_control(&asic->cpu.devices[0x14], asic);
@@ -93,7 +102,6 @@ void asic_mirror_ports(asic_t *asic) {
 
 void free_devices(asic_t *asic) {
 	/* Link port unimplemented */
-	free_mapping_ports(asic);
 }
 
 asic_t *asic_init(ti_device_type type, log_t *log) {

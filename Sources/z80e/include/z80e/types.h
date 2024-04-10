@@ -19,7 +19,7 @@ typedef struct ti_interrupts ti_interrupts_t;
 
 typedef struct ti_bw_lcd ti_bw_lcd_t;
 
-//MARK: - Devices
+//MARK: - Device Management
 
 typedef struct z80_device *device_t;
 
@@ -30,3 +30,9 @@ typedef struct z80_device *device_t;
 typedef unsigned char (* _Nullable read_t)(const device_t _Nonnull);
 
 typedef void (* _Nullable write_t)(const device_t _Nonnull, unsigned char);
+
+//MARK: - Devices
+
+typedef struct keyboard_device *keyboard_device_t;
+
+typedef struct mapping_device *mapping_device_t;

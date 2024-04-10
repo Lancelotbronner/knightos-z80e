@@ -2,6 +2,8 @@
 
 #include <z80e/types.h>
 
+//MARK: - Device Configuration
+
 /// Configures a device to control the flash memory of the specified chip.
 /// - Parameters:
 ///   - device: The device to configure.

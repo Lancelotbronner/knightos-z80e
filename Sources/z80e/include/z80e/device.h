@@ -12,11 +12,7 @@
 #include <stdbool.h>
 
 struct z80_device {
-	union {
-		unsigned long long value;
-		unsigned char bytes[16];
-		void * _Nullable data;
-	};
+	void * _Nullable data;
 	read_t read;
 	write_t write;
 };
