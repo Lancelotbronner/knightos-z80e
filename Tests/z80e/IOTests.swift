@@ -1,7 +1,7 @@
 import XCTest
 import z80e
 
-final class IOTests: z80eTestCase {
+final class IOTests: AsicTestCase {
 
 	//MARK: - OUT
 
@@ -9,9 +9,9 @@ final class IOTests: z80eTestCase {
 		let test: [UInt8] = [0xD3, 0x12] // OUT (0x12), A
 		device.cpu.registers.A = 0x3C;
 		flash(test)
-		value = 0
+		_value = 0
 		let cycles = cpu_execute(&device.cpu, 11)
-		XCTAssertEqual(value, 0x3C)
+		XCTAssertEqual(_value, 0x3C)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -23,7 +23,7 @@ final class IOTests: z80eTestCase {
 		device.cpu.registers.C = 0x12;
 		flash(test)
 		cpu_execute(&device.cpu, 12)
-		XCTAssertEqual(value, 0xFF)
+		XCTAssertEqual(_value, 0xFF)
 	}
 
 	func test_OUT_C_r() {
@@ -32,7 +32,7 @@ final class IOTests: z80eTestCase {
 		device.cpu.registers.C = 0x12;
 		flash(test)
 		cpu_execute(&device.cpu, 12)
-		XCTAssertEqual(value, 0xB2)
+		XCTAssertEqual(_value, 0xB2)
 	}
 
 	//MARK: - IN
@@ -40,7 +40,7 @@ final class IOTests: z80eTestCase {
 	func test_IN_A_n() {
 		let test: [UInt8] = [0xDB, 0x12] // IN A, (0x12)
 		flash(test)
-		value = 0x3C
+		_value = 0x3C
 		let cycles = cpu_execute(&device.cpu, 11)
 		XCTAssertEqual(device.cpu.registers.A, 0x3C)
 		XCTAssertEqual(cycles, 0)
@@ -49,7 +49,7 @@ final class IOTests: z80eTestCase {
 	func test_IN_C() {
 		let test: [UInt8] = [0xED, 0x70] // IN (C)
 		flash(test)
-		value = 0
+		_value = 0
 		device.cpu.registers.C = 0x12;
 		let cycles = cpu_execute(&device.cpu, 12)
 		XCTAssertEqual(device.cpu.registers.flags.Z, 1)
@@ -59,7 +59,7 @@ final class IOTests: z80eTestCase {
 	func test_IN_r_C() {
 		let test: [UInt8] = [0xED, 0x40] // IN B, (C)
 		flash(test)
-		value = 0x5B
+		_value = 0x5B
 		device.cpu.registers.C = 0x12;
 		let cycles = cpu_execute(&device.cpu, 12)
 		XCTAssertEqual(device.cpu.registers.B, 0x5B)
@@ -70,7 +70,7 @@ final class IOTests: z80eTestCase {
 
 	func test_INI() {
 		let test: [UInt8] = [0xED, 0xA2] // INI
-		value = 0x3E
+		_value = 0x3E
 		device.cpu.registers.B = 1;
 		device.cpu.registers.HL = 0xC000;
 		device.cpu.registers.C = 0x12;
@@ -86,7 +86,7 @@ final class IOTests: z80eTestCase {
 
 	func test_IND() {
 		let test: [UInt8] = [0xED, 0xAA] // IND
-		value = 0x3E
+		_value = 0x3E
 		device.cpu.registers.B = 1;
 		device.cpu.registers.HL = 0xC000;
 		device.cpu.registers.C = 0x12;
@@ -102,7 +102,7 @@ final class IOTests: z80eTestCase {
 
 	func test_INIR() {
 		let test: [UInt8] = [0xED, 0xB2] // INIR
-		value = 0x3E
+		_value = 0x3E
 		device.cpu.registers.B = 5;
 		device.cpu.registers.HL = 0xC000;
 		device.cpu.registers.C = 0x12;
@@ -122,7 +122,7 @@ final class IOTests: z80eTestCase {
 
 	func test_INDR() {
 		let test: [UInt8] = [0xED, 0xBA] // INDR
-		value = 0x3E
+		_value = 0x3E
 		device.cpu.registers.B = 5;
 		device.cpu.registers.HL = 0xC004;
 		device.cpu.registers.C = 0x12;
@@ -142,7 +142,7 @@ final class IOTests: z80eTestCase {
 
 	func test_OUTI() {
 		let test: [UInt8] = [0xED, 0xA3]
-		value = 0x00
+		_value = 0x00
 		device.cpu.registers.C = 0x12;
 		device.cpu.registers.B = 5;
 		device.cpu.registers.HL = 0xC000;
@@ -153,7 +153,7 @@ final class IOTests: z80eTestCase {
 		write_byte(0xC004, 0x55)
 		flash(test)
 		let cycles = cpu_execute(&device.cpu, 16)
-		XCTAssertEqual(value, 0x11)
+		XCTAssertEqual(_value, 0x11)
 		XCTAssertEqual(device.cpu.registers.B, 4)
 		XCTAssertEqual(device.cpu.registers.HL, 0xC001)
 		XCTAssertEqual(cycles, 0)
@@ -163,7 +163,7 @@ final class IOTests: z80eTestCase {
 
 	func test_OUTD() {
 		let test: [UInt8] = [0xED, 0xAB]
-		value = 0x00
+		_value = 0x00
 		device.cpu.registers.C = 0x12;
 		device.cpu.registers.B = 5;
 		device.cpu.registers.HL = 0xC004;
@@ -174,7 +174,7 @@ final class IOTests: z80eTestCase {
 		write_byte(0xC004, 0x55)
 		flash(test)
 		let cycles = cpu_execute(&device.cpu, 16)
-		XCTAssertEqual(value, 0x55)
+		XCTAssertEqual(_value, 0x55)
 		XCTAssertEqual(device.cpu.registers.B, 4)
 		XCTAssertEqual(device.cpu.registers.HL, 0xC003)
 		XCTAssertEqual(cycles, 0)
@@ -184,7 +184,7 @@ final class IOTests: z80eTestCase {
 
 	func test_OTIR() {
 		let test: [UInt8] = [0xED, 0xB3]
-		value = 0x00
+		_value = 0x00
 		device.cpu.registers.C = 0x12;
 		device.cpu.registers.B = 5;
 		device.cpu.registers.HL = 0xC000;
@@ -195,7 +195,7 @@ final class IOTests: z80eTestCase {
 		write_byte(0xC004, 0x55)
 		flash(test)
 		let cycles = cpu_execute(&device.cpu, 100)
-		XCTAssertEqual(value, 0x55)
+		XCTAssertEqual(_value, 0x55)
 		XCTAssertEqual(device.cpu.registers.B, 0)
 		XCTAssertEqual(device.cpu.registers.HL, 0xC005)
 		XCTAssertEqual(cycles, 0)
@@ -205,7 +205,7 @@ final class IOTests: z80eTestCase {
 
 	func test_OTDR() {
 		let test: [UInt8] = [0xED, 0xBB]
-		value = 0x00
+		_value = 0x00
 		device.cpu.registers.C = 0x12;
 		device.cpu.registers.B = 5;
 		device.cpu.registers.HL = 0xC004;
@@ -216,7 +216,7 @@ final class IOTests: z80eTestCase {
 		write_byte(0xC004, 0x55)
 		flash(test)
 		let cycles = cpu_execute(&device.cpu, 100)
-		XCTAssertEqual(value, 0x11)
+		XCTAssertEqual(_value, 0x11)
 		XCTAssertEqual(device.cpu.registers.B, 0)
 		XCTAssertEqual(device.cpu.registers.HL, 0xBFFF)
 		XCTAssertEqual(cycles, 0)

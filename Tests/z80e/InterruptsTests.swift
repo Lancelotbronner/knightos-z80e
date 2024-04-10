@@ -1,7 +1,7 @@
 import XCTest
 import z80e
 
-final class InterruptsTests: z80eTestCase {
+final class InterruptsTests: AsicTestCase {
 
 	//MARK: - IM 1
 

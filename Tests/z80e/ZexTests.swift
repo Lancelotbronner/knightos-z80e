@@ -31,7 +31,7 @@ func write_text(_ device: UnsafeMutableRawPointer?) -> CUnsignedChar {
 	return 0;
 }
 
-final class ZexTests: z80eTestCase {
+final class ZexTests: AsicTestCase {
 
 	func zex(_ resource: String, _ ext: String) {
 		guard let url = Bundle.module.url(forResource: resource, withExtension: ext, subdirectory: "zex") else {

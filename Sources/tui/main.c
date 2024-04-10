@@ -284,7 +284,7 @@ int main(int argc, char **argv) {
 	}
 
 	hook_add_lcd_update(device->hook, NULL, lcd_changed_hook);
-	asic_add_timer(device, 0, 60, lcd_timer_tick, device->cpu.devices[0x10].device);
+	asic_add_timer(device, 0, 60, lcd_timer_tick, device->cpu.devices[0x10].data);
 
 	if (device->debugger) {
 		tui_state_t state = { device->debugger };

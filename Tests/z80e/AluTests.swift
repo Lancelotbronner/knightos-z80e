@@ -1,7 +1,7 @@
 import XCTest
 import z80e
 
-final class ArithmeticLogicUnitTests: z80eTestCase {
+final class ArithmeticLogicUnitTests: AsicTestCase {
 
 	//MARK: - ADD
 

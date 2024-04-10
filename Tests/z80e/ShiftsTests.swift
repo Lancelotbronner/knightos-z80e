@@ -1,7 +1,7 @@
 import XCTest
 import z80e
 
-final class ShiftsTests: z80eTestCase {
+final class ShiftsTests: AsicTestCase {
 
 	//MARK: - RLCA
 

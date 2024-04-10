@@ -1,7 +1,7 @@
 import XCTest
 import z80e
 
-final class ControlTests: z80eTestCase {
+final class ControlTests: AsicTestCase {
 
 	//MARK: - RST
 

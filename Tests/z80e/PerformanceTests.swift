@@ -1,7 +1,7 @@
 import XCTest
 import z80e
 
-final class PerformanceTests: z80eTestCase {
+final class PerformanceTests: AsicTestCase {
 
 	func test_instructions() {
 		measure {

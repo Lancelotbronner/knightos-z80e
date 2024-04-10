@@ -32,7 +32,7 @@ let package = Package(
 		.executableTarget(
 			name: "z80e-gui",
 			dependencies: ["z80e"],
-			path: "Sources/sdl"),
+			path: "Sources/gui"),
 
 		.testTarget(
 			name: "z80eTests",

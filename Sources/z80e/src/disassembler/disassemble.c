@@ -12,8 +12,8 @@ struct pcall {
 };
 
 struct {
-	list_t *pcalls;
-	list_t *objects;
+	list_t pcalls;
+	list_t objects;
 } globals;
 
 void parse_kernel_inc(FILE *file) {

@@ -1,7 +1,7 @@
 import XCTest
 import z80e
 
-final class DeviceTests: z80eTestCase {
+final class DeviceTests: AsicTestCase {
 
 	//MARK: - Keyboard
 

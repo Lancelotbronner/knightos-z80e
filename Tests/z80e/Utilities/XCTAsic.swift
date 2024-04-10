@@ -8,9 +8,11 @@
 import XCTest
 import z80e
 
-class z80eTestCase: XCTestCase {
+class AsicTestCase: XCTestCase {
 
 	//MARK: - Device Management
+
+	open var _type: ti_device_type { TI83p }
 
 	var _device: UnsafeMutablePointer<asic_t>!
 
@@ -43,12 +45,12 @@ class z80eTestCase: XCTestCase {
 
 	//MARK: - Test Device
 
-	var value: UInt8 = 0
+	var _value: UInt8 = 0
 
 	//MARK: - Hooks
 
 	override func setUp() {
-		guard let device = asic_init(TI83p, nil) else {
+		guard let device = asic_init(_type, nil) else {
 			XCTFail("Failed to initialize device")
 			return
 		}
@@ -56,7 +58,7 @@ class z80eTestCase: XCTestCase {
 
 		// Configure the default test device
 		cpu_device(&self.device.cpu, 0x12)[0] = z80_device(
-			data: Unmanaged<z80eTestCase>
+			data: Unmanaged<AsicTestCase>
 				.passUnretained(self)
 				.toOpaque(),
 			read: test_read,
@@ -70,15 +72,15 @@ class z80eTestCase: XCTestCase {
 }
 
 private func test_read(_ device: UnsafeMutableRawPointer!) -> UInt8 {
-	let test = Unmanaged<z80eTestCase>
+	let test = Unmanaged<AsicTestCase>
 		.fromOpaque(device)
 		.takeUnretainedValue()
-	return test.value
+	return test._value
 }
 
 private func test_write(_ device: UnsafeMutableRawPointer!, _ value: UInt8) {
-	let test = Unmanaged<z80eTestCase>
+	let test = Unmanaged<AsicTestCase>
 		.fromOpaque(device)
 		.takeUnretainedValue()
-	test.value = value
+	test._value = value
 }
