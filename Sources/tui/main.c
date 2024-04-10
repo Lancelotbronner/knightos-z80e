@@ -305,7 +305,7 @@ int main(int argc, char **argv) {
 	}
 
 	if (context.print_state) {
-		print_state(&device->cpu.registers);
+		print_state(&device->cpu);
 	}
 	asic_free(device);
 	return 0;

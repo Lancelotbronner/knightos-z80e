@@ -14,7 +14,5 @@ Here are some non-goal:
 
 ## Tasks
 
-- Inline the registers struct into the CPU, making the functions take a CPU or asic pointer.
-- Rework the z80 CPU and execution: the `asic` should be the top-level, so `asic_execute(calculator, 23)`
-- The `ExecutionContext` can be renamed `z80_cycle_t` and would contain the `const asic_t *chip`, current opcode and timings (executed cycle count).
-- Devices should also receive an `asic_t` pointer
+- Devices should receive an `asic_t` pointer, most could be inlined within 8 bytes
+- Investigate `cpu.prefix` and if it could be replaced by storing the opcodes into the `ExecutionContext` 
