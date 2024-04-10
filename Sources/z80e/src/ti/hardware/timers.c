@@ -10,33 +10,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint8_t read_timer_freq_port(void *device) {
-	struct crystal_timer *timer = device;
+uint8_t read_timer_freq_port(device_t device) {
+	struct crystal_timer *timer = device->data;
 	return timer->frequency;
 }
 
-uint8_t read_timer_loop_port(void *device) {
-	struct crystal_timer *timer = device;
+uint8_t read_timer_loop_port(device_t device) {
+	struct crystal_timer *timer = device->data;
 	return timer->loop;
 }
 
-uint8_t read_timer_counter_port(void *device) {
-	struct crystal_timer *timer = device;
+uint8_t read_timer_counter_port(device_t device) {
+	struct crystal_timer *timer = device->data;
 	return timer->counter;
 }
 
-void write_timer_freq_port(void *device, uint8_t val) {
-	struct crystal_timer *timer = device;
+void write_timer_freq_port(device_t device, uint8_t val) {
+	struct crystal_timer *timer = device->data;
 	timer->frequency = val;
 }
 
-void write_timer_loop_port(void *device, uint8_t val) {
-	struct crystal_timer *timer = device;
+void write_timer_loop_port(device_t device, uint8_t val) {
+	struct crystal_timer *timer = device->data;
 	timer->loop = val;
 }
 
-void write_timer_counter_port(void *device, uint8_t val) {
-	struct crystal_timer *timer = device;
+void write_timer_counter_port(device_t device, uint8_t val) {
+	struct crystal_timer *timer = device->data;
 	timer->counter = val;
 }
 

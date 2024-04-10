@@ -12,14 +12,14 @@
 #include <stdbool.h>
 
 struct z80_device {
-	void * _Nullable data;
+	union {
+		unsigned long long value;
+		unsigned char bytes[16];
+		void * _Nullable data;
+	};
 	read_t read;
 	write_t write;
 };
-
-unsigned char device_read(const struct z80_device device);
-
-void device_write(const struct z80_device device, const unsigned char value);
 
 /// Configures a device to mirror to another device.
 /// - Parameters:
@@ -31,7 +31,7 @@ void device_mirror(device_t _Nonnull device, const device_t _Nonnull other);
 /// - Parameters:
 ///  - device: The device to configure.
 ///  - port: The port of the device for logging purposes.
-void device_unimplemented(device_t _Nonnull device, int port);
+void device_unimplemented(device_t _Nonnull device, unsigned char port);
 
 /// Configures a device to ignore reads and/or writes.
 /// - Parameters:

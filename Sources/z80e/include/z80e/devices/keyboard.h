@@ -1,26 +1,20 @@
 #pragma once
 
-#include <stdint.h>
-
 #include <z80e/types.h>
 
-struct keyboard {
-	uint8_t group_mask;
-	uint8_t groups[8];
+typedef struct keyboard_device *keyboard_device_t;
+
+struct keyboard_device {
+	unsigned char group_mask;
+	unsigned char groups[8];
 };
 
-void keyboard_init(keyboard_t keyboard);
+/// Configures a device to be a Ti keyboard.
+/// - Parameters:
+///   - device: The device to configure.
+void device_keyboard(device_t device);
 
-keyboard_t keyboard_new();
-void keyboard_delete(const keyboard_t keyboard);
+//MARK: - Keyboard Management
 
-void keyboard_release(keyboard_t keyboard, uint8_t keycode);
-void keyboard_press(keyboard_t keyboard, uint8_t keycode);
-
-//MARK: - Device Management
-
-uint8_t keyboard_read(const keyboard_t keyboard);
-
-void keyboard_write(const keyboard_t keyboard, uint8_t value);
-
-struct z80_device keyboard_device(const keyboard_t keyboard);
+void keyboard_release(keyboard_device_t keyboard, unsigned char keycode);
+void keyboard_press(keyboard_device_t keyboard, unsigned char keycode);

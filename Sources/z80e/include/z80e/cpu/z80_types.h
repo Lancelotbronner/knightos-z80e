@@ -1,10 +1,3 @@
-//
-//  cpu/z80_types.h
-//  z80e
-//
-//  Created by Christophe Bronner on 2024-04-10.
-//
-
 #pragma once
 
 #include <z80e/types.h>

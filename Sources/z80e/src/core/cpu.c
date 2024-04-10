@@ -235,20 +235,20 @@ void cpu_write_word(z80cpu_t *cpu, uint16_t address, uint16_t value) {
 }
 
 uint8_t cpu_port_in(z80cpu_t *cpu, uint8_t port) {
-	struct z80_device device = cpu->devices[port];
+	device_t device = &cpu->devices[port];
 	uint8_t val = 0;
-	if (device.read) {
-		val = device_read(device);
+	if (device->read) {
+		val = device->read(device);
 		val = hook_on_port_in(cpu->hook, port, val);
 	}
 	return val;
 }
 
 void cpu_port_out(z80cpu_t *cpu, uint8_t port, uint8_t val) {
-	struct z80_device device = cpu->devices[port];
-	if (device.write) {
+	device_t device = &cpu->devices[port];
+	if (device->write) {
 		val = hook_on_port_out(cpu->hook, port, val);
-		device_write(device, val);
+		device->write(device, val);
 	}
 }
 

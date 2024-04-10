@@ -9,9 +9,9 @@
 #include <z80e/ti/hardware/t6a04.h>
 #include <z80e/ti/hardware/speed.h>
 #include <z80e/ti/hardware/memorymapping.h>
+#include <z80e/devices/flash.h>
 #include <z80e/devices/keyboard.h>
 #include <z80e/devices/status.h>
-#include <z80e/ti/hardware/flash.h>
 #include <z80e/ti/hardware/link.h>
 #include <z80e/ti/hardware/timers.h>
 
@@ -20,15 +20,15 @@ typedef struct {
 	uint8_t port;
 } unimplemented_device_t;
 
-uint8_t read_unimplemented_port(void *device) {
-	unimplemented_device_t *d = device;
-	log_message(d->asic->log, L_INFO, "asic", 
+uint8_t read_unimplemented_port(device_t device) {
+	unimplemented_device_t *d = device->data;
+	log_message(d->asic->log, L_INFO, "asic",
 				"Warning: attempted to read from unimplemented port 0x%02x from 0x%04X.", d->port, d->asic->cpu.registers.PC);
 	return 0x00;
 }
 
-void write_unimplemented_port(void *device, uint8_t value) {
-	unimplemented_device_t *d = device;
+void write_unimplemented_port(device_t device, uint8_t value) {
+	unimplemented_device_t *d = device->data;
 	log_message(d->asic->log, L_INFO, "asic",
 				"Warning: attempted to write 0x%02x to unimplemented port 0x%02x from 0x%04X.", value, d->port, d->asic->cpu.registers.PC);
 }
@@ -44,8 +44,8 @@ void plug_devices(asic_t *asic) {
 		asic->cpu.devices[i] = device;
 	}
 
-	asic->cpu.devices[0x01] = keyboard_device(keyboard_new());
-	asic->cpu.devices[0x02] = status_device(status_new(asic));
+	device_keyboard(&asic->cpu.devices[0x01]);
+	device_status(&asic->cpu.devices[0x02], asic);
 	asic->cpu.devices[0x03] = init_interrupts(asic, &asic->interrupts);
 	setup_lcd_display(asic, asic->hook);
 
@@ -56,7 +56,10 @@ void plug_devices(asic_t *asic) {
 
 	init_link_ports(asic);
 	init_mapping_ports(asic);
-	init_flash_ports(asic);
+
+	// Initialize flash ports
+	device_flash_control(&asic->cpu.devices[0x14], asic);
+	device_flash_size(&asic->cpu.devices[0x21]);
 }
 
 void asic_null_write(void *ignored, uint8_t value) {}
@@ -90,8 +93,6 @@ void asic_mirror_ports(asic_t *asic) {
 
 void free_devices(asic_t *asic) {
 	/* Link port unimplemented */
-	keyboard_delete(asic->cpu.devices[0x01].data);
-	status_delete(asic->cpu.devices[0x02].data);
 	free_mapping_ports(asic);
 }
 
