@@ -1,10 +1,6 @@
 #include <z80e/devices/status.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
+
 #include <z80e/ti/asic.h>
-#include <z80e/cpu/z80.h>
-#include <z80e/ti/hardware/interrupts.h>
 
 static uint8_t __status_read(device_t device) {
 	asic_t *asic = device->data;

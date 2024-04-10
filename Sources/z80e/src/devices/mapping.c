@@ -1,12 +1,6 @@
 #include <z80e/devices/mapping.h>
 
 #include <z80e/ti/asic.h>
-#include <z80e/log/log.h>
-#include <z80e/ti/memory.h>
-#include <z80e/ti/hardware/interrupts.h>
-
-#include <stdlib.h>
-#include <string.h>
 
 void mapping_init(mapping_device_t mapping, asic_t *asic) {
 	*mapping = (struct mapping_device){
