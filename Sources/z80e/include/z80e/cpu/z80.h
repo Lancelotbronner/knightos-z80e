@@ -4,13 +4,13 @@
 
 #include <z80e/types.h>
 #include <z80e/device.h>
-#include <z80e/core/registers.h>
+#include <z80e/cpu/z80_types.h>
 #include <z80e/debugger/hooks.h>
 #include <z80e/log/log.h>
 
 struct z80_cpu {
 	struct z80_device devices[0x100];
-	z80registers_t registers;
+	struct z80_regstate registers;
 	struct {
 		uint8_t IFF1 : 1;
 		uint8_t IFF2 : 1;
@@ -28,6 +28,9 @@ struct z80_cpu {
 	hook_info_t * _Nullable hook;
 	log_t * _Nullable log;
 };
+
+int parity(uint8_t x);
+void print_state(z80cpu_t * _Nonnull);
 
 uint8_t cpu_read_register_byte(z80cpu_t * _Nonnull, enum z80_registers);
 uint16_t cpu_read_register_word(z80cpu_t * _Nonnull, enum z80_registers);

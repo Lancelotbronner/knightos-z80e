@@ -72,7 +72,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 			}
 
 			if (state->debugger->flags.echo_reg) {
-				print_state(&state->asic->cpu.registers);
+				print_state(&state->asic->cpu);
 			}
 
 			oldHalted = state->asic->cpu.halted;
@@ -132,7 +132,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 		}
 
 		if (state->debugger->flags.echo_reg) {
-			print_state(&state->asic->cpu.registers);
+			print_state(&state->asic->cpu);
 		}
 
 		oldHalted = state->asic->cpu.halted;

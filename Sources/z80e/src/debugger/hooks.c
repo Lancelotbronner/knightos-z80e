@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include <z80e/debugger/hooks.h>
-#include <z80e/core/cpu.h>
+#include <z80e/cpu/z80.h>
 #include <z80e/ti/asic.h>
 #include <z80e/ti/memory.h>
 

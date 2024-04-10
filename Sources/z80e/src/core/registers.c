@@ -1,25 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <z80e/core/registers.h>
-
-void exAFAF(z80registers_t *r) {
-	uint16_t temp = r->_AF;
-	r->_AF = r->AF;
-	r->AF = temp;
-}
-
-void exDEHL(z80registers_t *r) {
-	uint16_t temp = r->HL;
-	r->HL = r->DE;
-	r->DE = temp;
-}
-
-void exx(z80registers_t *r) {
-	uint16_t temp;
-	temp = r->_HL; r->_HL = r->HL; r->HL = temp;
-	temp = r->_DE; r->_DE = r->DE; r->DE = temp;
-	temp = r->_BC; r->_BC = r->BC; r->BC = temp;
-}
+#include <z80e/cpu/z80.h>
 
 int parity(uint8_t x) {
 	x ^= x >> 4;
@@ -28,7 +9,8 @@ int parity(uint8_t x) {
 	return x & 1;
 }
 
-void print_state(z80registers_t *r) {
+void print_state(z80cpu_t *cpu) {
+	struct z80_regstate *r = &cpu->registers;
 	printf("   AF: 0x%04X   BC: 0x%04X   DE: 0x%04X  HL: 0x%04X\n", r->AF, r->BC, r->DE, r->HL);
 	printf("  'AF: 0x%04X  'BC: 0x%04X  'DE: 0x%04X 'HL: 0x%04X\n", r->_AF, r->_BC, r->_DE, r->_HL);
 	printf("   PC: 0x%04X   SP: 0x%04X   IX: 0x%04X  IY: 0x%04X\n", r->PC, r->SP, r->IX, r->IY);

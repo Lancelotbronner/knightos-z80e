@@ -1,8 +1,8 @@
+#include <z80e/cpu/z80.h>
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <z80e/core/registers.h>
-#include <z80e/core/cpu.h>
 
 struct ExecutionContext {
 	uint8_t cycles;
@@ -548,15 +548,15 @@ void daa(struct ExecutionContext *context) {
 	if (r->flags.N) {
 		r->A -= v;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_parity(r->A)
-			| _flag_subtract(r->flags.N) | __flag_c(v >= 0x60)
-			| _flag_halfcarry_8_sub(old, v, 0);
+		| _flag_undef_8(r->A) | _flag_parity(r->A)
+		| _flag_subtract(r->flags.N) | __flag_c(v >= 0x60)
+		| _flag_halfcarry_8_sub(old, v, 0);
 	} else {
 		r->A += v;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_parity(r->A)
-			| _flag_subtract(r->flags.N) | __flag_c(v >= 0x60)
-			| _flag_halfcarry_8_add(old, v, 0);
+		| _flag_undef_8(r->A) | _flag_parity(r->A)
+		| _flag_subtract(r->flags.N) | __flag_c(v >= 0x60)
+		| _flag_halfcarry_8_add(old, v, 0);
 	}
 }
 
@@ -569,60 +569,60 @@ void execute_alu(int i, uint8_t v, struct ExecutionContext *context) {
 		old = r->A;
 		r->A += v;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_overflow_8_add(old, v, r->A)
-			| _flag_subtract(0) | _flag_carry_8(old + v)
-			| _flag_halfcarry_8_add(old, v, 0);
+		| _flag_undef_8(r->A) | _flag_overflow_8_add(old, v, r->A)
+		| _flag_subtract(0) | _flag_carry_8(old + v)
+		| _flag_halfcarry_8_add(old, v, 0);
 		break;
 	case 1: // ADC A, v
 		old = r->A;
 		r->A += v + r->flags.C;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_overflow_8_add(old, v, r->A)
-			| _flag_subtract(0) | _flag_carry_8(old + v + r->flags.C)
-			| _flag_halfcarry_8_add(old, v, r->flags.C);
+		| _flag_undef_8(r->A) | _flag_overflow_8_add(old, v, r->A)
+		| _flag_subtract(0) | _flag_carry_8(old + v + r->flags.C)
+		| _flag_halfcarry_8_add(old, v, r->flags.C);
 		break;
 	case 2: // SUB v
 		old = r->A;
 		r->A -= v;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_overflow_8_sub(old, v, r->A)
-			| _flag_subtract(1) | _flag_carry_8(old - v)
-			| _flag_halfcarry_8_sub(old, v, 0);
+		| _flag_undef_8(r->A) | _flag_overflow_8_sub(old, v, r->A)
+		| _flag_subtract(1) | _flag_carry_8(old - v)
+		| _flag_halfcarry_8_sub(old, v, 0);
 		break;
 	case 3: // SBC v
 		old = r->A;
 		r->A -= v + r->flags.C;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_overflow_8_sub(old, v, r->A)
-			| _flag_subtract(1) | _flag_carry_8(old - v - r->flags.C)
-			| _flag_halfcarry_8_sub(old, v, r->flags.C);
+		| _flag_undef_8(r->A) | _flag_overflow_8_sub(old, v, r->A)
+		| _flag_subtract(1) | _flag_carry_8(old - v - r->flags.C)
+		| _flag_halfcarry_8_sub(old, v, r->flags.C);
 		break;
 	case 4: // AND v
 		old = r->A;
 		r->A &= v;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_parity(r->A)
-			| FLAG_H;
+		| _flag_undef_8(r->A) | _flag_parity(r->A)
+		| FLAG_H;
 		break;
 	case 5: // XOR v
 		old = r->A;
 		r->A ^= v;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_parity(r->A);
+		| _flag_undef_8(r->A) | _flag_parity(r->A);
 		break;
 	case 6: // OR v
 		old = r->A;
 		r->A |= v;
 		r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-			| _flag_undef_8(r->A) | _flag_parity(r->A);
+		| _flag_undef_8(r->A) | _flag_parity(r->A);
 		break;
 	case 7: // CP v
 		old = r->A - v;
 		r->F = _flag_sign_8(old) | _flag_zero(old)
-			| _flag_undef_8(v) | _flag_subtract(1)
-			| _flag_carry_8(r->A - v)
-			| _flag_overflow_8_sub(r->A, v, old)
-			| _flag_halfcarry_8_sub(r->A, v, 0);
+		| _flag_undef_8(v) | _flag_subtract(1)
+		| _flag_carry_8(r->A - v)
+		| _flag_overflow_8_sub(r->A, v, old)
+		| _flag_halfcarry_8_sub(r->A, v, 0);
 		break;
 	}
 }
@@ -646,50 +646,50 @@ void execute_rot(int y, int z, int switch_opcode_data, struct ExecutionContext *
 		r <<= 1; r |= old_7;
 		write_r(z, r, context);
 		reg->F = __flag_c(old_7) | _flag_sign_8(r) | _flag_parity(r)
-			| _flag_undef_8(r) | _flag_zero(r);
+		| _flag_undef_8(r) | _flag_zero(r);
 		break;
 	case 1: // RRC r[z]
 		r >>= 1; r |= old_0 << 7;
 		write_r(z, r, context);
 		reg->F = __flag_c(old_0) | _flag_sign_8(r) | _flag_parity(r)
-			| _flag_undef_8(r) | _flag_zero(r);
+		| _flag_undef_8(r) | _flag_zero(r);
 		break;
 	case 2: // RL r[z]
 		r <<= 1; r |= old_c;
 		write_r(z, r, context);
 		reg->F = __flag_c(old_7) | _flag_sign_8(r) | _flag_parity(r)
-			| _flag_undef_8(r) | _flag_zero(r);
+		| _flag_undef_8(r) | _flag_zero(r);
 		break;
 	case 3: // RR r[z]
 		r >>= 1; r |= old_c << 7;
 		write_r(z, r, context);
 		reg->F = __flag_c(old_0) | _flag_sign_8(r) | _flag_parity(r)
-			| _flag_undef_8(r) | _flag_zero(r);
+		| _flag_undef_8(r) | _flag_zero(r);
 		break;
 	case 4: // SLA r[z]
 		r <<= 1;
 		write_r(z, r, context);
 		reg->F = __flag_c(old_7) | _flag_sign_8(r) | _flag_parity(r)
-			| _flag_undef_8(r) | _flag_zero(r);
+		| _flag_undef_8(r) | _flag_zero(r);
 		break;
 	case 5: // SRA r[z]
 		r >>= 1;
 		r |= old_7 << 7;
 		write_r(z, r, context);
 		reg->F = __flag_c(old_0) | _flag_sign_8(r) | _flag_parity(r)
-			| _flag_undef_8(r) | _flag_zero(r);
+		| _flag_undef_8(r) | _flag_zero(r);
 		break;
 	case 6: // SLL r[z]
 		r <<= 1; r |= 1;
 		write_r(z, r, context);
 		reg->F = __flag_c(old_7) | _flag_sign_8(r) | _flag_parity(r)
-			| _flag_undef_8(r) | _flag_zero(r);
+		| _flag_undef_8(r) | _flag_zero(r);
 		break;
 	case 7: // SRL r[z]
 		r >>= 1;
 		write_r(z, r, context);
 		reg->F = __flag_c(old_0) | _flag_sign_8(r) | _flag_parity(r)
-			| _flag_undef_8(r) | _flag_zero(r);
+		| _flag_undef_8(r) | _flag_zero(r);
 		break;
 	}
 }
@@ -706,8 +706,8 @@ void execute_bli(int y, int z, struct ExecutionContext *context) {
 			cpu_write_byte(context->cpu, r->DE++, old);
 			new = r->A + old;
 			r->F = (r->F & (FLAG_S | FLAG_Z | FLAG_C))
-				| __flag_pv(--r->BC) | _flag_subtract(0)
-				| _flag_undef_8_block(new);
+			| __flag_pv(--r->BC) | _flag_subtract(0)
+			| _flag_undef_8_block(new);
 			break;
 		case 1: // CPI
 			context->cycles += 12;
@@ -715,9 +715,9 @@ void execute_bli(int y, int z, struct ExecutionContext *context) {
 			new = r->A - old;
 			hc = _flag_halfcarry_8_sub(r->A, old, 0) > 0;
 			r->F = _flag_sign_8(new) | _flag_zero(new)
-				| __flag_h(hc) | __flag_pv(--r->BC)
-				| _flag_subtract(1) | __flag_c(r->flags.C)
-				| _flag_undef_8_block(new - hc);
+			| __flag_h(hc) | __flag_pv(--r->BC)
+			| _flag_subtract(1) | __flag_c(r->flags.C)
+			| _flag_undef_8_block(new - hc);
 			break;
 		case 2: // INI
 			context->cycles += 12;
@@ -743,8 +743,8 @@ void execute_bli(int y, int z, struct ExecutionContext *context) {
 			cpu_write_byte(context->cpu, r->DE--, old);
 			new = r->A + old;
 			r->F = (r->F & (FLAG_S | FLAG_Z | FLAG_C))
-				| __flag_pv(--r->BC) | _flag_subtract(0)
-				| _flag_undef_8_block(new);
+			| __flag_pv(--r->BC) | _flag_subtract(0)
+			| _flag_undef_8_block(new);
 			break;
 		case 1: // CPD
 			context->cycles += 12;
@@ -752,9 +752,9 @@ void execute_bli(int y, int z, struct ExecutionContext *context) {
 			new = r->A - old;
 			hc = _flag_halfcarry_8_sub(r->A, old, 0) > 0;
 			r->F = _flag_sign_8(new) | _flag_zero(new)
-				| __flag_h(hc) | __flag_pv(--r->BC)
-				| _flag_subtract(1) | __flag_c(r->flags.C)
-				| _flag_undef_8_block(new - hc);
+			| __flag_h(hc) | __flag_pv(--r->BC)
+			| _flag_subtract(1) | __flag_c(r->flags.C)
+			| _flag_undef_8_block(new - hc);
 			break;
 		case 2: // IND
 			context->cycles += 12;
@@ -780,8 +780,8 @@ void execute_bli(int y, int z, struct ExecutionContext *context) {
 			cpu_write_byte(context->cpu, r->DE++, old);
 			new = r->A + old;
 			r->F = (r->F & (FLAG_S | FLAG_Z | FLAG_C))
-				| __flag_pv(--r->BC) | _flag_subtract(0)
-				| _flag_undef_8_block(new);
+			| __flag_pv(--r->BC) | _flag_subtract(0)
+			| _flag_undef_8_block(new);
 			if (r->BC) {
 				context->cycles += 5;
 				r->PC -= 2;
@@ -793,9 +793,9 @@ void execute_bli(int y, int z, struct ExecutionContext *context) {
 			new = r->A - old;
 			hc = _flag_halfcarry_8_sub(r->A, old, 0) > 0;
 			r->F = _flag_sign_8(new) | _flag_zero(new)
-				| __flag_h(hc) | __flag_pv(--r->BC)
-				| _flag_subtract(1) | __flag_c(r->flags.C)
-				| _flag_undef_8_block(new - hc);
+			| __flag_h(hc) | __flag_pv(--r->BC)
+			| _flag_subtract(1) | __flag_c(r->flags.C)
+			| _flag_undef_8_block(new - hc);
 			if (r->BC && !r->flags.Z) {
 				context->cycles += 5;
 				r->PC -= 2;
@@ -833,8 +833,8 @@ void execute_bli(int y, int z, struct ExecutionContext *context) {
 			cpu_write_byte(context->cpu, r->DE--, old);
 			new = r->A + old;
 			r->F = (r->F & (FLAG_S | FLAG_Z | FLAG_C))
-				| __flag_pv(--r->BC) | _flag_subtract(0)
-				| _flag_undef_8_block(new);
+			| __flag_pv(--r->BC) | _flag_subtract(0)
+			| _flag_undef_8_block(new);
 			if (r->BC) {
 				context->cycles += 5;
 				r->PC -= 2;
@@ -846,9 +846,9 @@ void execute_bli(int y, int z, struct ExecutionContext *context) {
 			new = r->A - old;
 			hc = _flag_halfcarry_8_sub(r->A, old, 0) > 0;
 			r->F = _flag_sign_8(new) | _flag_zero(new)
-				| __flag_h(hc) | __flag_pv(--r->BC)
-				| _flag_subtract(1) | __flag_c(r->flags.C)
-				| _flag_undef_8_block(new - hc);
+			| __flag_h(hc) | __flag_pv(--r->BC)
+			| _flag_subtract(1) | __flag_c(r->flags.C)
+			| _flag_undef_8_block(new - hc);
 			if (r->BC && !r->flags.Z) {
 				context->cycles += 5;
 				r->PC -= 2;
@@ -972,9 +972,9 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 				old = read_r(context.z, &context);
 				new = old & (1 << context.y);
 				r->F = _flag_sign_8(new) | _flag_zero(new)
-					| (context.z == 6 ? _flag_undef_16(r->WZ) : _flag_undef_8(old))
-					| _flag_parity(new) | __flag_c(r->flags.C)
-					| FLAG_H;
+				| (context.z == 6 ? _flag_undef_16(r->WZ) : _flag_undef_8(old))
+				| _flag_parity(new) | __flag_c(r->flags.C)
+				| FLAG_H;
 				break;
 			case 2: // RES y, r[z]
 				context.cycles += 4;
@@ -1008,24 +1008,24 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 						context.cycles += 8;
 						new = cpu_port_in(cpu, r->C);
 						r->F = _flag_sign_8(new) | _flag_undef_8(new)
-							| __flag_c(r->flags.C) | _flag_zero(new)
-							| _flag_parity(new);
+						| __flag_c(r->flags.C) | _flag_zero(new)
+						| _flag_parity(new);
 					} else { // IN r[y], (C)
 						context.cycles += 8;
 						new = cpu_port_in(cpu, r->C);
 						old = read_r(context.y, &context);
 						write_r(context.y, new, &context);
 						r->F = _flag_sign_8(new) | _flag_undef_8(new)
-							| __flag_c(r->flags.C) | _flag_zero(new)
-							| _flag_parity(new);
+						| __flag_c(r->flags.C) | _flag_zero(new)
+						| _flag_parity(new);
 					}
 					break;
 				case 1:
 					if (context.y == 6) { // OUT (C), 0
-						// This instruction outputs 0 for NMOS z80s, and 0xFF for CMOS z80s.
-						// TIs are the CMOS variant. Most emulators do *not* emulate this
-						// correctly, but I have verified through my own research that the
-						// correct value to output is 0xFF.
+										  // This instruction outputs 0 for NMOS z80s, and 0xFF for CMOS z80s.
+										  // TIs are the CMOS variant. Most emulators do *not* emulate this
+										  // correctly, but I have verified through my own research that the
+										  // correct value to output is 0xFF.
 						context.cycles += 8;
 						cpu_port_out(cpu, r->C, 0xFF);
 					} else { // OUT (C), r[y]
@@ -1040,18 +1040,18 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 						op16 = read_rp(context.p, &context);
 						r->WZ = r->HL -= op16 + r->flags.C;
 						r->F = _flag_sign_16(r->HL) | _flag_zero(r->HL)
-							| _flag_undef_16(r->HL) | _flag_overflow_16_sub(old16, op16, r->HL)
-							| _flag_subtract(1) | _flag_carry_16(old16 - op16 - r->flags.C)
-							| _flag_halfcarry_16_sub(old16, op16, r->flags.C);
+						| _flag_undef_16(r->HL) | _flag_overflow_16_sub(old16, op16, r->HL)
+						| _flag_subtract(1) | _flag_carry_16(old16 - op16 - r->flags.C)
+						| _flag_halfcarry_16_sub(old16, op16, r->flags.C);
 					} else { // ADC HL, rp[p]
 						context.cycles += 11;
 						old16 = r->HL;
 						op16 = read_rp(context.p, &context);
 						r->WZ = r->HL += op16 + r->flags.C;
 						r->F = _flag_sign_16(r->HL) | _flag_zero(r->HL)
-							| _flag_undef_16(r->HL) | _flag_overflow_16_add(old16, op16, r->HL)
-							| _flag_subtract(0) | _flag_carry_16(old16 + op16 + r->flags.C)
-							| _flag_halfcarry_16_add(old16, op16, r->flags.C);
+						| _flag_undef_16(r->HL) | _flag_overflow_16_add(old16, op16, r->HL)
+						| _flag_subtract(0) | _flag_carry_16(old16 + op16 + r->flags.C)
+						| _flag_halfcarry_16_add(old16, op16, r->flags.C);
 					}
 					break;
 				case 3:
@@ -1071,18 +1071,18 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 					r->A = -r->A;
 					new = r->A;
 					r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-						| _flag_undef_8(r->A) | __flag_pv(old == 0x80)
-						| _flag_subtract(1) | __flag_c(old != 0)
-						| _flag_halfcarry_8_sub(0, old, 0);
+					| _flag_undef_8(r->A) | __flag_pv(old == 0x80)
+					| _flag_subtract(1) | __flag_c(old != 0)
+					| _flag_halfcarry_8_sub(0, old, 0);
 					break;
 				case 5:
 					if (context.y == 1) { // RETI
-						// Note: Does not implement non-maskable interrupts
+										  // Note: Does not implement non-maskable interrupts
 						context.cycles += 14;
 						r->PC = pop(cpu);
 						break;
 					} else { // RETN
-						// Note: Does not implement non-maskable interrupts
+							 // Note: Does not implement non-maskable interrupts
 						context.cycles += 14;
 						r->PC = pop(cpu);
 						break;
@@ -1107,16 +1107,16 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 						old = r->A;
 						r->A = r->I;
 						r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-							| _flag_undef_8(r->A) | __flag_pv(cpu->IFF2)
-							| _flag_subtract(0) | __flag_c(r->flags.C);
+						| _flag_undef_8(r->A) | __flag_pv(cpu->IFF2)
+						| _flag_subtract(0) | __flag_c(r->flags.C);
 						break;
 					case 3: // LD A, R
 						context.cycles += 5;
 						old = r->A;
 						r->A = r->R;
 						r->F = _flag_sign_8(r->A) | _flag_zero(r->A)
-							| _flag_undef_8(r->A) | __flag_pv(cpu->IFF2)
-							| _flag_subtract(0) | __flag_c(r->flags.C);
+						| _flag_undef_8(r->A) | __flag_pv(cpu->IFF2)
+						| _flag_subtract(0) | __flag_c(r->flags.C);
 						break;
 					case 4: // RRD
 						context.cycles += 14;
@@ -1128,7 +1128,7 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 						new |= old << 4;
 						cpu_write_byte(cpu, r->HL, new);
 						r->F = __flag_c(r->flags.C) | _flag_sign_8(r->A) | _flag_zero(r->A)
-							| _flag_parity(r->A) | _flag_undef_8(r->A);
+						| _flag_parity(r->A) | _flag_undef_8(r->A);
 						break;
 					case 5: // RLD
 						context.cycles += 14;
@@ -1140,7 +1140,7 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 						new |= old & 0x0F;
 						cpu_write_byte(cpu, r->HL, new);
 						r->F = __flag_c(r->flags.C) | _flag_sign_8(r->A) | _flag_zero(r->A)
-							| _flag_parity(r->A) | _flag_undef_8(r->A);
+						| _flag_parity(r->A) | _flag_undef_8(r->A);
 						break;
 					default: // NOP (invalid instruction)
 						context.cycles += 4;
@@ -1168,38 +1168,40 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 				switch (context.z) {
 				case 0:
 					switch (context.y) {
-						case 0: // NOP
-							context.cycles += 4;
-							break;
-						case 1: // EX AF, AF'
-							context.cycles += 4;
-							exAFAF(r);
-							break;
-						case 2: // DJNZ d
-							context.cycles += 8;
-							d = context.d(&context);
-							r->B--;
-							if (r->B != 0) {
-								context.cycles += 5;
-								r->WZ = r->PC += d;
-							}
-							break;
-						case 3: // JR d
-							context.cycles += 12;
-							d = context.d(&context);
+					case 0: // NOP
+						context.cycles += 4;
+						break;
+					case 1: // EX AF, AF'
+						context.cycles += 4;
+						uint16_t temp = r->_AF;
+						r->_AF = r->AF;
+						r->AF = temp;
+						break;
+					case 2: // DJNZ d
+						context.cycles += 8;
+						d = context.d(&context);
+						r->B--;
+						if (r->B != 0) {
+							context.cycles += 5;
 							r->WZ = r->PC += d;
-							break;
-						case 4:
-						case 5:
-						case 6:
-						case 7: // JR cc[y-4], d
-							context.cycles += 7;
-							d = context.d(&context);
-							if (read_cc(context.y - 4, &context)) {
-								context.cycles += 5;
-								r->WZ = r->PC += d;
-							}
-							break;
+						}
+						break;
+					case 3: // JR d
+						context.cycles += 12;
+						d = context.d(&context);
+						r->WZ = r->PC += d;
+						break;
+					case 4:
+					case 5:
+					case 6:
+					case 7: // JR cc[y-4], d
+						context.cycles += 7;
+						d = context.d(&context);
+						if (read_cc(context.y - 4, &context)) {
+							context.cycles += 5;
+							r->WZ = r->PC += d;
+						}
+						break;
 					}
 					break;
 				case 1:
@@ -1214,9 +1216,9 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 						op16 = read_rp(context.p, &context);
 						r->WZ = new16 = HLorIw(&context, old16 + op16);
 						r->F = __flag_s(r->flags.S) | _flag_zero(!r->flags.Z)
-							| _flag_undef_16(new16) | __flag_pv(r->flags.PV)
-							| _flag_subtract(0) | _flag_carry_16(old16 + op16)
-							| _flag_halfcarry_16_add(old16, op16, 0);
+						| _flag_undef_16(new16) | __flag_pv(r->flags.PV)
+						| _flag_subtract(0) | _flag_carry_16(old16 + op16)
+						| _flag_halfcarry_16_add(old16, op16, 0);
 						break;
 					}
 					break;
@@ -1289,8 +1291,8 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 
 					new = write_r(context.y, old + 1, &context);
 					r->F = __flag_c(r->flags.C) | _flag_sign_8(new) | _flag_zero(new)
-						| _flag_halfcarry_8_add(old, 0, 1) | __flag_pv(old == 0x7F)
-						| _flag_undef_8(new);
+					| _flag_halfcarry_8_add(old, 0, 1) | __flag_pv(old == 0x7F)
+					| _flag_undef_8(new);
 					break;
 				case 5: // DEC r[y]
 					context.cycles += 4;
@@ -1301,8 +1303,8 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 
 					new = write_r(context.y, old - 1, &context);
 					r->F = __flag_c(r->flags.C) | _flag_sign_8(new) | _flag_zero(new)
-						| _flag_halfcarry_8_sub(old, 0, 1) | __flag_pv(old == 0x80)
-						| _flag_subtract(1) | _flag_undef_8(new);
+					| _flag_halfcarry_8_sub(old, 0, 1) | __flag_pv(old == 0x80)
+					| _flag_subtract(1) | _flag_undef_8(new);
 					break;
 				case 6: // LD r[y], n
 					context.cycles += 7;
@@ -1430,7 +1432,10 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 							break;
 						case 1: // EXX
 							context.cycles += 4;
-							exx(&cpu->registers);
+							uint16_t temp;
+							temp = r->_HL; r->_HL = r->HL; r->HL = temp;
+							temp = r->_DE; r->_DE = r->DE; r->DE = temp;
+							temp = r->_BC; r->_BC = r->BC; r->BC = temp;
 							break;
 						case 2: // JP HL
 							context.cycles += 4;
@@ -1479,7 +1484,9 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 						break;
 					case 5: // EX DE, HL
 						context.cycles += 4;
-						exDEHL(&cpu->registers);
+						uint16_t temp = r->HL;
+						r->HL = r->DE;
+						r->DE = temp;
 						break;
 					case 6: // DI
 						context.cycles += 4;
@@ -1511,30 +1518,30 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 						break;
 					case 1:
 						switch (context.p) {
-							case 0: // CALL nn
-								context.cycles += 17;
-								nn = context.nn(&context);
-								push(cpu, r->PC);
-								r->PC = nn;
-								break;
-							case 1: // 0xDD prefixed opcodes
-								context.cycles += 4;
-								cpu->prefix &= 0xFF;
-								cpu->prefix |= 0xDD00;
-								reset_prefix = 0;
-								break;
-							case 2: // 0xED prefixed opcodes
-								context.cycles += 4;
-								cpu->prefix &= 0xFF;
-								cpu->prefix |= 0xED00;
-								reset_prefix = 0;
-								break;
-							case 3: // 0xFD prefixed opcodes
-								context.cycles += 4;
-								cpu->prefix &= 0xFF;
-								cpu->prefix |= 0xFD00;
-								reset_prefix = 0;
-								break;
+						case 0: // CALL nn
+							context.cycles += 17;
+							nn = context.nn(&context);
+							push(cpu, r->PC);
+							r->PC = nn;
+							break;
+						case 1: // 0xDD prefixed opcodes
+							context.cycles += 4;
+							cpu->prefix &= 0xFF;
+							cpu->prefix |= 0xDD00;
+							reset_prefix = 0;
+							break;
+						case 2: // 0xED prefixed opcodes
+							context.cycles += 4;
+							cpu->prefix &= 0xFF;
+							cpu->prefix |= 0xED00;
+							reset_prefix = 0;
+							break;
+						case 3: // 0xFD prefixed opcodes
+							context.cycles += 4;
+							cpu->prefix &= 0xFF;
+							cpu->prefix |= 0xFD00;
+							reset_prefix = 0;
+							break;
 						}
 						break;
 					}
@@ -1556,7 +1563,7 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 			cpu->prefix = 0;
 		}
 
-exit_loop:
+	exit_loop:
 		cycles -= context.cycles;
 		if (context.cycles == 0) {
 			log_message(cpu->log, L_ERROR, "cpu", "Error: Unrecognized instruction 0x%02X.", context.opcode);

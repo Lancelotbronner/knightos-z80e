@@ -1,6 +1,5 @@
 #include <z80e/debugger/debugger.h>
-#include <z80e/core/cpu.h>
-#include <z80e/core/registers.h>
+#include <z80e/cpu/z80.h>
 
 int command_unhalt(struct debugger_state *state, int argc, char **argv) {
 	if (argc != 1) {

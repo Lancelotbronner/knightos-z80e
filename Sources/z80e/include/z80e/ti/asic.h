@@ -6,7 +6,7 @@
 #endif
 
 #include <z80e/types.h>
-#include <z80e/core/cpu.h>
+#include <z80e/cpu/z80.h>
 #include <z80e/log/log.h>
 #include <z80e/ti/memory.h>
 #include <z80e/ti/ti.h>

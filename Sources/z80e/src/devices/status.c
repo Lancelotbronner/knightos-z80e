@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <z80e/ti/asic.h>
-#include <z80e/core/cpu.h>
+#include <z80e/cpu/z80.h>
 #include <z80e/ti/hardware/interrupts.h>
 
 void status_init(status_t status, asic_t *asic) {

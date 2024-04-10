@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <z80e/ti/asic.h>
-#include <z80e/core/cpu.h>
+#include <z80e/cpu/z80.h>
 
 void keyboard_init(keyboard_t keyboard) {
 	for (int i = 0; i < 8; i++)

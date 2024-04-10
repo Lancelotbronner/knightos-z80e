@@ -1,5 +1,5 @@
 #include <z80e/ti/memory.h>
-#include <z80e/core/cpu.h>
+#include <z80e/cpu/z80.h>
 #include <z80e/debugger/commands.h>
 #include <z80e/debugger/debugger.h>
 #include <z80e/disassembler/disassemble.h>

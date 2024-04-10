@@ -1,4 +1,4 @@
-#include <z80e/core/cpu.h>
+#include <z80e/cpu/z80.h>
 
 #include <z80e/debugger/commands.h>
 #include <z80e/debugger/debugger.h>
