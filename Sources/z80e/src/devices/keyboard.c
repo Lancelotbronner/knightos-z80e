@@ -11,6 +11,18 @@ void keyboard_init(keyboard_t keyboard) {
 	keyboard->group_mask = 0;
 }
 
+//MARK: - Memory Management
+
+keyboard_t keyboard_new() {
+	keyboard_t keyboard = malloc(sizeof(struct keyboard));
+	keyboard_init(keyboard);
+	return keyboard;
+}
+
+void keyboard_delete(keyboard_t keyboard) {
+	free(keyboard);
+}
+
 //MARK: - Key Management
 
 /* Key codes in z80e are group << 4 | bit. That is, 0x14 is bit 4 of group 1. */
@@ -25,18 +37,6 @@ void keyboard_release(keyboard_t keyboard, uint8_t keycode) {
 	uint8_t group = keycode >> 4;
 	uint8_t mask = 1 << (keycode & 0xF);
 	keyboard->groups[group] |= mask;
-}
-
-//MARK: - Memory Management
-
-keyboard_t keyboard_new() {
-	keyboard_t keyboard = malloc(sizeof(struct keyboard));
-	keyboard_init(keyboard);
-	return keyboard;
-}
-
-void keyboard_delete(keyboard_t keyboard) {
-	free(keyboard);
 }
 
 //MARK: - Device Management

@@ -13,7 +13,7 @@ void status_init(status_t status, asic_t *asic) {
 //MARK: - Memory Management
 
 status_t status_new(asic_t *asic) {
-	status_t status = malloc(sizeof(status_t));
+	status_t status = malloc(sizeof(struct status));
 	status_init(status, asic);
 	return status;
 }

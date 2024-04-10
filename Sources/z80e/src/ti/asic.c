@@ -66,22 +66,24 @@ void asic_mirror_ports(asic_t *asic) {
 	switch (asic->device) {
 	case TI83p:
 		for (i = 0x08; i < 0x10; i++) {
-			asic->cpu.devices[i] = asic->cpu.devices[i & 0x07];
-			asic->cpu.devices[i].write = asic_null_write;
+			device_mirror(&asic->cpu.devices[i], &asic->cpu.devices[i & 0x07]);
+			device_null(&asic->cpu.devices[i], false, true);
 		}
-		asic->cpu.devices[0x12] = asic->cpu.devices[0x10];
-		asic->cpu.devices[0x13] = asic->cpu.devices[0x11];
-		asic->cpu.devices[0x15] = asic->cpu.devices[0x05];
-		asic->cpu.devices[0x15].write = asic_null_write;
+		
+		device_mirror(&asic->cpu.devices[0x12], &asic->cpu.devices[0x10]);
+		device_mirror(&asic->cpu.devices[0x13], &asic->cpu.devices[0x11]);
+
+		device_mirror(&asic->cpu.devices[0x15], &asic->cpu.devices[0x05]);
+		device_null(&asic->cpu.devices[0x15], false, true);
+
 		for (i = 0x17; i < 0x100; i++) {
-			asic->cpu.devices[i] = asic->cpu.devices[i & 0x07];
-			asic->cpu.devices[i].write = asic_null_write;
+			device_mirror(&asic->cpu.devices[i], &asic->cpu.devices[i & 0x07]);
+			device_null(&asic->cpu.devices[i], false, true);
 		}
 		break;
 	default:
-		for (i = 0x60; i < 0x80; i++) {
-			asic->cpu.devices[i] = asic->cpu.devices[i - 0x20];
-		}
+		for (i = 0x60; i < 0x80; i++)
+			device_mirror(&asic->cpu.devices[i], &asic->cpu.devices[i - 0x20]);
 		break;
 	}
 }

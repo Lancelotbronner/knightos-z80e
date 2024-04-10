@@ -9,6 +9,8 @@
 
 #include <z80e/types.h>
 
+#include <stdbool.h>
+
 struct z80_device {
 	void * _Nullable data;
 	read_t read;
@@ -16,4 +18,24 @@ struct z80_device {
 };
 
 unsigned char device_read(const struct z80_device device);
+
 void device_write(const struct z80_device device, const unsigned char value);
+
+/// Configures a device to mirror to another device.
+/// - Parameters:
+///   - device: The device to configure.
+///   - other: The device to mirror.
+void device_mirror(device_t _Nonnull device, const device_t _Nonnull other);
+
+/// Configures a device to be considered unimplemented.
+/// - Parameters:
+///  - device: The device to configure.
+///  - port: The port of the device for logging purposes.
+void device_unimplemented(device_t _Nonnull device, int port);
+
+/// Configures a device to ignore reads and/or writes.
+/// - Parameters:
+///   - device: The device to configure.
+///   - read: Whether to ignore reads.
+///   - write: Whether to ignore writes.
+void device_null(device_t _Nonnull device, bool read, bool write);

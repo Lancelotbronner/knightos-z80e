@@ -23,6 +23,10 @@ typedef struct ti_bw_lcd ti_bw_lcd_t;
 
 typedef struct z80_device *device_t;
 
+//TODO: pass the asic in device functions
+//typedef unsigned char (* _Nullable read_t)(asic_t * _Nonnull , void * _Null_unspecified);
+//typedef void (* _Nullable write_t)(asic_t * _Nonnull, void * _Null_unspecified, unsigned char);
+
 typedef unsigned char (* _Nullable read_t)(void * _Null_unspecified);
 
 typedef void (* _Nullable write_t)(void * _Null_unspecified, unsigned char);
@@ -32,3 +36,6 @@ typedef struct keyboard *keyboard_t;
 
 /// Status device
 typedef struct status *status_t;
+
+/// Mirror device, forwards calls to another device
+typedef struct mirror *mirror_t;
