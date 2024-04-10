@@ -4,7 +4,7 @@
 
 #include <z80e/types.h>
 
-struct z80registers {
+struct z80_regstate {
 	union {
 		uint16_t AF;
 		struct {
@@ -65,27 +65,49 @@ struct z80registers {
 	uint16_t WZ;
 };
 
-typedef enum {
-	FLAG_S =  1 << 7,
-	FLAG_Z =  1 << 6,
-	FLAG_5 =  1 << 5,
-	FLAG_H =  1 << 4,
-	FLAG_3 =  1 << 3,
-	FLAG_PV = 1 << 2,
-	FLAG_N  = 1 << 1,
-	FLAG_C  = 1 << 0,
-	FLAG_NONE = 0
-} z80flags;
+enum z80_flags : uint8_t {
+	FLAG_S =  0x80,
+	FLAG_Z =  0x40,
+	FLAG_5 =  0x20,
+	FLAG_H =  0x10,
+	FLAG_3 =  0x8,
+	FLAG_PV = 0x4,
+	FLAG_N  = 0x2,
+	FLAG_C  = 0x1,
+	FLAG_NONE = 0x0,
+};
 
-typedef enum {
-	A = (1 << 0), F = (1 << 1), AF = (1 << 2), _AF = (1 << 3),
-	B = (1 << 4), C = (1 << 5), BC = (1 << 6), _BC = (1 << 7),
-	D = (1 << 8), E = (1 << 9), DE = (1 << 10), _DE = (1 << 11),
-	H = (1 << 12), L = (1 << 13), HL = (1 << 14), _HL = (1 << 15),
-	PC = (1 << 16), SP = (1 << 17), I = (1 << 18), R = (1 << 19),
-	IXH = (1 << 20), IXL = (1 << 21), IX = (1 << 22),
-	IYH = (1 << 23), IYL = (1 << 24), IY = (1 << 25),
-} registers;
+enum z80_registers : uint32_t {
+	A = 0x1,
+	F = 0x2,
+	AF = 0x4,
+	_AF = 0x8,
+	B = 0x10,
+	C = 0x20,
+	BC = 0x40,
+	_BC = 0x80,
+
+	D = 0x0100,
+	E = 0x0200,
+	DE = 0x0400,
+	_DE = 0x0800,
+	H = 0x1000,
+	L = 0x2000,
+	HL = 0x4000,
+	_HL = 0x8000,
+
+	PC = 0x010000,
+	SP = 0x020000,
+	I = 0x040000,
+	R = 0x080000,
+	IXH = 0x100000,
+	IXL = 0x200000,
+	IX = 0x400000,
+	IYH = 0x800000,
+
+	IYL = 0x01000000,
+	IY = 0x02000000,
+};
 
 void exAFAF(z80registers_t *r);
 void exDEHL(z80registers_t *r);

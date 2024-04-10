@@ -1,4 +1,5 @@
 //import XCTest
+import XCTz80e
 //import z80e
 //
 //final class DisassemblerTests: z80eTestCase {

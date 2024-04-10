@@ -1,7 +1,8 @@
 import XCTest
+import XCTz80e
 import z80e
 
-final class IOTests: AsicTestCase {
+final class IOTests: XCTestCaseTI83p {
 
 	//MARK: - OUT
 

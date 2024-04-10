@@ -1,7 +1,8 @@
 import XCTest
+import XCTz80e
 import z80e
 
-final class LoadTests: AsicTestCase {
+final class LoadTests: XCTestCaseTI83p {
 
 	//MARK: - LD
 

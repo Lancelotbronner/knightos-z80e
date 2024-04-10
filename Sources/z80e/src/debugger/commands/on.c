@@ -60,7 +60,7 @@ typedef struct {
 	char *exec_string;
 } on_state_t;
 
-uint16_t command_on_register_hook(void *state, registers reg, uint16_t value) {
+uint16_t command_on_register_hook(void *state, enum z80_registers reg, uint16_t value) {
 	on_state_t *data = state;
 	debugger_exec(data->deb_sta, data->exec_string);
 	return value;

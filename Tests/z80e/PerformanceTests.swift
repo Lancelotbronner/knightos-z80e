@@ -1,7 +1,8 @@
 import XCTest
+import XCTz80e
 import z80e
 
-final class PerformanceTests: AsicTestCase {
+final class PerformanceTests: XCTestCaseTI83p {
 
 	func test_instructions() {
 		measure {

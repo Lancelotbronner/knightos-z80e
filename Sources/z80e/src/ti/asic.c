@@ -9,8 +9,8 @@
 #include <z80e/ti/hardware/t6a04.h>
 #include <z80e/ti/hardware/speed.h>
 #include <z80e/ti/hardware/memorymapping.h>
-#include <z80e/ti/hardware/keyboard.h>
-#include <z80e/ti/hardware/status.h>
+#include <z80e/devices/keyboard.h>
+#include <z80e/devices/status.h>
 #include <z80e/ti/hardware/flash.h>
 #include <z80e/ti/hardware/link.h>
 #include <z80e/ti/hardware/timers.h>

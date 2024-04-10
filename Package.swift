@@ -8,6 +8,7 @@ let package = Package(
 	products: [
 		.library(name: "z80e", targets: ["z80e"]),
 		.library(name: "z80ejs", targets: ["z80ejs"]),
+		.library(name: "XCTz80e", targets: ["XCTz80e"]),
 	],
 	dependencies: [
 		.package(name: "scas", path: "../scas"),
@@ -34,13 +35,23 @@ let package = Package(
 			dependencies: ["z80e"],
 			path: "Sources/gui"),
 
+		// Testing
+
+		.target(
+			name: "XCTz80e",
+			dependencies: ["z80e"],
+			path: "Tests/xct"),
+
 		.testTarget(
 			name: "z80eTests",
-			dependencies: ["z80e"],
-			path: "Tests/z80e",
-			resources: [
-				.copy("zex")
-			]),
+			dependencies: ["XCTz80e"],
+			path: "Tests/z80e"),
+
+		.testTarget(
+			name: "z80eInstructionSetExerciser",
+			dependencies: ["XCTz80e"],
+			path: "Tests/zex",
+			resources: [.copy("resources")]),
 	],
 	cLanguageStandard: .c2x
 )

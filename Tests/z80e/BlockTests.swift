@@ -1,7 +1,8 @@
 import XCTest
+import XCTz80e
 import z80e
 
-final class BlockTests: AsicTestCase {
+final class BlockTests: XCTestCaseTI83p {
 
 	// Note: INI, INIR, IND, INDR, OUTI, OUTD, OTIR, and OTDR are tested in IOTests.swift
 

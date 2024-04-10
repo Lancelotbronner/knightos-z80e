@@ -11,9 +11,9 @@
 
 typedef struct asic asic_t;
 
-typedef struct z80cpu z80cpu_t;
+typedef struct z80_cpu z80cpu_t;
 
-typedef struct z80registers z80registers_t;
+typedef struct z80_regstate z80registers_t;
 
 typedef struct ti_interrupts ti_interrupts_t;
 

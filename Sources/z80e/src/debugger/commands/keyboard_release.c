@@ -1,7 +1,7 @@
 #include <strings.h>
 #include <z80e/debugger/commands.h>
 #include <z80e/debugger/debugger.h>
-#include <z80e/ti/hardware/keyboard.h>
+#include <z80e/devices/keyboard.h>
 #include <z80e/debugger/keys.h>
 
 int command_release_key(debugger_state_t *state, int argc, char **argv) {

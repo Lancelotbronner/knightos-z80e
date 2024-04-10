@@ -23,15 +23,15 @@ int hook_add_memory_write(hook_info_t *, uint16_t address_start, uint16_t addres
 
 //MARK: - Register Hooks
 
-uint16_t hook_on_register_read(hook_info_t *, registers flags, uint16_t value);
-uint16_t hook_on_register_write(hook_info_t *, registers flags, uint16_t value);
+uint16_t hook_on_register_read(hook_info_t *, enum z80_registers flags, uint16_t value);
+uint16_t hook_on_register_write(hook_info_t *, enum z80_registers flags, uint16_t value);
 
-typedef uint16_t (*hook_register_callback_t)(void *data, registers reg, uint16_t value);
+typedef uint16_t (*hook_register_callback_t)(void *data, enum z80_registers reg, uint16_t value);
 
 void hook_remove_register_read(hook_info_t *, int);
-int hook_add_register_read(hook_info_t *, registers flags, void *data, hook_register_callback_t);
+int hook_add_register_read(hook_info_t *, enum z80_registers flags, void *data, hook_register_callback_t);
 void hook_remove_register_write(hook_info_t *, int);
-int hook_add_register_write(hook_info_t *, registers flags, void *data, hook_register_callback_t);
+int hook_add_register_write(hook_info_t *, enum z80_registers flags, void *data, hook_register_callback_t);
 
 //MARK: - Port Hooks
 

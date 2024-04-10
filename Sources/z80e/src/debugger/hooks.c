@@ -27,7 +27,7 @@ typedef struct {
 typedef struct {
 	void *data;
 	hook_register_callback_t callback;
-	registers registers;
+	enum z80_registers registers;
 	enum hook_flags flags;
 } register_hook_callback_t;
 
@@ -204,7 +204,7 @@ int hook_add_memory_write(hook_info_t *info, uint16_t address_start, uint16_t ad
 	return hook_add_to_memory_array(info->on_memory_write, address_start, address_end, data, callback);
 }
 
-uint16_t hook_on_register_read(hook_info_t *info, registers flags, uint16_t value) {
+uint16_t hook_on_register_read(hook_info_t *info, enum z80_registers flags, uint16_t value) {
 	int i = 0;
 	for (i = 0; i < info->on_register_read->capacity; i++) {
 		register_hook_callback_t *cb = &info->on_register_read->callbacks[i];
@@ -214,7 +214,7 @@ uint16_t hook_on_register_read(hook_info_t *info, registers flags, uint16_t valu
 	return value;
 }
 
-uint16_t hook_on_register_write(hook_info_t *info, registers flags, uint16_t value) {
+uint16_t hook_on_register_write(hook_info_t *info, enum z80_registers flags, uint16_t value) {
 	int i = 0;
 	for (i = 0; i < info->on_register_write->capacity; i++) {
 		register_hook_callback_t *cb = &info->on_register_write->callbacks[i];
@@ -224,7 +224,7 @@ uint16_t hook_on_register_write(hook_info_t *info, registers flags, uint16_t val
 	return value;
 }
 
-int hook_add_to_register_array(hook_register_array_t *hook, registers flags, void *data, hook_register_callback_t callback) {
+int hook_add_to_register_array(hook_register_array_t *hook, enum z80_registers flags, void *data, hook_register_callback_t callback) {
 	int x = 0;
 
 	for (; x < hook->capacity; x++) {
@@ -256,7 +256,7 @@ void hook_remove_register_read(hook_info_t *info, int index) {
 	info->on_register_read->callbacks[index].callback = 0;
 }
 
-int hook_add_register_read(hook_info_t *info, registers flags, void *data, hook_register_callback_t callback) {
+int hook_add_register_read(hook_info_t *info, enum z80_registers flags, void *data, hook_register_callback_t callback) {
 	return hook_add_to_register_array(info->on_register_read, flags, data, callback);
 }
 
@@ -264,7 +264,7 @@ void hook_remove_register_write(hook_info_t *info, int index) {
 	info->on_register_write->callbacks[index].callback = 0;
 }
 
-int hook_add_register_write(hook_info_t *info, registers flags, void *data, hook_register_callback_t callback) {
+int hook_add_register_write(hook_info_t *info, enum z80_registers flags, void *data, hook_register_callback_t callback) {
 	return hook_add_to_register_array(info->on_register_write, flags, data, callback);
 }
 

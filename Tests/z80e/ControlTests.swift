@@ -1,7 +1,8 @@
 import XCTest
+import XCTz80e
 import z80e
 
-final class ControlTests: AsicTestCase {
+final class ControlTests: XCTestCaseTI83p {
 
 	//MARK: - RST
 
@@ -110,6 +111,7 @@ final class ControlTests: AsicTestCase {
 		flash(test_nz)
 		let cycles = cpu_execute(&device.cpu, 12)
 		XCTAssertEqual(device.cpu.registers.PC, 0x10)
+		XCTAssertEqual(cycles, 0)
 	}
 
 	//MARK: - RET
@@ -140,6 +142,7 @@ final class ControlTests: AsicTestCase {
 		flash(test_nz)
 		let cycles = cpu_execute(&device.cpu, 11)
 		XCTAssertEqual(device.cpu.registers.PC, 0xFFFF)
+		XCTAssertEqual(cycles, 0)
 	}
 
 	//MARK: - JP

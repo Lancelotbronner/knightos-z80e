@@ -1,4 +1,4 @@
-#include <z80e/ti/hardware/keyboard.h>
+#include <z80e/devices/keyboard.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>

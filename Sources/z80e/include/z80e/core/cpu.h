@@ -3,12 +3,12 @@
 #include <stdint.h>
 
 #include <z80e/types.h>
-#include <z80e/core/device.h>
+#include <z80e/device.h>
 #include <z80e/core/registers.h>
 #include <z80e/debugger/hooks.h>
 #include <z80e/log/log.h>
 
-struct z80cpu {
+struct z80_cpu {
 	struct z80_device devices[0x100];
 	z80registers_t registers;
 	struct {
@@ -29,11 +29,11 @@ struct z80cpu {
 	log_t * _Nullable log;
 };
 
-uint8_t cpu_read_register_byte(z80cpu_t *_Nonnull, registers);
-uint16_t cpu_read_register_word(z80cpu_t *_Nonnull, registers);
+uint8_t cpu_read_register_byte(z80cpu_t * _Nonnull, enum z80_registers);
+uint16_t cpu_read_register_word(z80cpu_t * _Nonnull, enum z80_registers);
 
-uint8_t cpu_write_register_byte(z80cpu_t *_Nonnull, registers, uint8_t);
-uint16_t cpu_write_register_word(z80cpu_t *_Nonnull, registers, uint16_t);
+uint8_t cpu_write_register_byte(z80cpu_t * _Nonnull, enum z80_registers, uint8_t);
+uint16_t cpu_write_register_word(z80cpu_t * _Nonnull, enum z80_registers, uint16_t);
 
 void cpu_init(z80cpu_t * _Nonnull cpu, log_t * _Nullable log);
 device_t _Nonnull cpu_device( z80cpu_t * _Nonnull cpu, unsigned char i);
