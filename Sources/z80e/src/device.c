@@ -7,22 +7,27 @@
 
 #include <z80e/device.h>
 
-#include <z80e/ti/asic.h>
-
 #include <assert.h>
-#include <stdint.h>
 
-//MARK: - Mirror Device
-
-static uint8_t __mirror_read(device_t device) {
+unsigned char device_read(device_t _Nonnull device) {
 	if (device->read)
 		return device->read(device);
 	return 0x00;
 }
 
-static void __mirror_write(device_t device, uint8_t value) {
+void device_write(device_t _Nonnull device, unsigned char value) {
 	if (device->write)
 		device->write(device, value);
+}
+
+//MARK: - Mirror Device
+
+static unsigned char __mirror_read(device_t device) {
+	return device_read(device->data);
+}
+
+static void __mirror_write(device_t device, unsigned char value) {
+	device_write(device->data, value);
 }
 
 void device_mirror(device_t device, const device_t other) {
@@ -35,12 +40,12 @@ void device_mirror(device_t device, const device_t other) {
 //MARK: - Unimplemented Device
 
 //TODO: Once the asic is passed to device functions, use it to log in the unimplemented device
-static uint8_t __unimplemented_read(device_t device) {
+static unsigned char __unimplemented_read(device_t device) {
 //	log_message(asic->log, L_INFO, "asic", "Warning: attempted to read from unimplemented port 0x%02x from 0x%04X.", (int)port, d->asic->cpu.registers.PC);
 	return 0x00;
 }
 
-static void __unimplemented_write(device_t device, uint8_t value) {
+static void __unimplemented_write(device_t device, unsigned char value) {
 //	log_message(asic->log, L_INFO, "asic", "Warning: attempted to write 0x%02x to unimplemented port 0x%02x from 0x%04X.", value, d->port, d->asic->cpu.registers.PC);
 }
 
@@ -53,8 +58,8 @@ void device_unimplemented(device_t device, unsigned char port) {
 
 //MARK: - Null Device
 
-static uint8_t __null_read(device_t) { return 0x00; }
-static void __null_write(device_t, uint8_t) { }
+static unsigned char __null_read(device_t) { return 0x00; }
+static void __null_write(device_t, unsigned char) { }
 
 void device_null(device_t _Nonnull device, bool read, bool write) {
 	assert(device);

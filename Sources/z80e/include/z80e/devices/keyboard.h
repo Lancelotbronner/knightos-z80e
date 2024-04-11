@@ -10,11 +10,10 @@ struct keyboard_device {
 	};
 };
 
-//MARK: - Keyboard Management
-
 void keyboard_init(keyboard_device_t keyboard);
 
 void keyboard_release(keyboard_device_t keyboard, unsigned char keycode);
+
 void keyboard_press(keyboard_device_t keyboard, unsigned char keycode);
 
 //MARK: - Device Configuration

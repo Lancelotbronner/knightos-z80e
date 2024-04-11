@@ -17,6 +17,12 @@ struct z80_device {
 	write_t write;
 };
 
+unsigned char device_read(device_t _Nonnull device);
+
+void device_write(device_t _Nonnull device, unsigned char value);
+
+//MARK: - Device Configuration
+
 /// Configures a device to mirror to another device.
 /// - Parameters:
 ///   - device: The device to configure.

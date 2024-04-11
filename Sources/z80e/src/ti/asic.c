@@ -7,10 +7,10 @@
 #include <z80e/cpu/z80.h>
 #include <z80e/ti/memory.h>
 #include <z80e/ti/hardware/t6a04.h>
-#include <z80e/ti/hardware/speed.h>
 #include <z80e/devices/flash.h>
 #include <z80e/devices/keyboard.h>
 #include <z80e/devices/mapping.h>
+#include <z80e/devices/speed.h>
 #include <z80e/devices/status.h>
 #include <z80e/ti/hardware/link.h>
 #include <z80e/ti/hardware/timers.h>
@@ -44,17 +44,25 @@ void plug_devices(asic_t *asic) {
 		asic->cpu.devices[i] = device;
 	}
 
-	keyboard_init(&asic->keyboard);
-	device_keyboard(&asic->cpu.devices[0x01], &asic->keyboard);
-	device_status(&asic->cpu.devices[0x02], asic);
-	asic->cpu.devices[0x03] = init_interrupts(asic, &asic->interrupts);
-	setup_lcd_display(asic, asic->hook);
-
 	if (asic->device != TI73 && asic->device != TI83p) {
-		asic->cpu.devices[0x20] = init_speed(asic);
+		device_speed(&asic->cpu.devices[0x20], asic);
 		init_crystal_timers(asic);
 	}
 
+	// Initialize the keyboard
+	keyboard_init(&asic->keyboard);
+	device_keyboard(&asic->cpu.devices[0x01], &asic->keyboard);
+
+	// Initialize the status port
+	device_status(&asic->cpu.devices[0x02], asic);
+
+	// Initialize interrupts
+	asic->cpu.devices[0x03] = init_interrupts(asic, &asic->interrupts);
+
+	// Initialize the LCD display
+	setup_lcd_display(asic, asic->hook);
+
+	// Initialize link ports
 	init_link_ports(asic);
 
 	// Initialize memory mapping ports

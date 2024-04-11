@@ -6,10 +6,7 @@
 
 static unsigned char __flash_mirror_read(device_t device) {
 	asic_t *asic = device->data;
-	device_t port4 = &asic->cpu.devices[0x04];
-	if (port4->read)
-		return port4->read(device);
-	return 0x00;
+	return device_read(&asic->cpu.devices[0x04]);
 }
 
 //MARK: - Flash Control
