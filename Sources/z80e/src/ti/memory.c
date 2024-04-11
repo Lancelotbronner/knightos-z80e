@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void ti_mmu_init(ti_mmu_t *mmu, ti_device_type device_type, log_t *log) {
+void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type, log_t *log) {
 	switch (device_type) {
 	case TI83p:
 	case TI73:
@@ -49,20 +49,20 @@ void ti_mmu_init(ti_mmu_t *mmu, ti_device_type device_type, log_t *log) {
 	return mmu;
 }
 
-void ti_mmu_deinit(ti_mmu_t *mmu) {
+void ti_mmu_deinit(ti_mmu_t mmu) {
 	free(mmu->ram);
 	free(mmu->flash);
 }
 
-void chip_reset(ti_mmu_t *mmu, uint32_t address, uint8_t value) {
+void chip_reset(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 	mmu->flash_write_index = 0;
 }
 
-void chip_write(ti_mmu_t *mmu, uint32_t address, uint8_t value) {
+void chip_write(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 	mmu->flash[address] &= value;
 }
 
-void chip_erase_sector(ti_mmu_t *mmu, uint32_t address, uint8_t value) {
+void chip_erase_sector(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 	uint32_t length = 0x10000;
 	if ((address >> 16) + 1 == mmu->settings.flash_pages >> 2) {
 		switch ((address >> 13) & 7) {
@@ -85,13 +85,13 @@ void chip_erase_sector(ti_mmu_t *mmu, uint32_t address, uint8_t value) {
 	memset(&mmu->flash[address & ~(length - 1)], 0xFF, length);
 }
 
-void chip_erase(ti_mmu_t *mmu, uint32_t address, uint8_t value) {
+void chip_erase(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 	memset(mmu->flash, 0xFF, mmu->settings.flash_pages * 0x4000);
 	log_message(mmu->log, L_WARN, "mmu", "Erased entire Flash chip - you probably didn't want to do that.");
 }
 
 uint8_t ti_read_byte(void *memory, uint16_t address) {
-	ti_mmu_t *mmu = memory;
+	ti_mmu_t mmu = memory;
 	ti_mmu_bank_state_t bank = mmu->banks[address / 0x4000];
 	uint32_t mapped_address = address;
 	mapped_address %= 0x4000;
@@ -110,7 +110,7 @@ uint8_t ti_read_byte(void *memory, uint16_t address) {
 struct flash_pattern {
 	int length;
 	const flash_write_t pattern[6];
-	void (*handler)(ti_mmu_t *memory, uint32_t address, uint8_t value);
+	void (*handler)(ti_mmu_t memory, uint32_t address, uint8_t value);
 };
 
 struct flash_pattern patterns[] = {
@@ -155,7 +155,7 @@ struct flash_pattern patterns[] = {
 };
 
 void ti_write_byte(void *memory, uint16_t address, uint8_t value) {
-	ti_mmu_t *mmu = memory;
+	ti_mmu_t mmu = memory;
 	ti_mmu_bank_state_t bank = mmu->banks[address / 0x4000];
 	uint32_t mapped_address = address;
 	mapped_address %= 0x4000;
@@ -194,7 +194,7 @@ void ti_write_byte(void *memory, uint16_t address, uint8_t value) {
 }
 
 void mmu_force_write(void *memory, uint16_t address, uint8_t value) {
-	ti_mmu_t *mmu = memory;
+	ti_mmu_t mmu = memory;
 	ti_mmu_bank_state_t bank = mmu->banks[address / 0x4000];
 	uint32_t mapped_address = address;
 	mapped_address %= 0x4000;

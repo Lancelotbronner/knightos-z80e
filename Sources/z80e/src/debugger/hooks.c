@@ -73,7 +73,7 @@ typedef struct {
 
 struct hook_info {
 	z80cpu_t *cpu;
-	ti_mmu_t *mmu;
+	ti_mmu_t mmu;
 
 	hook_memory_array_t *on_memory_read;
 	hook_memory_array_t *on_memory_write;

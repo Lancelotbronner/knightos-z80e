@@ -54,7 +54,7 @@ void tui_init(tui_state_t *state) {
 }
 
 struct tui_disasm {
-	ti_mmu_t *mmu;
+	ti_mmu_t mmu;
 	char *string_pointer;
 };
 

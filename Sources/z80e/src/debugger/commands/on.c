@@ -196,7 +196,7 @@ int command_break(struct debugger_state *state, int argc, char **argv) {
 }
 
 typedef struct {
-	ti_mmu_t *mmu;
+	ti_mmu_t mmu;
 	debugger_state_t *state;
 } command_step_over_dism_extra_t;
 
