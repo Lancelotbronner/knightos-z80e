@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 
-void ti_interrupts_check_state(ti_interrupts_t *interrupts) {
+void ti_interrupts_check_state(ti_interrupts_t interrupts) {
 	if (!(
 		interrupts->interrupted.on_key ||
 		interrupts->interrupted.first_timer ||
@@ -18,7 +18,7 @@ void ti_interrupts_check_state(ti_interrupts_t *interrupts) {
 	}
 }
 
-void ti_interrupts_interrupt(ti_interrupts_t *interrupts, int flag) {
+void ti_interrupts_interrupt(ti_interrupts_t interrupts, int flag) {
 	int should_interrupt = 0;
 
 	if (flag & INTERRUPT_ON_KEY && interrupts->enabled.on_key) {
@@ -68,7 +68,7 @@ void ti_interrupts_interrupt(ti_interrupts_t *interrupts, int flag) {
 	}
 }
 
-void ti_interrupts_set_interrupt_enabled(ti_interrupts_t *interrupts, int flag, int set_to) {
+void ti_interrupts_set_interrupt_enabled(ti_interrupts_t interrupts, int flag, int set_to) {
 	if (flag & INTERRUPT_ON_KEY) {
 		interrupts->enabled.on_key = set_to;
 		log_message(interrupts->asic->log, L_DEBUG, "interrupts", "on key interrupt %s", set_to ? "enabled" : "disabled");
@@ -105,7 +105,7 @@ void ti_interrupts_set_interrupt_enabled(ti_interrupts_t *interrupts, int flag, 
 	}
 }
 
-void ti_interrupts_acknowledge_interrupt(ti_interrupts_t *interrupts, int flag) {
+void ti_interrupts_acknowledge_interrupt(ti_interrupts_t interrupts, int flag) {
 	if (flag & INTERRUPT_ON_KEY) {
 		interrupts->interrupted.on_key = 0;
 		log_message(interrupts->asic->log, L_DEBUG, "interrupts", "on key interrupt acknowledged");
@@ -144,17 +144,17 @@ void ti_interrupts_acknowledge_interrupt(ti_interrupts_t *interrupts, int flag) 
 	ti_interrupts_check_state(interrupts);
 }
 
-void depress_on_key(ti_interrupts_t *interrupts) {
+void depress_on_key(ti_interrupts_t interrupts) {
 	interrupts->interrupted.on_key_pressed = 0;
 	ti_interrupts_interrupt(interrupts, INTERRUPT_ON_KEY);
 }
 
-void release_on_key(ti_interrupts_t *interrupts) {
+void release_on_key(ti_interrupts_t interrupts) {
 	interrupts->interrupted.on_key_pressed = 1;
 }
 
 uint8_t read_interrupt_mask(void *device) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 	return
 		(interrupts->enabled.on_key ? INTERRUPT_ON_KEY : 0) |
 		(interrupts->enabled.first_timer ? INTERRUPT_FIRST_TIMER : 0) |
@@ -167,7 +167,7 @@ uint8_t read_interrupt_mask(void *device) {
 }
 
 void write_interrupt_mask(void *device, uint8_t value) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 
 	interrupts->interrupted.on_key &= (interrupts->enabled.on_key = !!(value & INTERRUPT_ON_KEY));
 	interrupts->interrupted.first_timer &= (interrupts->enabled.first_timer = !!(value & INTERRUPT_FIRST_TIMER));
@@ -183,7 +183,7 @@ void write_interrupt_mask(void *device, uint8_t value) {
 }
 
 uint8_t read_interrupting_device(void *device) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 	return
 		(interrupts->interrupted.on_key ? INTERRUPT_ON_KEY : 0) |
 		(interrupts->interrupted.first_timer ? INTERRUPT_FIRST_TIMER : 0) |
@@ -196,7 +196,7 @@ uint8_t read_interrupting_device(void *device) {
 }
 
 void write_acknowledged_interrupts(void *device, uint8_t value) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 
 	interrupts->interrupted.on_key &= !!(value & INTERRUPT_ON_KEY);
 	interrupts->interrupted.first_timer &= !!(value & INTERRUPT_FIRST_TIMER);
@@ -215,7 +215,7 @@ double second_timer_table[2][4] =
 	{{ 1120, 497, 344, 236 }, { 1024, 455.11, 292.57, 215.28 }};
 
 void write_timer_speed(void *device, uint8_t value) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 
 	value >>= 1;
 	uint8_t timer_speed = value & 3;
@@ -224,19 +224,19 @@ void write_timer_speed(void *device, uint8_t value) {
 }
 
 void first_timer_tick(asic_t *asic, void *device) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 
 	ti_interrupts_interrupt(interrupts, INTERRUPT_FIRST_TIMER);
 }
 
 void second_timer_tick(asic_t *asic, void *device) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 
 	ti_interrupts_interrupt(interrupts, INTERRUPT_SECOND_TIMER);
 }
 
 void set_first_timer_frequency(void *device, double speed) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 
 	if (interrupts->first_timer_id != -1) {
 		asic_remove_timer(interrupts->asic, interrupts->first_timer_id);
@@ -249,7 +249,7 @@ void set_first_timer_frequency(void *device, double speed) {
 }
 
 void set_second_timer_frequency(void *device, double speed) {
-	ti_interrupts_t *interrupts = device;
+	ti_interrupts_t interrupts = device;
 
 	if (interrupts->second_timer_id != -1) {
 		asic_remove_timer(interrupts->asic, interrupts->second_timer_id);
@@ -261,7 +261,7 @@ void set_second_timer_frequency(void *device, double speed) {
 	}
 }
 
-struct z80_device init_interrupts(asic_t *asic, ti_interrupts_t **result) {
+struct z80_device init_interrupts(asic_t *asic, ti_interrupts_t *result) {
 	*result = calloc(sizeof(ti_interrupts_t), 1);
 	(*result)->asic = asic;
 	(*result)->first_timer_id = -1;

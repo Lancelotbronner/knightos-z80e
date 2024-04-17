@@ -13,7 +13,7 @@
 #include <z80e/devices/speed.h>
 #include <z80e/devices/status.h>
 #include <z80e/ti/hardware/link.h>
-#include <z80e/ti/hardware/timers.h>
+#include <z80e/devices/crystal.h>
 
 typedef struct {
 	asic_t *asic;

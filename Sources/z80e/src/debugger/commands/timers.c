@@ -1,6 +1,6 @@
 #include <z80e/debugger/commands.h>
 #include <z80e/debugger/debugger.h>
-#include <z80e/ti/hardware/timers.h>
+#include <z80e/devices/crystal.h>
 
 #include <sys/types.h>
 #include <stdlib.h>

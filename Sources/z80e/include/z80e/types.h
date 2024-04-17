@@ -17,7 +17,7 @@ typedef struct ti_mmu *ti_mmu_t;
 
 typedef struct z80_regstate z80registers_t;
 
-typedef struct ti_interrupts ti_interrupts_t;
+typedef struct ti_interrupts *ti_interrupts_t;
 
 typedef struct ti_bw_lcd ti_bw_lcd_t;
 

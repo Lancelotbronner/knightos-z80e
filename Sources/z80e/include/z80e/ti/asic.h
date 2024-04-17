@@ -69,7 +69,7 @@ struct asic {
 	struct keyboard_device keyboard;
 	struct mapping_device mapping;
 	struct ti_mmu mmu;
-	ti_interrupts_t *interrupts;
+	ti_interrupts_t interrupts;
 	z80_hardware_timers_t *timers;
 	z80_link_socket_t *link;
 

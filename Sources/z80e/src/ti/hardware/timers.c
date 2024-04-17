@@ -4,7 +4,7 @@
 #include <z80e/ti/asic.h>
 #include <z80e/log/log.h>
 #include <z80e/ti/memory.h>
-#include <z80e/ti/hardware/timers.h>
+#include <z80e/devices/crystal.h>
 #include <z80e/ti/hardware/interrupts.h>
 
 #include <stdlib.h>
