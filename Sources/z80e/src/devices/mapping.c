@@ -61,7 +61,7 @@ void mapping_reload(mapping_device_t mapping) {
 
 static unsigned char __mapping_status_read(device_t device) {
 	mapping_device_t mapping = device->data;
-	return read_interrupting_device(mapping->asic->interrupts);
+	return read_interrupting_device(&mapping->asic->cpu.devices[0x03]);
 }
 
 static void __mapping_status_write(device_t device, unsigned char value) {
@@ -71,7 +71,7 @@ static void __mapping_status_write(device_t device, unsigned char value) {
 	log_message(mapping->asic->log, L_DEBUG, "memorymapping", "Set mapping mode to %d (at 0x%04X)", mapping->mode, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 
-	write_timer_speed(mapping->asic->interrupts, value);
+	write_timer_speed(&mapping->asic->interrupts, value);
 }
 
 void device_mapping_status(device_t device, mapping_device_t mapping) {

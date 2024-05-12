@@ -70,8 +70,8 @@ void bw_lcd_reset(ti_bw_lcd_t *lcd) {
 	lcd->op_amp2 = 0;
 }
 
-uint8_t bw_lcd_status_read(void *device) {
-	ti_bw_lcd_t *lcd = device;
+uint8_t bw_lcd_status_read(device_t device) {
+	ti_bw_lcd_t *lcd = device->data;
 
 	uint8_t retval = 0;
 	retval |= (0) << 7;
@@ -84,8 +84,8 @@ uint8_t bw_lcd_status_read(void *device) {
 	return retval;
 }
 
-void bw_lcd_status_write(void *device, uint8_t val) {
-	ti_bw_lcd_t *lcd = device;
+void bw_lcd_status_write(device_t device, uint8_t val) {
+	ti_bw_lcd_t *lcd = device->data;
 
 	log_message(lcd->asic->log, L_DEBUG, "lcd", "Wrote 0x%02X (0b%d%d%d%d%d%d%d%d) to status", val,
 		!!(val & (1 << 7)),
@@ -172,8 +172,8 @@ void bw_lcd_advance_pointer(ti_bw_lcd_t *lcd) {
 	}
 }
 
-uint8_t bw_lcd_data_read(void *device) {
-	ti_bw_lcd_t *lcd = device;
+uint8_t bw_lcd_data_read(device_t device) {
+	ti_bw_lcd_t *lcd = device->data;
 
 	int cY = lcd->Y * (lcd->word_length ? 8 : 6);
 	int cX = lcd->X;
@@ -192,8 +192,8 @@ uint8_t bw_lcd_data_read(void *device) {
 	return retval;
 }
 
-void bw_lcd_data_write(void *device, uint8_t val) {
-	ti_bw_lcd_t *lcd = device;
+void bw_lcd_data_write(device_t device, uint8_t val) {
+	ti_bw_lcd_t *lcd = device->data;
 
 	int cY = lcd->Y * (lcd->word_length ? 8 : 6);
 	int cX = lcd->X;

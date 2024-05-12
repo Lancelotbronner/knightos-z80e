@@ -153,8 +153,8 @@ void release_on_key(ti_interrupts_t interrupts) {
 	interrupts->interrupted.on_key_pressed = 1;
 }
 
-uint8_t read_interrupt_mask(void *device) {
-	ti_interrupts_t interrupts = device;
+uint8_t read_interrupt_mask(device_t device) {
+	ti_interrupts_t interrupts = device->data;
 	return
 		(interrupts->enabled.on_key ? INTERRUPT_ON_KEY : 0) |
 		(interrupts->enabled.first_timer ? INTERRUPT_FIRST_TIMER : 0) |
@@ -166,8 +166,8 @@ uint8_t read_interrupt_mask(void *device) {
 		(interrupts->enabled.third_crystal ? INTERRUPT_THIRD_CRYSTAL : 0);
 }
 
-void write_interrupt_mask(void *device, uint8_t value) {
-	ti_interrupts_t interrupts = device;
+void write_interrupt_mask(device_t device, uint8_t value) {
+	ti_interrupts_t interrupts = device->data;
 
 	interrupts->interrupted.on_key &= (interrupts->enabled.on_key = !!(value & INTERRUPT_ON_KEY));
 	interrupts->interrupted.first_timer &= (interrupts->enabled.first_timer = !!(value & INTERRUPT_FIRST_TIMER));
@@ -182,8 +182,8 @@ void write_interrupt_mask(void *device, uint8_t value) {
 	ti_interrupts_check_state(interrupts);
 }
 
-uint8_t read_interrupting_device(void *device) {
-	ti_interrupts_t interrupts = device;
+uint8_t read_interrupting_device(device_t device) {
+	ti_interrupts_t interrupts = device->data;
 	return
 		(interrupts->interrupted.on_key ? INTERRUPT_ON_KEY : 0) |
 		(interrupts->interrupted.first_timer ? INTERRUPT_FIRST_TIMER : 0) |
@@ -195,8 +195,8 @@ uint8_t read_interrupting_device(void *device) {
 		(interrupts->interrupted.third_crystal ? INTERRUPT_THIRD_CRYSTAL : 0);
 }
 
-void write_acknowledged_interrupts(void *device, uint8_t value) {
-	ti_interrupts_t interrupts = device;
+void write_acknowledged_interrupts(device_t device, uint8_t value) {
+	ti_interrupts_t interrupts = device->data;
 
 	interrupts->interrupted.on_key &= !!(value & INTERRUPT_ON_KEY);
 	interrupts->interrupted.first_timer &= !!(value & INTERRUPT_FIRST_TIMER);
@@ -261,13 +261,13 @@ void set_second_timer_frequency(void *device, double speed) {
 	}
 }
 
-struct z80_device init_interrupts(asic_t *asic, ti_interrupts_t *result) {
-	*result = calloc(sizeof(ti_interrupts_t), 1);
-	(*result)->asic = asic;
-	(*result)->first_timer_id = -1;
-	(*result)->second_timer_id = -1;
-	release_on_key(*result);
-	struct z80_device device = { *result, read_interrupt_mask, write_interrupt_mask };
+struct z80_device init_interrupts(asic_t *asic, ti_interrupts_t result) {
+	result = calloc(sizeof(struct ti_interrupts), 1);
+	result->asic = asic;
+	result->first_timer_id = -1;
+	result->second_timer_id = -1;
+	release_on_key(result);
+	struct z80_device device = { result, read_interrupt_mask, write_interrupt_mask };
 	return device;
 }
 

@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint8_t read_link_port(void *device) {
-	link_state_t *state = device;
+uint8_t read_link_port(device_t device) {
+	link_state_t *state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -33,16 +33,16 @@ uint8_t read_link_port(void *device) {
 	}
 }
 
-void write_link_port(void *device, uint8_t val) {
-	link_state_t *state = device;
+void write_link_port(device_t device, uint8_t val) {
+	link_state_t *state = device->data;
 	bool tip = val & 1;
 	bool ring = val & 2;
 	state->us.tip = tip;
 	state->us.ring = ring;
 }
 
-uint8_t read_link_assist_enable_port(void *device) {
-	link_state_t *state = device;
+uint8_t read_link_assist_enable_port(device_t device) {
+	link_state_t *state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -52,8 +52,8 @@ uint8_t read_link_assist_enable_port(void *device) {
 	}
 }
 
-void write_link_assist_enable_port(void *device, uint8_t val) {
-	link_state_t *state = device;
+void write_link_assist_enable_port(device_t device, uint8_t val) {
+	link_state_t *state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -69,8 +69,8 @@ void write_link_assist_enable_port(void *device, uint8_t val) {
 	}
 }
 
-uint8_t read_link_assist_rx_port(void *device) {
-	link_state_t *state = device;
+uint8_t read_link_assist_rx_port(device_t device) {
+	link_state_t *state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -90,12 +90,12 @@ uint8_t read_link_assist_rx_port(void *device) {
 	}
 }
 
-void write_link_assist_rx_port(void *device, uint8_t val) {
+void write_link_assist_rx_port(device_t device, uint8_t val) {
 	// Not emualted by z80e
 }
 
-uint8_t read_link_assist_status_port(void *device) {
-	link_state_t *state = device;
+uint8_t read_link_assist_status_port(device_t device) {
+	link_state_t *state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -105,16 +105,16 @@ uint8_t read_link_assist_status_port(void *device) {
 	}
 }
 
-void write_link_assist_status_port(void *device, uint8_t val) {
+void write_link_assist_status_port(device_t device, uint8_t val) {
 	// Not emualted by z80e
 }
 
-uint8_t read_link_assist_tx_port(void *device) {
+uint8_t read_link_assist_tx_port(device_t device) {
 	return 0; // no-op
 }
 
-void write_link_assist_tx_port(void *device, uint8_t val) {
-	link_state_t *state = device;
+void write_link_assist_tx_port(device_t device, uint8_t val) {
+	link_state_t *state = device->data;
 	if (!state->assist.status.tx_ready) {
 		// TODO: What actually happens? Probably this behavior tbh
 		return;

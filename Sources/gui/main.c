@@ -6,7 +6,7 @@
 #include <z80e/debugger/commands.h>
 #include <z80e/log/log.h>
 #include <z80e/ti/hardware/t6a04.h>
-#include <z80e/ti/hardware/keyboard.h>
+#include <z80e/devices/keyboard.h>
 #include <z80e/ti/hardware/interrupts.h>
 
 #include <SDL2/SDL.h>
@@ -321,9 +321,9 @@ void sdl_events_hook(asic_t *device, void * unused) {
 						break;
 					case SDLK_F12: /* F12 = On */
 						if (event.type == SDL_KEYDOWN) {
-							depress_on_key(device->interrupts);
+							depress_on_key(&device.interrupts);
 						} else {
-							release_on_key(device->interrupts);
+							release_on_key(&device.interrupts);
 						}
 						break;
 					case SDLK_SPACE: /* Space = 0 */
