@@ -1,15 +1,20 @@
 #pragma once
 
-#include <stdint.h>
-
 #include <z80e/types.h>
 
-struct crystal_timer {
-    asic_t *asic;
-    uint8_t frequency;
-    uint8_t loop;
-    uint8_t counter;
-};
+//MARK: - Device Configuration
 
-void init_crystal_timers(asic_t *asic);
-void free_crystal_timers(asic_t *asic);
+/// Configures a device to be the frequency of a crystal timer.
+/// - Parameters:
+///   - device: The device to configure.
+void device_crystal_frequency(device_t device);
+
+/// Configures a device to be the loop of a crystal timer.
+/// - Parameters:
+///   - device: The device to configure.
+void device_crystal_loop(device_t device);
+
+/// Configures a device to be the count of a crystal timer.
+/// - Parameters:
+///   - device: The device to configure.
+void device_crystal_count(device_t device);

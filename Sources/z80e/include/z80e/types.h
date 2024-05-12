@@ -38,3 +38,5 @@ typedef void (* _Nullable write_t)(const device_t _Nonnull, unsigned char);
 typedef struct keyboard_device *keyboard_device_t;
 
 typedef struct mapping_device *mapping_device_t;
+
+typedef struct crystal_device *crystal_device_t;

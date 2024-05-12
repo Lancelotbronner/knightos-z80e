@@ -46,7 +46,20 @@ void plug_devices(asic_t *asic) {
 
 	if (asic->device != TI73 && asic->device != TI83p) {
 		device_speed(&asic->cpu.devices[0x20], asic);
-		init_crystal_timers(asic);
+		
+		// Initialize 3 crystal timers
+		
+		device_crystal_frequency(&asic->cpu.devices[0x30]);
+		device_crystal_loop(&asic->cpu.devices[0x31]);
+		device_crystal_count(&asic->cpu.devices[0x32]);
+
+		device_crystal_frequency(&asic->cpu.devices[0x33]);
+		device_crystal_loop(&asic->cpu.devices[0x34]);
+		device_crystal_count(&asic->cpu.devices[0x35]);
+
+		device_crystal_frequency(&asic->cpu.devices[0x36]);
+		device_crystal_loop(&asic->cpu.devices[0x37]);
+		device_crystal_count(&asic->cpu.devices[0x38]);
 	}
 
 	// Initialize the keyboard
