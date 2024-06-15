@@ -11,12 +11,12 @@ final class InterruptsTests: XCTestCaseTI83p {
 
 	func test_IM_1() {
 		flash(IM_1)
-		cpu_execute(&device.cpu, 100)
-		XCTAssertEqual(device.cpu.registers.PC, 3)
-		device.cpu.interrupt = 1;
-		let cycles = cpu_execute(&device.cpu, 13)
-		XCTAssertEqual(device.cpu.registers.PC, 0x38)
-		XCTAssertEqual(device.cpu.registers.SP, 0xFFFE)
+		cpu_execute(&asic.cpu, 100)
+		XCTAssertEqual(asic.cpu.registers.PC, 3)
+		asic.cpu.interrupt = 1;
+		let cycles = cpu_execute(&asic.cpu, 13)
+		XCTAssertEqual(asic.cpu.registers.PC, 0x38)
+		XCTAssertEqual(asic.cpu.registers.SP, 0xFFFE)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -27,14 +27,14 @@ final class InterruptsTests: XCTestCaseTI83p {
 
 	func test_IM_2() {
 		flash(IM2)
-		cpu_execute(&device.cpu, 100)
-		XCTAssertEqual(device.cpu.registers.PC, 7)
-		XCTAssertEqual(device.cpu.registers.I, 0x80)
-		device.cpu.bus = 0x90;
-		device.cpu.interrupt = 1;
-		let cycles = cpu_execute(&device.cpu, 19)
-		XCTAssertEqual(device.cpu.registers.PC, 0x8090)
-		XCTAssertEqual(device.cpu.registers.SP, 0xFFFE)
+		cpu_execute(&asic.cpu, 100)
+		XCTAssertEqual(asic.cpu.registers.PC, 7)
+		XCTAssertEqual(asic.cpu.registers.I, 0x80)
+		asic.cpu.bus = 0x90;
+		asic.cpu.interrupt = 1;
+		let cycles = cpu_execute(&asic.cpu, 19)
+		XCTAssertEqual(asic.cpu.registers.PC, 0x8090)
+		XCTAssertEqual(asic.cpu.registers.SP, 0xFFFE)
 		XCTAssertEqual(cycles, 0)
 	}
 

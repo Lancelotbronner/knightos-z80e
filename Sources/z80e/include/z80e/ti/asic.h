@@ -63,7 +63,7 @@ struct asic {
 	int battery_remove_check;
 	int clock_rate;
 
-	z80cpu_t cpu;
+	struct z80_cpu cpu;
 	runloop_state_t *runloop;
 
 	struct keyboard_device keyboard;

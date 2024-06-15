@@ -9,7 +9,7 @@
 #include <z80e/log/log.h>
 
 struct z80_cpu {
-	struct z80_device devices[0x100];
+	struct device devices[0x100];
 	struct z80_regstate registers;
 	struct {
 		uint8_t IFF1 : 1;

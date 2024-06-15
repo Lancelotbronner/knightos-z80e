@@ -201,7 +201,7 @@ void handleLongFlag(appContext_t *context, char *flag, int *i, char **argv) {
 
 void frontend_log(void *data, loglevel_t level, const char *part, const char *message, va_list args) {
 	vprintf(message, args);
-	printf("\n");
+	putc('\n', stdout);
 }
 
 void sigint_handler(int sig) {

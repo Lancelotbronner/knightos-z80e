@@ -27,12 +27,12 @@ struct ExecutionContext {
 
 void cpu_init(z80cpu_t* cpu, log_t *log) {
 	cpu->log = log;
-	struct z80_device nullDevice = { NULL, NULL, NULL };
+	struct device nullDevice = { NULL, NULL, NULL };
 	for (int i = 0; i < 0x100; i++)
 		cpu->devices[i] = nullDevice;
 }
 
-struct z80_device *cpu_device(z80cpu_t *cpu, unsigned char i) {
+struct device *cpu_device(z80cpu_t *cpu, unsigned char i) {
 	return &cpu->devices[i];
 }
 

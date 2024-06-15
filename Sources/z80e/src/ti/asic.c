@@ -40,7 +40,7 @@ void plug_devices(asic_t *asic) {
 		unimplemented_device_t *d = malloc(sizeof(unimplemented_device_t));
 		d->asic = asic;
 		d->port = i;
-		struct z80_device device = { d, read_unimplemented_port, write_unimplemented_port };
+		struct device device = { d, read_unimplemented_port, write_unimplemented_port };
 		asic->cpu.devices[i] = device;
 	}
 

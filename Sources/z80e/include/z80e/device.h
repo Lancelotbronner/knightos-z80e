@@ -11,15 +11,15 @@
 
 #include <stdbool.h>
 
-struct z80_device {
+struct device {
 	void * _Nullable data;
 	read_t read;
 	write_t write;
 };
 
-unsigned char device_read(device_t _Nonnull device);
+unsigned char device_read(const device_t _Nonnull device);
 
-void device_write(device_t _Nonnull device, unsigned char value);
+void device_write(const device_t _Nonnull device, unsigned char value);
 
 //MARK: - Device Configuration
 

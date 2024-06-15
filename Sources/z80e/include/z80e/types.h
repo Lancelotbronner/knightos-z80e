@@ -23,7 +23,7 @@ typedef struct ti_bw_lcd ti_bw_lcd_t;
 
 //MARK: - Device Management
 
-typedef struct z80_device *device_t;
+typedef struct device *device_t;
 
 //TODO: pass the asic in device functions
 //typedef unsigned char (* _Nullable read_t)(asic_t * _Nonnull , void * _Null_unspecified);

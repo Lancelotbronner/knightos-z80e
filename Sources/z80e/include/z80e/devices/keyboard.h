@@ -21,4 +21,5 @@ void keyboard_press(keyboard_device_t keyboard, unsigned char keycode);
 /// Configures a device to be a Ti keyboard.
 /// - Parameters:
 ///   - device: The device to configure.
-void device_keyboard(device_t device, keyboard_device_t keyboard);
+///   - keyboard: The keyboard to connect to this device.
+void device_keyboard(device_t device, const keyboard_device_t keyboard);

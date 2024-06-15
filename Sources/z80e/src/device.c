@@ -9,13 +9,13 @@
 
 #include <assert.h>
 
-unsigned char device_read(device_t _Nonnull device) {
+unsigned char device_read(const device_t _Nonnull device) {
 	if (device->read)
 		return device->read(device);
 	return 0x00;
 }
 
-void device_write(device_t _Nonnull device, unsigned char value) {
+void device_write(const device_t _Nonnull device, unsigned char value) {
 	if (device->write)
 		device->write(device, value);
 }

@@ -7,28 +7,31 @@ final class DeviceTests: XCTestCaseTI83p {
 	//MARK: - Keyboard
 
 	func test_keyboard() {
-		var keyboard = keyboard()
+		var keyboard = keyboard_device()
 		keyboard_init(&keyboard)
 
+		var device = device()
+		device_keyboard(&device, &keyboard)
+
 		keyboard_press(&keyboard, 0)
-		keyboard_write(&keyboard, 0xFE)
-		var value = keyboard_read(&keyboard)
+		device_write(&device, 0xFE)
+		var value = device_read(&device)
 		XCTAssertEqual(value, 0xFE)
 
 		keyboard_press(&keyboard, 1);
-		value = keyboard_read(&keyboard)
+		value = device_read(&device)
 		XCTAssertEqual(value, 0xFC)
 
 		keyboard_press(&keyboard, 0x14);
-		value = keyboard_read(&keyboard)
+		value = device_read(&device)
 		XCTAssertEqual(value, 0xFC)
 
-		keyboard_write(&keyboard, 0xFC)
-		value = keyboard_read(&keyboard)
+		device_write(&device, 0xFC)
+		value = device_read(&device)
 		XCTAssertEqual(value, 0xEC)
 
 		keyboard_release(&keyboard, 0x14);
-		value = keyboard_read(&keyboard)
+		value = device_read(&device)
 		XCTAssertEqual(value, 0xFC)
 	}
 
@@ -131,38 +134,38 @@ final class DeviceTests: XCTestCaseTI83p {
 	//MARK: - Status
 
 	func test_battery() {
-		var status = status()
-		status_init(&status, _device)
+		var device = device()
+		device_status(&device, _asic)
 
-		device.battery = BATTERIES_GOOD
-		device.battery_remove_check = 0
-		let value = status_read(&status) & 0x1
+		asic.battery = BATTERIES_GOOD
+		asic.battery_remove_check = 0
+		let value = device_read(&device) & 0x1
 		XCTAssertEqual(value, 0x1)
 	}
 
 	func test_flash() {
-		var status = status()
-		status_init(&status, _device)
+		var device = device()
+		device_status(&device, _asic)
 
-		device.mmu.flash_unlocked = 1
-		var value = status_read(&status) & 0x4
+		asic.mmu.flash_unlocked = 1
+		var value = device_read(&device) & 0x4
 		XCTAssertEqual(value, 0x4)
 
-		device.mmu.flash_unlocked = 0;
-		value = status_read(&status) & 0x4
+		asic.mmu.flash_unlocked = 0;
+		value = device_read(&device) & 0x4
 		XCTAssertEqual(value, 0)
 	}
 
 	//MARK: - Link Port
 
 	func test_link_port() {
-		let link = cpu_device(&device.cpu, 0x00).pointee
+		var device = get(device: 0x00)
 
-		var value = device_read(link);
+		var value = device_read(&device);
 		XCTAssertEqual(value, 0)
 
-		device_write(link, 0x01)
-		value = device_read(link)
+		device_write(&device, 0x01)
+		value = device_read(&device)
 		XCTAssertEqual(value, 0x11)
 	}
 
@@ -170,8 +173,8 @@ final class DeviceTests: XCTestCaseTI83p {
 
 //	func test_link_assist_rx() {
 //		asic_t *asic = asic_init(TI83pSE, NULL);
-//		struct z80_device link_assist_rx_read = asic->cpu->devices[0x0A];
-//		struct z80_device link_assist_status = asic->cpu->devices[0x09];
+//		struct device link_assist_rx_read = asic->cpu->devices[0x0A];
+//		struct device link_assist_status = asic->cpu->devices[0x09];
 //		link_state_t *state = link_assist_rx_read.device;
 //
 //		if (!link_recv_byte(asic, 0xBE)) {
@@ -208,8 +211,8 @@ final class DeviceTests: XCTestCaseTI83p {
 
 //	func test_link_assist_tx() {
 //		asic_t *asic = asic_init(TI83pSE, NULL);
-//		struct z80_device link_assist_tx_read = asic->cpu->devices[0x0D];
-//		struct z80_device link_assist_status = asic->cpu->devices[0x09];
+//		struct device link_assist_tx_read = asic->cpu->devices[0x0D];
+//		struct device link_assist_status = asic->cpu->devices[0x09];
 //		link_state_t *state = link_assist_tx_read.device;
 //
 //		if (link_read_tx_buffer(asic) != EOF) {

@@ -261,13 +261,13 @@ void set_second_timer_frequency(void *device, double speed) {
 	}
 }
 
-struct z80_device init_interrupts(asic_t *asic, ti_interrupts_t result) {
+struct device init_interrupts(asic_t *asic, ti_interrupts_t result) {
 	result = calloc(sizeof(struct ti_interrupts), 1);
 	result->asic = asic;
 	result->first_timer_id = -1;
 	result->second_timer_id = -1;
 	release_on_key(result);
-	struct z80_device device = { result, read_interrupt_mask, write_interrupt_mask };
+	struct device device = { result, read_interrupt_mask, write_interrupt_mask };
 	return device;
 }
 

@@ -8,7 +8,7 @@ final class PerformanceTests: XCTestCaseTI83p {
 		measure {
 			var i: CInt = 0
 			while i < 1_000_000 {
-				i -= cpu_execute(&device.cpu, 1);
+				i -= cpu_execute(&asic.cpu, 1);
 				i += 1
 			}
 		}

@@ -131,11 +131,11 @@ void init_link_ports(asic_t *asic) {
 	state->asic = asic;
 	state->assist.status.tx_ready = state->assist.status.int_tx_ready = true;
 
-	struct z80_device link_port = { state, read_link_port, write_link_port };
-	struct z80_device link_assist_enable = { state, read_link_assist_enable_port, write_link_assist_enable_port };
-	struct z80_device link_assist_status = { state, read_link_assist_status_port, write_link_assist_status_port };
-	struct z80_device link_assist_rx_read = { state, read_link_assist_rx_port, write_link_assist_rx_port };
-	struct z80_device link_assist_tx_read = { state, read_link_assist_tx_port, write_link_assist_tx_port };
+	struct device link_port = { state, read_link_port, write_link_port };
+	struct device link_assist_enable = { state, read_link_assist_enable_port, write_link_assist_enable_port };
+	struct device link_assist_status = { state, read_link_assist_status_port, write_link_assist_status_port };
+	struct device link_assist_rx_read = { state, read_link_assist_rx_port, write_link_assist_rx_port };
+	struct device link_assist_tx_read = { state, read_link_assist_tx_port, write_link_assist_tx_port };
 
 	asic->cpu.devices[0x00] = link_port;
 	asic->cpu.devices[0x08] = link_assist_enable;

@@ -8,11 +8,11 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_RLCA() {
 		let test: [UInt8] = [0x07] // RLCA
-		device.cpu.registers.A = 0x80;
+		asic.cpu.registers.A = 0x80;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 4)
-		XCTAssertEqual(device.cpu.registers.A, 1)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 4)
+		XCTAssertEqual(asic.cpu.registers.A, 1)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -20,11 +20,11 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_RRCA() {
 		let test: [UInt8] = [0x0F] // RRCA
-		device.cpu.registers.A = 1;
+		asic.cpu.registers.A = 1;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 4)
-		XCTAssertEqual(device.cpu.registers.A, 0x80)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 4)
+		XCTAssertEqual(asic.cpu.registers.A, 0x80)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -32,11 +32,11 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_RLA() {
 		let test: [UInt8] = [0x17] // RLA
-		device.cpu.registers.A = 0x80;
+		asic.cpu.registers.A = 0x80;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 4)
-		XCTAssertEqual(device.cpu.registers.A, 0)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 4)
+		XCTAssertEqual(asic.cpu.registers.A, 0)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -44,11 +44,11 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_RRA() {
 		let test: [UInt8] = [0x1F] // RRA
-		device.cpu.registers.A = 1;
+		asic.cpu.registers.A = 1;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 4)
-		XCTAssertEqual(device.cpu.registers.A, 0)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 4)
+		XCTAssertEqual(asic.cpu.registers.A, 0)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -56,11 +56,11 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_RLC() {
 		let test: [UInt8] = [0xCB, 0x00] // RLC B
-		device.cpu.registers.B = 0x80;
+		asic.cpu.registers.B = 0x80;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 8)
-		XCTAssertEqual(device.cpu.registers.B, 1)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 8)
+		XCTAssertEqual(asic.cpu.registers.B, 1)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -68,11 +68,11 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_RRC() {
 		let test: [UInt8] = [0xCB, 0x08] // RRC B
-		device.cpu.registers.B = 1;
+		asic.cpu.registers.B = 1;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 8)
-		XCTAssertEqual(device.cpu.registers.B, 0x80)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 8)
+		XCTAssertEqual(asic.cpu.registers.B, 0x80)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -80,12 +80,12 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_RL() {
 		let test: [UInt8] = [0xCB, 0x10] // RL B
-		device.cpu.registers.B = 0x80;
-		device.cpu.registers.flags.C = 1;
+		asic.cpu.registers.B = 0x80;
+		asic.cpu.registers.flags.C = 1;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 8)
-		XCTAssertEqual(device.cpu.registers.B, 1)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 8)
+		XCTAssertEqual(asic.cpu.registers.B, 1)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -93,12 +93,12 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_RR() {
 		let test: [UInt8] = [0xCB, 0x18] // RR B
-		device.cpu.registers.B = 1;
-		device.cpu.registers.flags.C = 0;
+		asic.cpu.registers.B = 1;
+		asic.cpu.registers.flags.C = 0;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 8)
-		XCTAssertEqual(device.cpu.registers.B, 0)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 8)
+		XCTAssertEqual(asic.cpu.registers.B, 0)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -106,12 +106,12 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_SLA() {
 		let test: [UInt8] = [0xCB, 0x20] // SLA B
-		device.cpu.registers.B = 0x80;
-		device.cpu.registers.flags.C = 0;
+		asic.cpu.registers.B = 0x80;
+		asic.cpu.registers.flags.C = 0;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 8)
-		XCTAssertEqual(device.cpu.registers.B, 0)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 8)
+		XCTAssertEqual(asic.cpu.registers.B, 0)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -119,12 +119,12 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_SRA() {
 		let test: [UInt8] = [0xCB, 0x28] // SRA B
-		device.cpu.registers.B = 1;
-		device.cpu.registers.flags.C = 0;
+		asic.cpu.registers.B = 1;
+		asic.cpu.registers.flags.C = 0;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 8)
-		XCTAssertEqual(device.cpu.registers.B, 0)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 8)
+		XCTAssertEqual(asic.cpu.registers.B, 0)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -132,12 +132,12 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_SLL() {
 		let test: [UInt8] = [0xCB, 0x30] // SLL B
-		device.cpu.registers.B = 1;
-		device.cpu.registers.flags.C = 0;
+		asic.cpu.registers.B = 1;
+		asic.cpu.registers.flags.C = 0;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 8)
-		XCTAssertEqual(device.cpu.registers.B, 3)
-		XCTAssertEqual(device.cpu.registers.flags.C, 0)
+		let cycles = cpu_execute(&asic.cpu, 8)
+		XCTAssertEqual(asic.cpu.registers.B, 3)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 0)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -145,12 +145,12 @@ final class ShiftsTests: XCTestCaseTI83p {
 
 	func test_SRL() {
 		let test: [UInt8] = [0xCB, 0x38] // SRL B
-		device.cpu.registers.B = 1;
-		device.cpu.registers.flags.C = 0;
+		asic.cpu.registers.B = 1;
+		asic.cpu.registers.flags.C = 0;
 		flash(test)
-		let cycles = cpu_execute(&device.cpu, 8)
-		XCTAssertEqual(device.cpu.registers.B, 0)
-		XCTAssertEqual(device.cpu.registers.flags.C, 1)
+		let cycles = cpu_execute(&asic.cpu, 8)
+		XCTAssertEqual(asic.cpu.registers.B, 0)
+		XCTAssertEqual(asic.cpu.registers.flags.C, 1)
 		XCTAssertEqual(cycles, 0)
 	}
 
