@@ -3,7 +3,7 @@
 #include <z80e/ti/asic.h>
 
 static uint8_t __status_read(device_t device) {
-	asic_t *asic = device->data;
+	asic_t asic = device->data;
 	uint8_t value = 0x00;
 
 	if (asic->battery_remove_check) {
@@ -30,13 +30,13 @@ static uint8_t __status_read(device_t device) {
 }
 
 static void __status_write(device_t device, uint8_t value) {
-	asic_t *asic = device->data;
+	asic_t asic = device->data;
 	if (asic->device == TI83p || asic->device == TI73)
 		return;
 	write_acknowledged_interrupts(&asic->cpu.devices[0x03], value);
 }
 
-void device_status(device_t device, asic_t *asic) {
+void device_status(device_t device, asic_t asic) {
 	device->data = asic;
 	device->read = __status_read;
 	device->write = __status_write;

@@ -59,14 +59,14 @@ typedef struct {
 } timer_tick_t;
 
 struct runloop_state {
-	asic_t *asic;
+	asic_t asic;
 	long long last_end;
 	int spare_cycles;
 	timer_tick_t *ticks;
 	int max_tick_count;
 };
 
-runloop_state_t *runloop_init(asic_t *asic) {
+runloop_state_t *runloop_init(asic_t asic) {
 	runloop_state_t *state = calloc(sizeof(runloop_state_t), 1);
 
 	state->asic = asic;
@@ -92,7 +92,7 @@ int runloop_compare(const void *first, const void *second) {
 	return a->after_cycle - b->after_cycle;
 }
 
-void link_socket_update(asic_t *asic, int c) {
+void link_socket_update(asic_t asic, int c) {
 	if (c != EOF) {
 		char _c = ' ';
 		if (isprint((char)c)) {

@@ -151,7 +151,7 @@ int command_on(struct debugger_state *state, int argc, char **argv) {
 
 struct break_data {
 	uint16_t address;
-	asic_t *asic;
+	asic_t asic;
 	int hook_id;
 	int count;
 	int log;

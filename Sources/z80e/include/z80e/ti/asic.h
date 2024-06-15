@@ -24,7 +24,7 @@ typedef enum {
 } battery_state;
 
 
-typedef void (*timer_tick)(asic_t *, void *);
+typedef void (*timer_tick)(asic_t , void *);
 typedef struct z80_hardware_timers z80_hardware_timers_t;
 typedef struct z80_hardware_timer z80_hardware_timer_t;
 typedef struct z80_link_socket z80_link_socket_t;
@@ -78,10 +78,10 @@ struct asic {
 	debugger_t *debugger;
 };
 
-asic_t* asic_init(ti_device_type, log_t *);
-void asic_free(asic_t*);
+struct asic* asic_init(ti_device_type, log_t *);
+void asic_free(struct asic*);
 
-int asic_set_clock_rate(asic_t *, int);
+int asic_set_clock_rate(asic_t , int);
 
-int asic_add_timer(asic_t *, int, double, timer_tick, void *);
-void asic_remove_timer(asic_t *, int);
+int asic_add_timer(asic_t , int, double, timer_tick, void *);
+void asic_remove_timer(asic_t , int);

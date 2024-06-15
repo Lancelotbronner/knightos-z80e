@@ -33,7 +33,7 @@ const loglevel_options_t log_options[] = {
 
 typedef struct {
 	ti_device_type device;
-	asic_t *device_asic;
+	asic_t device_asic;
 	char *rom_file;
 	int cycles;
 	int print_state;
@@ -143,7 +143,7 @@ void print_lcd(void *data, ti_bw_lcd_t *lcd) {
 	}
 }
 
-void lcd_timer_tick(asic_t *asic, void *data) {
+void lcd_timer_tick(asic_t asic, void *data) {
 	ti_bw_lcd_t *lcd = data;
 	if (lcd_changed) {
 		print_lcd(asic, lcd);
@@ -265,7 +265,7 @@ void sigint_handler(int sig) {
 	fflush(stdout);
 }
 
-void key_tap(asic_t *asic, int scancode, int down) {
+void key_tap(asic_t asic, int scancode, int down) {
 	if (down) {
 		keyboard_press(asic->cpu->devices[0x01].device, scancode);
 	} else {
@@ -273,7 +273,7 @@ void key_tap(asic_t *asic, int scancode, int down) {
 	}
 }
 
-void sdl_events_hook(asic_t *device, void * unused) {
+void sdl_events_hook(asic_t device, void * unused) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
@@ -572,7 +572,7 @@ int main(int argc, char **argv) {
 	}
 
 	log_t *log = init_log_z80e(frontend_log, 0, context.log_level);
-	asic_t *device = asic_init(context.device, log);
+	asic_t device = asic_init(context.device, log);
 	context.device_asic = device;
 
 	if (enable_debug) {

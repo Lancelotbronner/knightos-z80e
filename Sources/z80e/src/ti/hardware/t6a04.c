@@ -17,7 +17,7 @@
 #define lcd_print(...) printf( __VA_ARGS__)
 #endif
 
-void setup_lcd_display(asic_t *asic, hook_info_t *hook) {
+void setup_lcd_display(asic_t asic, hook_info_t *hook) {
 	ti_bw_lcd_t *lcd = malloc(sizeof(ti_bw_lcd_t));
 
 	bw_lcd_reset(lcd);

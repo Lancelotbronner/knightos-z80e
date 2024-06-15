@@ -14,9 +14,9 @@ open class XCTestCaseAsic: XCTestCase {
 
 	open var _type: ti_device_type { TI83p }
 
-	public internal(set) var _asic: UnsafeMutablePointer<asic_t>!
+	public internal(set) var _asic: UnsafeMutablePointer<struct asic>!
 
-	public var asic: asic_t {
+	public var asic: struct asic {
 		_read { yield _asic.pointee }
 		_modify { yield &_asic.pointee }
 	}

@@ -170,7 +170,7 @@ debugger_command_t default_commands[] = {
 
 int default_command_count = sizeof(default_commands) / sizeof(debugger_command_t);
 
-debugger_t *init_debugger(asic_t *asic) {
+debugger_t *init_debugger(asic_t asic) {
 	debugger_t *debugger = calloc(1, sizeof(debugger_t));
 
 	debugger->commands.count = default_command_count;

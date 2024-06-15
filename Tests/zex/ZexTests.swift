@@ -7,11 +7,11 @@ func cpu_reset(_ device: UnsafeMutableRawPointer?, _ data: UInt8) {
 }
 
 func write_text(_ device: UnsafeMutableRawPointer?) -> CUnsignedChar {
-	guard let _device = device?.assumingMemoryBound(to: asic_t.self) else {
+	guard let _device = device?.assumingMemoryBound(to: struct asic.self) else {
 		return 0
 	}
 
-	var asic: asic_t {
+	var asic: struct asic {
 		_read { yield _device.pointee }
 	}
 

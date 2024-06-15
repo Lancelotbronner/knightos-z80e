@@ -5,19 +5,19 @@
 //MARK: - Flash Status
 
 static unsigned char __flash_mirror_read(device_t device) {
-	asic_t *asic = device->data;
+	asic_t asic = device->data;
 	return device_read(&asic->cpu.devices[0x04]);
 }
 
 //MARK: - Flash Control
 
 static void __flash_control_write(device_t device, unsigned char value) {
-	asic_t *asic = device->data;
+	asic_t asic = device->data;
 	// TODO: check permissions
 	asic->mmu.flash_unlocked = value & 1;
 }
 
-void device_flash_control(device_t device, asic_t *asic) {
+void device_flash_control(device_t device, asic_t asic) {
 	device->data = asic;
 	device->read = __flash_mirror_read;
 	device->write = __flash_control_write;
@@ -32,7 +32,7 @@ static void __flash_exclusion_write(device_t device, unsigned char value) {
 	// TODO: Implement flash exclusion writes
 }
 
-void device_flash_exclusion(device_t device, asic_t *asic) {
+void device_flash_exclusion(device_t device, asic_t asic) {
 	device->data = asic;
 	device->read = __flash_mirror_read;
 	device->write = __flash_exclusion_write;

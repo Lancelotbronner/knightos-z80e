@@ -74,7 +74,7 @@ int tui_disassemble_write(struct disassemble_memory *state, const char *format, 
 
 void tui_tick(tui_state_t *state) {
 	current_state = state;
-	asic_t *asic = state->debugger->asic;
+	asic_t asic = state->debugger->asic;
 	struct tui_disasm disasm_custom = { &asic->mmu, 0 };
 	struct disassemble_memory disasm = { tui_disassemble_read, 0, &disasm_custom };
 	while (1) {

@@ -90,7 +90,7 @@ struct hook_info {
 	hook_lcd_update_array_t *on_lcd_update;
 };
 
-hook_info_t *create_hook_set(asic_t *asic) {
+hook_info_t *create_hook_set(asic_t asic) {
 	hook_info_t *info = malloc(sizeof(hook_info_t));
 	info->cpu = &asic->cpu;
 	info->mmu = &asic->mmu;

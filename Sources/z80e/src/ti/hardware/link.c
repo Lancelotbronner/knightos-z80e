@@ -124,7 +124,7 @@ void write_link_assist_tx_port(device_t device, uint8_t val) {
 	state->assist.tx_buffer = val;
 }
 
-void init_link_ports(asic_t *asic) {
+void init_link_ports(asic_t asic) {
 	link_state_t *state = malloc(sizeof(link_state_t));
 
 	memset(state, 0, sizeof(link_state_t));
@@ -144,16 +144,16 @@ void init_link_ports(asic_t *asic) {
 	asic->cpu.devices[0x0D] = link_assist_tx_read;
 }
 
-void free_link_ports(asic_t *asic) {
+void free_link_ports(asic_t asic) {
 	free(asic->cpu.devices[0x00].data);
 }
 
-bool link_recv_ready(asic_t *asic) {
+bool link_recv_ready(asic_t asic) {
 	link_state_t *state = asic->cpu.devices[0x00].data;
 	return !state->assist.status.rx_ready;
 }
 
-bool link_recv_byte(asic_t *asic, uint8_t val) {
+bool link_recv_byte(asic_t asic, uint8_t val) {
 	printf("Receiving %02X via link port\n", val);
 	link_state_t *state = asic->cpu.devices[0x00].data;
 	if (!link_recv_ready(asic)) {
@@ -169,7 +169,7 @@ bool link_recv_byte(asic_t *asic, uint8_t val) {
 	return true;
 }
 
-int link_read_tx_buffer(asic_t *asic) {
+int link_read_tx_buffer(asic_t asic) {
 	link_state_t *state = asic->cpu.devices[0x00].data;
 	if (state->assist.status.tx_active) {
 		state->assist.status.tx_active = false;

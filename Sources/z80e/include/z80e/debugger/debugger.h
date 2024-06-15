@@ -28,7 +28,7 @@ struct debugger_state {
 	int (*vprint)(debugger_state_t *, const char *, va_list);
 	void *state;
 	void *interface_state;
-	asic_t *asic;
+	asic_t asic;
 	debugger_t *debugger;
 	debugger_state_t *(*create_new_state)(debugger_state_t *, const char *command_name);
 	void (*close_window)(debugger_state_t *);
@@ -52,13 +52,13 @@ struct debugger {
 	} flags;
 
 	debugger_list_t commands;
-	asic_t *asic;
+	asic_t asic;
 	debugger_operation_state state;
 };
 
 int debugger_source_rc(debugger_state_t *, const char *rc_name);
 
-debugger_t *init_debugger(asic_t *);
+debugger_t *init_debugger(asic_t );
 void free_debugger(debugger_t *);
 
 int find_best_command(debugger_t *, const char *, debugger_command_t **);

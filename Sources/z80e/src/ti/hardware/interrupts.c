@@ -223,13 +223,13 @@ void write_timer_speed(void *device, uint8_t value) {
 	set_second_timer_frequency(device, second_timer_table[interrupts->asic->device != TI83p][timer_speed]);
 }
 
-void first_timer_tick(asic_t *asic, void *device) {
+void first_timer_tick(asic_t asic, void *device) {
 	ti_interrupts_t interrupts = device;
 
 	ti_interrupts_interrupt(interrupts, INTERRUPT_FIRST_TIMER);
 }
 
-void second_timer_tick(asic_t *asic, void *device) {
+void second_timer_tick(asic_t asic, void *device) {
 	ti_interrupts_t interrupts = device;
 
 	ti_interrupts_interrupt(interrupts, INTERRUPT_SECOND_TIMER);
@@ -261,7 +261,7 @@ void set_second_timer_frequency(void *device, double speed) {
 	}
 }
 
-struct device init_interrupts(asic_t *asic, ti_interrupts_t result) {
+struct device init_interrupts(asic_t asic, ti_interrupts_t result) {
 	result = calloc(sizeof(struct ti_interrupts), 1);
 	result->asic = asic;
 	result->first_timer_id = -1;

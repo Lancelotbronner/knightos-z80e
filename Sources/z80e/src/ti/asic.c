@@ -16,7 +16,7 @@
 #include <z80e/devices/crystal.h>
 
 typedef struct {
-	asic_t *asic;
+	asic_t asic;
 	uint8_t port;
 } unimplemented_device_t;
 
@@ -33,7 +33,7 @@ void write_unimplemented_port(device_t device, uint8_t value) {
 				"Warning: attempted to write 0x%02x to unimplemented port 0x%02x from 0x%04X.", value, d->port, d->asic->cpu.registers.PC);
 }
 
-void plug_devices(asic_t *asic) {
+void plug_devices(asic_t asic) {
 	/* Unimplemented devices */
 	int i;
 	for (i = 0; i < 0x100; i++) {
@@ -94,7 +94,7 @@ void plug_devices(asic_t *asic) {
 
 void asic_null_write(void *ignored, uint8_t value) {}
 
-void asic_mirror_ports(asic_t *asic) {
+void asic_mirror_ports(asic_t asic) {
 	int i;
 	switch (asic->device) {
 	case TI83p:
@@ -121,12 +121,12 @@ void asic_mirror_ports(asic_t *asic) {
 	}
 }
 
-void free_devices(asic_t *asic) {
+void free_devices(asic_t asic) {
 	/* Link port unimplemented */
 }
 
-asic_t *asic_init(ti_device_type type, log_t *log) {
-	asic_t* device = calloc(1, sizeof(asic_t));
+asic_t asic_init(ti_device_type type, log_t *log) {
+	struct asic* device = calloc(1, sizeof(struct asic));
 	device->log = log;
 	cpu_init(&device->cpu, log);
 	ti_mmu_init(&device->mmu, type, log);
@@ -153,13 +153,13 @@ asic_t *asic_init(ti_device_type type, log_t *log) {
 	return device;
 }
 
-void asic_free(asic_t* device) {
+void asic_free(struct asic* device) {
 	ti_mmu_deinit(&device->mmu);
 	free_devices(device);
 	free(device);
 }
 
-int asic_add_timer(asic_t *asic, int flags, double frequency, timer_tick tick, void *data) {
+int asic_add_timer(asic_t asic, int flags, double frequency, timer_tick tick, void *data) {
 	z80_hardware_timer_t *timer = 0;
 	int i;
 	for (i = 0; i < asic->timers->max_timers; i++) {
@@ -184,11 +184,11 @@ int asic_add_timer(asic_t *asic, int flags, double frequency, timer_tick tick, v
 	return i;
 }
 
-void asic_remove_timer(asic_t *asic, int index) {
+void asic_remove_timer(asic_t asic, int index) {
 	asic->timers->timers[index].flags &= ~TIMER_IN_USE;
 }
 
-int asic_set_clock_rate(asic_t *asic, int new_rate) {
+int asic_set_clock_rate(asic_t asic, int new_rate) {
 	int old_rate = asic->clock_rate;
 
 	int i;

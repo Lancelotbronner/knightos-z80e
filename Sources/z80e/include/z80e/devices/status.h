@@ -8,4 +8,4 @@
 /// - Parameters:
 ///   - device: The device to configure.
 ///   - asic: The chip to monitor.
-void device_status(device_t device, asic_t *asic);
+void device_status(device_t device, asic_t asic);

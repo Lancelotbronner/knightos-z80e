@@ -3,7 +3,7 @@
 #include <z80e/types.h>
 
 struct mapping_device {
-	asic_t *asic;
+	asic_t asic;
 	struct {
 		unsigned char mode : 1;
 		/// Whether bank A points to flash memory
@@ -19,7 +19,7 @@ struct mapping_device {
 	unsigned char b;
 };
 
-void mapping_init(mapping_device_t mapping, asic_t *asic);
+void mapping_init(mapping_device_t mapping, asic_t asic);
 
 void mapping_reload(mapping_device_t mapping);
 

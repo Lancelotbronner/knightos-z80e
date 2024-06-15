@@ -5,7 +5,7 @@
 #include <z80e/types.h>
 
 typedef struct {
-	asic_t *asic;
+	asic_t asic;
 	struct {
 		uint8_t tip		: 1;
 		uint8_t ring	: 1;
@@ -44,15 +44,15 @@ typedef struct {
 	bool la_ready;
 } link_state_t;
 
-void init_link_ports(asic_t *asic);
-void free_link_ports(asic_t *asic);
+void init_link_ports(asic_t asic);
+void free_link_ports(asic_t asic);
 /**
  * Receives a byte via link assist.
  */
-bool link_recv_byte(asic_t *asic, uint8_t val);
+bool link_recv_byte(asic_t asic, uint8_t val);
 /**
  * Reads a byte from the tx buffer and sets the link assist state to ready to send another byte.
  */
-int link_read_tx_buffer(asic_t *asic);
+int link_read_tx_buffer(asic_t asic);
 
-bool link_recv_ready(asic_t *asic);
+bool link_recv_ready(asic_t asic);

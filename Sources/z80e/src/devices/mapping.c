@@ -2,7 +2,7 @@
 
 #include <z80e/ti/asic.h>
 
-void mapping_init(mapping_device_t mapping, asic_t *asic) {
+void mapping_init(mapping_device_t mapping, asic_t asic) {
 	*mapping = (struct mapping_device){
 		.asic = asic,
 		.flashA = 1,
