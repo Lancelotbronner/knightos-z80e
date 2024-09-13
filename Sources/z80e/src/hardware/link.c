@@ -1,7 +1,7 @@
 #include <z80e/ti/asic.h>
 #include <z80e/log/log.h>
 #include <z80e/ti/memory.h>
-#include <z80e/ti/hardware/link.h>
+#include <z80e/hardware/link.h>
 
 #include <stdlib.h>
 #include <string.h>

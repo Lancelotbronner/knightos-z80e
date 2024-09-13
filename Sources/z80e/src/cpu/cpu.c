@@ -635,7 +635,6 @@ void execute_rot(int y, int z, int switch_opcode_data, struct ExecutionContext *
 		context->cpu->registers.PC--;
 	}
 
-	uint8_t old_r = r;
 	uint8_t old_7 = (r & 0x80) > 0;
 	uint8_t old_0 = (r & 1) > 0;
 	uint8_t old_c = context->cpu->registers.flags.C > 0;

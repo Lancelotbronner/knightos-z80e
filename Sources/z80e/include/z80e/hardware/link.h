@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdbool.h>
-
 #include <z80e/types.h>
 
 typedef struct {

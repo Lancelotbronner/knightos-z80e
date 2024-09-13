@@ -1,5 +1,5 @@
 #include <z80e/ti/asic.h>
-#include <z80e/ti/hardware/interrupts.h>
+#include <z80e/hardware/interrupts.h>
 #include <z80e/log/log.h>
 
 #include <stdlib.h>

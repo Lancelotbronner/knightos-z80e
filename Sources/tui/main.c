@@ -1,11 +1,11 @@
 #include <z80e/ti/asic.h>
+#include <z80e/ti/runloop.h>
 #include <z80e/debugger/debugger.h>
 #include <z80e/disassembler/disassemble.h>
-#include <z80e/runloop/runloop.h>
 #include "tui.h"
 #include <z80e/debugger/commands.h>
 #include <z80e/log/log.h>
-#include <z80e/ti/hardware/t6a04.h>
+#include <z80e/hardware/t6a04.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -249,7 +249,9 @@ int main(int argc, char **argv) {
 	}
 
 	log_t *log = init_log_z80e(frontend_log, 0, context.log_level);
-	asic_t device = asic_init(context.device, log);
+	struct asic device_storage;
+	asic_t device = &device_storage;
+	asic_init(device, context.device, log);
 	context.device_asic = device;
 
 	if (enable_debug) {
@@ -265,7 +267,7 @@ int main(int argc, char **argv) {
 		FILE *file = fopen(context.rom_file, "r");
 		if (!file) {
 			printf("Error opening '%s'.\n", context.rom_file);
-			asic_free(device);
+			asic_deinit(device);
 			return 1;
 		}
 		long length;
@@ -276,7 +278,7 @@ int main(int argc, char **argv) {
 			printf("Error: This file does not match the required ROM size of %d bytes, but it is %ld bytes (use --no-rom-check to override).\n",
 				   device->mmu.settings.flash_pages * 0x4000, length);
 			fclose(file);
-			asic_free(device);
+			asic_deinit(device);
 			return 1;
 		}
 		length = fread(device->mmu.flash, 0x4000, device->mmu.settings.flash_pages, file);
@@ -307,6 +309,6 @@ int main(int argc, char **argv) {
 	if (context.print_state) {
 		print_state(&device->cpu);
 	}
-	asic_free(device);
+	asic_deinit(device);
 	return 0;
 }

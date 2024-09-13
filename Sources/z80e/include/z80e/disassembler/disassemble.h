@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <stdbool.h>
 
 struct disassemble_memory {
 	uint8_t (*read_byte)(struct disassemble_memory *, uint16_t);

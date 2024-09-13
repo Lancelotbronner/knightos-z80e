@@ -5,9 +5,9 @@
 #include "tui.h"
 #include <z80e/debugger/commands.h>
 #include <z80e/log/log.h>
-#include <z80e/ti/hardware/t6a04.h>
+#include <z80e/hardware/t6a04.h>
 #include <z80e/devices/keyboard.h>
-#include <z80e/ti/hardware/interrupts.h>
+#include <z80e/hardware/interrupts.h>
 
 #include <SDL2/SDL.h>
 

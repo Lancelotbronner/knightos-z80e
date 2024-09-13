@@ -1,4 +1,4 @@
-#include <z80e/runloop/runloop.h>
+#include <z80e/ti/runloop.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -25,7 +25,7 @@
 static double orwl_timebase = 0.0;
 static uint64_t orwl_timestart = 0;
 #endif
-#include <z80e/ti/hardware/link.h>
+#include <z80e/hardware/link.h>
 
 long long get_time_nsec() {
 #ifdef EMSCRIPTEN
@@ -72,11 +72,10 @@ runloop_state_t *runloop_init(asic_t asic) {
 	state->asic = asic;
 	state->last_end = get_time_nsec();
 	int i;
-	for (i = 0; i < asic->timers->max_timers; i++) {
-		z80_hardware_timer_t *timer = &asic->timers->timers[i];
-		if (timer->flags & TIMER_IN_USE) {
+	for (i = 0; i < asic->timers.capacity; i++) {
+		z80_timer_t timer = &asic->timers.head[i];
+		if (timer->callback)
 			timer->cycles_until_tick = asic->clock_rate / timer->frequency;
-		}
 	}
 
 	state->ticks = calloc(sizeof(timer_tick_t), 40);
@@ -159,12 +158,11 @@ void runloop_tick_cycles(runloop_state_t *state, int cycles) {
 	int cycles_until_next_tick = cycles;
 	int current_tick = 0;
 	int i;
-	for (i = 0; i < state->asic->timers->max_timers; i++) {
-		z80_hardware_timer_t *timer = &state->asic->timers->timers[i];
+	for (i = 0; i < state->asic->timers.capacity; i++) {
+		z80_timer_t timer = &state->asic->timers.head[i];
 
-		if (!(timer->flags & TIMER_IN_USE)) {
+		if (!timer->callback)
 			continue;
-		}
 
 		int tot_cycles = cycles;
 		if (timer->cycles_until_tick < tot_cycles) {
@@ -207,8 +205,8 @@ void runloop_tick_cycles(runloop_state_t *state, int cycles) {
 			tick_i++;
 			if (tick_i <= current_tick) {
 				int index = state->ticks[tick_i - 1].index;
-				z80_hardware_timer_t *timer = &state->asic->timers->timers[index];
-				timer->on_tick(state->asic, timer->data);
+				z80_timer_t timer = &state->asic->timers.head[index];
+				timer->callback(state->asic, timer->data);
 				cycles_until_next_tick = state->ticks[tick_i].after_cycle - total_cycles;
 			} else {
 				cycles_until_next_tick = cycles;

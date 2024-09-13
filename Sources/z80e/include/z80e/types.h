@@ -21,11 +21,17 @@ typedef struct ti_interrupts *ti_interrupts_t;
 
 typedef struct ti_bw_lcd ti_bw_lcd_t;
 
+typedef void (*timer_callback_t)(asic_t _Nonnull asic, void * _Nullable data);
+
+typedef struct z80_hardware_timer *z80_timer_t;
+
+typedef struct z80_link_socket z80_link_socket_t;
+
 //MARK: - Device Management
 
 typedef struct device *device_t;
 
-//TODO: pass the asic in device functions
+//TODO: pass the asic in device functions?
 //typedef unsigned char (* _Nullable read_t)(asic_t _Nonnull , void * _Null_unspecified);
 //typedef void (* _Nullable write_t)(asic_t _Nonnull, void * _Null_unspecified, unsigned char);
 
@@ -38,5 +44,3 @@ typedef void (* _Nullable write_t)(const device_t _Nonnull, unsigned char);
 typedef struct keyboard_device *keyboard_device_t;
 
 typedef struct mapping_device *mapping_device_t;
-
-typedef struct crystal_device *crystal_device_t;

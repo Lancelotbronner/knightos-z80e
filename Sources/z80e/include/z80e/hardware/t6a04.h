@@ -1,9 +1,9 @@
 #pragma once
 
-#include <stdint.h>
-
 #include <z80e/types.h>
 #include <z80e/debugger/hooks.h>
+
+#include <stdint.h>
 
 struct ti_bw_lcd {
 	uint8_t up: 1; // set=up, unset=down

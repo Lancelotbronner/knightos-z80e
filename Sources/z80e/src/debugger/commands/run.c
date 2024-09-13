@@ -1,11 +1,11 @@
 #include <string.h>
 
 #include <z80e/ti/asic.h>
+#include <z80e/ti/runloop.h>
 #include <z80e/debugger/commands.h>
 #include <z80e/debugger/debugger.h>
 #include <z80e/disassembler/disassemble.h>
-#include <z80e/runloop/runloop.h>
-#include <z80e/ti/hardware/t6a04.h>
+#include <z80e/hardware/t6a04.h>
 
 struct run_disassemble_state {
 	struct disassemble_memory memory;

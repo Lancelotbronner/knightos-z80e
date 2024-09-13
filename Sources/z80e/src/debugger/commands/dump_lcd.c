@@ -1,4 +1,4 @@
-#include <z80e/ti/hardware/t6a04.h>
+#include <z80e/hardware/t6a04.h>
 #include <z80e/debugger/debugger.h>
 #include <z80e/debugger/commands.h>
 

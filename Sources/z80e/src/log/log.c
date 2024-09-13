@@ -20,6 +20,8 @@ const char *loglevel_to_string(loglevel_t level) {
 	}
 }
 
+//TODO: Support os_log
+
 log_t *init_log_z80e(log_func func, void *data, int log_level) {
 	log_t *log = calloc(sizeof(log_t), 1);
 	log->log = func;

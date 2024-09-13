@@ -1,6 +1,6 @@
 //
-//  Header.h
-//  
+//  device.h
+//  z80e
 //
 //  Created by Christophe Bronner on 2024-03-18.
 //
@@ -8,8 +8,6 @@
 #pragma once
 
 #include <z80e/types.h>
-
-#include <stdbool.h>
 
 struct device {
 	void * _Nullable data;

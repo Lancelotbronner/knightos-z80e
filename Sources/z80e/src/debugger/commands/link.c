@@ -1,6 +1,6 @@
 #include <z80e/debugger/commands.h>
 #include <z80e/debugger/debugger.h>
-#include <z80e/ti/hardware/link.h>
+#include <z80e/hardware/link.h>
 #include <z80e/debugger/hooks.h>
 
 #ifndef NOLINK

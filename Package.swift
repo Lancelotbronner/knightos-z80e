@@ -14,7 +14,6 @@ let package = Package(
 		.package(name: "scas", path: "../scas"),
 	],
 	targets: [
-
 		.target(
 			name: "z80e",
 			dependencies: [

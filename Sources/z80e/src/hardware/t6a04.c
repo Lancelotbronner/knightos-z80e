@@ -1,5 +1,5 @@
 #include <z80e/ti/asic.h>
-#include <z80e/ti/hardware/t6a04.h>
+#include <z80e/hardware/t6a04.h>
 
 #include <stdlib.h>
 #include <stdio.h>
