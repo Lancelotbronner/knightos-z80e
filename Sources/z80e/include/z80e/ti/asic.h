@@ -41,8 +41,7 @@ struct asic {
 	int clock_rate;
 
 	struct z80_cpu cpu;
-	runloop_state_t *runloop;
-
+	struct z80_runloop runloop;
 	struct keyboard_device keyboard;
 	struct mapping_device mapping;
 	struct ti_mmu mmu;
@@ -68,6 +67,12 @@ void asic_remove_timer(asic_t , int);
 
 void asic_init(asic_t asic, ti_device_type, log_t *);
 void asic_deinit(asic_t asic);
+
+//MARK: - Runloop Management
+
+void asic_tick(asic_t asic);
+
+void asic_tick_cycles(asic_t asic, int cycles);
 
 //MARK: - Device Management
 

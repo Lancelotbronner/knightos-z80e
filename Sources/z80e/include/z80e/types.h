@@ -11,6 +11,8 @@
 
 typedef struct asic *asic_t;
 
+typedef struct z80_runloop *z80_runloop_t;
+
 typedef struct z80_cpu z80cpu_t;
 
 typedef struct ti_mmu *ti_mmu_t;

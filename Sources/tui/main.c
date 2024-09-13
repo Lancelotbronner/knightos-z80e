@@ -295,14 +295,14 @@ int main(int argc, char **argv) {
 	} else {
 		if (context.cycles == -1) { // Run indefinitely
 			while (1) {
-				runloop_tick(device->runloop);
+				asic_tick(device);
 				if (device->stopped) {
 					break;
 				}
 				nanosleep((struct timespec[]){{0, (1.f / 60.f) * 1000000000}}, NULL);
 			}
 		} else {
-			runloop_tick_cycles(device->runloop, context.cycles);
+			asic_tick_cycles(device, context.cycles);
 		}
 	}
 

@@ -45,9 +45,10 @@ void asic_init(asic_t asic, ti_device_type type, log_t *log) {
 	asic->timers.capacity = 20;
 	asic->timers.head = calloc(20, sizeof(z80_timer_t));
 
+	// Configure the runloop
+
 	asic->stopped = 0;
 	asic->debugger = 0;
-	asic->runloop = runloop_init(asic);
 	asic->hook = create_hook_set(asic);
 
 	asic->link = calloc(1, sizeof(z80_link_socket_t));
@@ -174,6 +175,8 @@ static void asic_mirror_ports(asic_t asic) {
 		break;
 	}
 }
+
+//MARK: - Timer Management
 
 int asic_add_timer(asic_t asic, int flags, double frequency, timer_callback_t tick, void *data) {
 	z80_timer_t timer = 0;

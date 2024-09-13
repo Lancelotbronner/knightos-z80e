@@ -1,10 +1,17 @@
 #pragma once
 
-typedef struct runloop_state runloop_state_t;
-#include <z80e/ti/asic.h>
+#include <z80e/types.h>
 
+typedef struct {
+	int index;
+	int after_cycle;
+} timer_tick_t;
 
-runloop_state_t *runloop_init(asic_t );
+struct z80_runloop {
+	long long last_end;
+	int spare_cycles;
+	timer_tick_t *ticks;
+	int ticks_capacity;
+};
 
-void runloop_tick_cycles(runloop_state_t *, int);
-void runloop_tick(runloop_state_t *);
+void runloop_init(asic_t asic, z80_runloop_t runloop);

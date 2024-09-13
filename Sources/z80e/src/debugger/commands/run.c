@@ -83,7 +83,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 				state->asic->cpu.IFF1 = 0;
 				state->asic->cpu.IFF2 = 0;
 			}
-			runloop_tick_cycles(state->asic->runloop, 1);
+			asic_tick_cycles(state->asic, 1);
 			if (state->debugger->flags.nointonstep) {
 				state->asic->cpu.IFF1 = iff1;
 				state->asic->cpu.IFF2 = iff2;
@@ -137,7 +137,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 
 		oldHalted = state->asic->cpu.halted;
 
-		runloop_tick_cycles(state->asic->runloop, 1);
+		asic_tick_cycles(state->asic, 1);
 
 		hook_on_before_execution(state->asic->hook, state->asic->cpu.registers.PC);
 		if (state->asic->stopped) {
