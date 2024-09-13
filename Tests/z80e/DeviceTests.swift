@@ -175,7 +175,7 @@ final class DeviceTests: XCTestCaseTI83p {
 //		asic_t *asic = asic_init(TI83pSE, NULL);
 //		struct device link_assist_rx_read = asic->cpu->devices[0x0A];
 //		struct device link_assist_status = asic->cpu->devices[0x09];
-//		link_state_t *state = link_assist_rx_read.device;
+//		link_device_t state = link_assist_rx_read.device;
 //
 //		if (!link_recv_byte(asic, 0xBE)) {
 //			asic_free(asic);
@@ -213,7 +213,7 @@ final class DeviceTests: XCTestCaseTI83p {
 //		asic_t *asic = asic_init(TI83pSE, NULL);
 //		struct device link_assist_tx_read = asic->cpu->devices[0x0D];
 //		struct device link_assist_status = asic->cpu->devices[0x09];
-//		link_state_t *state = link_assist_tx_read.device;
+//		link_device_t state = link_assist_tx_read.device;
 //
 //		if (link_read_tx_buffer(asic) != EOF) {
 //			asic_free(asic);

@@ -1,13 +1,13 @@
 #include <z80e/ti/asic.h>
 #include <z80e/log/log.h>
 #include <z80e/ti/memory.h>
-#include <z80e/hardware/link.h>
+#include <z80e/devices/link.h>
 
 #include <stdlib.h>
 #include <string.h>
 
 uint8_t read_link_port(device_t device) {
-	link_state_t *state = device->data;
+	link_device_t state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -34,7 +34,7 @@ uint8_t read_link_port(device_t device) {
 }
 
 void write_link_port(device_t device, uint8_t val) {
-	link_state_t *state = device->data;
+	link_device_t state = device->data;
 	bool tip = val & 1;
 	bool ring = val & 2;
 	state->us.tip = tip;
@@ -42,7 +42,7 @@ void write_link_port(device_t device, uint8_t val) {
 }
 
 uint8_t read_link_assist_enable_port(device_t device) {
-	link_state_t *state = device->data;
+	link_device_t state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -53,7 +53,7 @@ uint8_t read_link_assist_enable_port(device_t device) {
 }
 
 void write_link_assist_enable_port(device_t device, uint8_t val) {
-	link_state_t *state = device->data;
+	link_device_t state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -70,7 +70,7 @@ void write_link_assist_enable_port(device_t device, uint8_t val) {
 }
 
 uint8_t read_link_assist_rx_port(device_t device) {
-	link_state_t *state = device->data;
+	link_device_t state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -95,7 +95,7 @@ void write_link_assist_rx_port(device_t device, uint8_t val) {
 }
 
 uint8_t read_link_assist_status_port(device_t device) {
-	link_state_t *state = device->data;
+	link_device_t state = device->data;
 	switch (state->asic->device) {
 	case TI73:
 	case TI83p:
@@ -114,7 +114,7 @@ uint8_t read_link_assist_tx_port(device_t device) {
 }
 
 void write_link_assist_tx_port(device_t device, uint8_t val) {
-	link_state_t *state = device->data;
+	link_device_t state = device->data;
 	if (!state->assist.status.tx_ready) {
 		// TODO: What actually happens? Probably this behavior tbh
 		return;
@@ -125,12 +125,11 @@ void write_link_assist_tx_port(device_t device, uint8_t val) {
 }
 
 void init_link_ports(asic_t asic) {
-	link_state_t *state = malloc(sizeof(link_state_t));
-
-	memset(state, 0, sizeof(link_state_t));
+	link_device_t state = &asic->link;
 	state->asic = asic;
 	state->assist.status.tx_ready = state->assist.status.int_tx_ready = true;
 
+	//TODO: Move these to functions in <devices/link.h>
 	struct device link_port = { state, read_link_port, write_link_port };
 	struct device link_assist_enable = { state, read_link_assist_enable_port, write_link_assist_enable_port };
 	struct device link_assist_status = { state, read_link_assist_status_port, write_link_assist_status_port };
@@ -144,18 +143,14 @@ void init_link_ports(asic_t asic) {
 	asic->cpu.devices[0x0D] = link_assist_tx_read;
 }
 
-void free_link_ports(asic_t asic) {
-	free(asic->cpu.devices[0x00].data);
-}
-
 bool link_recv_ready(asic_t asic) {
-	link_state_t *state = asic->cpu.devices[0x00].data;
+	link_device_t state = asic->cpu.devices[0x00].data;
 	return !state->assist.status.rx_ready;
 }
 
 bool link_recv_byte(asic_t asic, uint8_t val) {
 	printf("Receiving %02X via link port\n", val);
-	link_state_t *state = asic->cpu.devices[0x00].data;
+	link_device_t state = asic->cpu.devices[0x00].data;
 	if (!link_recv_ready(asic)) {
 		return false;
 	}
@@ -170,7 +165,7 @@ bool link_recv_byte(asic_t asic, uint8_t val) {
 }
 
 int link_read_tx_buffer(asic_t asic) {
-	link_state_t *state = asic->cpu.devices[0x00].data;
+	link_device_t state = asic->cpu.devices[0x00].data;
 	if (state->assist.status.tx_active) {
 		state->assist.status.tx_active = false;
 		state->assist.status.tx_ready = state->assist.status.int_tx_ready = true;

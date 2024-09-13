@@ -13,7 +13,7 @@ final class InterruptsTests: XCTestCaseTI83p {
 		flash(IM_1)
 		cpu_execute(&asic.cpu, 100)
 		XCTAssertEqual(asic.cpu.registers.PC, 3)
-		asic.cpu.interrupt = 1;
+		asic.cpu.interrupt = true;
 		let cycles = cpu_execute(&asic.cpu, 13)
 		XCTAssertEqual(asic.cpu.registers.PC, 0x38)
 		XCTAssertEqual(asic.cpu.registers.SP, 0xFFFE)
@@ -31,7 +31,7 @@ final class InterruptsTests: XCTestCaseTI83p {
 		XCTAssertEqual(asic.cpu.registers.PC, 7)
 		XCTAssertEqual(asic.cpu.registers.I, 0x80)
 		asic.cpu.bus = 0x90;
-		asic.cpu.interrupt = 1;
+		asic.cpu.interrupt = true;
 		let cycles = cpu_execute(&asic.cpu, 19)
 		XCTAssertEqual(asic.cpu.registers.PC, 0x8090)
 		XCTAssertEqual(asic.cpu.registers.SP, 0xFFFE)

@@ -11,6 +11,7 @@
 #include <z80e/debugger/hooks.h>
 #include <z80e/debugger/debugger.h>
 #include <z80e/devices/keyboard.h>
+#include <z80e/devices/link.h>
 #include <z80e/devices/mapping.h>
 #include <z80e/log/log.h>
 #include <z80e/ti/runloop.h>
@@ -25,14 +26,6 @@ typedef enum {
 	BATTERIES_GOOD
 } battery_state;
 
-struct z80_link_socket {
-#ifndef NOLINK
-	int accept;
-	struct pollfd listenfd;
-	struct pollfd clients[10];
-#endif
-};
-
 struct asic {
 	int stopped;
 	ti_device_type device;
@@ -42,17 +35,26 @@ struct asic {
 
 	struct z80_cpu cpu;
 	struct z80_runloop runloop;
-	struct keyboard_device keyboard;
-	struct mapping_device mapping;
 	struct ti_mmu mmu;
 	struct ti_interrupts interrupts;
-	z80_link_socket_t *link;
+	struct keyboard_device keyboard;
+	struct mapping_device mapping;
+	struct link_device link;
+
+#ifndef NOLINK
+	struct {
+		int accept;
+		struct pollfd listenfd;
+		struct pollfd clients[10];
+	} socket;
+#endif
 
 	struct {
 		int capacity;
 		z80_timer_t head;
 	} timers;
 
+	//TODO: Inline hooks & debugger
 	hook_info_t *hook;
 	debugger_t *debugger;
 };

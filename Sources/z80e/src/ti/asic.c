@@ -10,10 +10,10 @@
 #include <z80e/devices/flash.h>
 #include <z80e/devices/interrupts.h>
 #include <z80e/devices/keyboard.h>
+#include <z80e/devices/link.h>
 #include <z80e/devices/mapping.h>
 #include <z80e/devices/speed.h>
 #include <z80e/devices/status.h>
-#include <z80e/hardware/link.h>
 #include <z80e/devices/crystal.h>
 
 //MARK: - Lifecycle Management
@@ -55,8 +55,6 @@ void asic_init(asic_t asic, ti_device_type type) {
 	asic->stopped = 0;
 	asic->debugger = 0;
 	asic->hook = create_hook_set(asic);
-
-	asic->link = calloc(1, sizeof(z80_link_socket_t));
 
 	// Configure devices
 	plug_devices(asic);

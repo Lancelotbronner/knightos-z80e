@@ -1,17 +1,18 @@
 import XCTest
+import XCTz80e
 import z80e
 
-func cpu_reset(_ device: UnsafeMutableRawPointer?, _ data: UInt8) {
+func cpu_reset(_ device: UnsafeMutablePointer<device>, _ data: UInt8) {
 	XCTFail("Jumped to 0x00!")
 	exit(0)
 }
 
-func write_text(_ device: UnsafeMutableRawPointer?) -> CUnsignedChar {
-	guard let _device = device?.assumingMemoryBound(to: struct asic.self) else {
+func write_text(_ device: UnsafeMutablePointer<device>) -> CUnsignedChar {
+	guard let _device = device.pointee.data?.assumingMemoryBound(to: asic.self) else {
 		return 0
 	}
 
-	var asic: struct asic {
+	var asic: asic {
 		_read { yield _device.pointee }
 	}
 
@@ -31,7 +32,7 @@ func write_text(_ device: UnsafeMutableRawPointer?) -> CUnsignedChar {
 	return 0;
 }
 
-final class ZexTests: AsicTestCase {
+final class ZexTests: XCTestCaseAsic {
 
 	func zex(_ resource: String, _ ext: String) {
 		guard let url = Bundle.module.url(forResource: resource, withExtension: ext, subdirectory: "zex") else {
@@ -40,15 +41,15 @@ final class ZexTests: AsicTestCase {
 		}
 
 		for i in 0..<0x100 {
-			let _iodevice = cpu_device(&device.cpu, UInt8(i))
-			var iodevice: z80_device {
+			let _iodevice = cpu_device(&asic.cpu, UInt8(i))
+			var iodevice: device {
 				_read { yield _iodevice.pointee }
 				_modify { yield &_iodevice.pointee }
 			}
 
 			iodevice.write = cpu_reset;
 			iodevice.read = write_text;
-			iodevice.data = UnsafeMutableRawPointer(_device);
+			iodevice.data = UnsafeMutableRawPointer(_asic);
 		}
 
 		guard let file = fopen(url.path(percentEncoded: false), "rb") else {
@@ -57,30 +58,30 @@ final class ZexTests: AsicTestCase {
 			return
 		}
 
-		fread(device.mmu.ram + 0x100, 1, Int(device.mmu.settings.ram_pages) * 0x4000, file);
+		fread(asic.mmu.ram + 0x100, 1, Int(asic.mmu.settings.ram_pages) * 0x4000, file);
 		fclose(file);
 
-		device.mmu.ram[0] = 0xd3; /* OUT N, A */
-		device.mmu.ram[1] = 0x00;
+		asic.mmu.ram[0] = 0xd3; /* OUT N, A */
+		asic.mmu.ram[1] = 0x00;
 
-		device.mmu.ram[5] = 0xdb; /* IN A, N */
-		device.mmu.ram[6] = 0x00;
-		device.mmu.ram[7] = 0xc9; /* RET */
+		asic.mmu.ram[5] = 0xdb; /* IN A, N */
+		asic.mmu.ram[6] = 0x00;
+		asic.mmu.ram[7] = 0xc9; /* RET */
 
-		device.mmu.banks.0.page = 0;
-		device.mmu.banks.1.page = 1;
-		device.mmu.banks.2.page = 2;
-		device.mmu.banks.3.page = 3;
+		asic.mmu.banks.0.page = 0;
+		asic.mmu.banks.1.page = 1;
+		asic.mmu.banks.2.page = 2;
+		asic.mmu.banks.3.page = 3;
 
-		device.mmu.banks.0.flash = 0;
-		device.mmu.banks.1.flash = 0;
-		device.mmu.banks.2.flash = 0;
-		device.mmu.banks.3.flash = 0;
+		asic.mmu.banks.0.flash = 0;
+		asic.mmu.banks.1.flash = 0;
+		asic.mmu.banks.2.flash = 0;
+		asic.mmu.banks.3.flash = 0;
 
-		device.cpu.registers.PC = 0x100;
+		asic.cpu.registers.PC = 0x100;
 
 		while true {
-			cpu_execute(&device.cpu, 10000);
+			cpu_execute(&asic.cpu, 10000);
 		}
 	}
 

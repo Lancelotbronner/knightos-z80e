@@ -1,6 +1,6 @@
 #include <z80e/debugger/commands.h>
 #include <z80e/debugger/debugger.h>
-#include <z80e/hardware/link.h>
+#include <z80e/devices/link.h>
 #include <z80e/debugger/hooks.h>
 
 #ifndef NOLINK
@@ -97,12 +97,12 @@ int handle_socket(struct debugger_state *state, int argc, char **argv) {
 #ifdef NOLINK
 	state->print(state, "Sockets are not supported\n");
 #else
-	state->asic->link->listenfd.fd =
+	state->asic->socket.listenfd.fd =
 		socket(AF_UNIX, SOCK_STREAM, 0);
-	fcntl(state->asic->link->listenfd.fd, F_SETFL, O_NONBLOCK);
-	fcntl(state->asic->link->listenfd.fd, F_SETFD, FD_CLOEXEC);
-	state->asic->link->listenfd.events = POLLIN;
-	if (state->asic->link->listenfd.fd == -1) {
+	fcntl(state->asic->socket.listenfd.fd, F_SETFL, O_NONBLOCK);
+	fcntl(state->asic->socket.listenfd.fd, F_SETFD, FD_CLOEXEC);
+	state->asic->socket.listenfd.events = POLLIN;
+	if (state->asic->socket.listenfd.fd == -1) {
 		state->print(state, "Unable to create socket\n");
 		return 1;
 	}
@@ -118,14 +118,14 @@ int handle_socket(struct debugger_state *state, int argc, char **argv) {
 	link_sockaddr->sun_path[sizeof(link_sockaddr->sun_path) - 1] = 0;
 
 	unlink(link_sockaddr->sun_path);
-	if (bind(state->asic->link->listenfd.fd,
+	if (bind(state->asic->socket.listenfd.fd,
 				(struct sockaddr *)link_sockaddr,
 				sizeof(*link_sockaddr)) == -1) {
 		state->print(state, "Unable to bind socket\n");
 		return 1;
 	}
 
-	if (listen(state->asic->link->listenfd.fd, 3) == -1) {
+	if (listen(state->asic->socket.listenfd.fd, 3) == -1) {
 		state->print(state, "Unable to listen on socket\n");
 		return 1;
 	}
@@ -136,7 +136,7 @@ int handle_socket(struct debugger_state *state, int argc, char **argv) {
 }
 
 int handle_status(struct debugger_state *state) {
-	link_state_t *lstate = state->asic->cpu.devices[0x00].data;
+	link_device_t lstate = state->asic->cpu.devices[0x00].data;
 	state->print(state, "Ready: %d\n", !lstate->assist.status.rx_ready);
 	state->print(state, "Tip: %d\n", lstate->us.tip);
 	state->print(state, "Ring: %d\n", lstate->us.ring);

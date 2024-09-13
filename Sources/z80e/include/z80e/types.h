@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 //MARK: - Hardware
 
 typedef struct asic *asic_t;
@@ -27,7 +29,7 @@ typedef void (*timer_callback_t)(asic_t _Nonnull asic, void * _Nullable data);
 
 typedef struct z80_hardware_timer *z80_timer_t;
 
-typedef struct z80_link_socket z80_link_socket_t;
+typedef struct z80_link_socket *z80_link_t;
 
 //MARK: - Device Management
 
@@ -46,3 +48,5 @@ typedef void (* _Nullable write_t)(const device_t _Nonnull, unsigned char);
 typedef struct keyboard_device *keyboard_device_t;
 
 typedef struct mapping_device *mapping_device_t;
+
+typedef struct link_device *link_device_t;

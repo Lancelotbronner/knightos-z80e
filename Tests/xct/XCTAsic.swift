@@ -14,9 +14,9 @@ open class XCTestCaseAsic: XCTestCase {
 
 	open var _type: ti_device_type { TI83p }
 
-	public internal(set) var _asic: UnsafeMutablePointer<struct asic>!
+	public internal(set) var _asic: asic_t!
 
-	public var asic: struct asic {
+	public var asic: asic {
 		_read { yield _asic.pointee }
 		_modify { yield &_asic.pointee }
 	}
@@ -54,11 +54,7 @@ open class XCTestCaseAsic: XCTestCase {
 	//MARK: - Hooks
 
 	override public func setUp() {
-		guard let __asic = asic_init(_type, nil) else {
-			XCTFail("Failed to initialize device")
-			return
-		}
-		_asic = __asic
+		asic_init(_asic, _type)
 
 		// Configure the default test device
 		cpu_device(&asic.cpu, 0x12)[0] = device(
@@ -70,7 +66,7 @@ open class XCTestCaseAsic: XCTestCase {
 	}
 
 	override public func tearDown() {
-		asic_free(_asic)
+		asic_deinit(_asic)
 	}
 
 }

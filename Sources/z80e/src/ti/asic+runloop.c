@@ -26,7 +26,7 @@
 static double orwl_timebase = 0.0;
 static uint64_t orwl_timestart = 0;
 #endif
-#include <z80e/hardware/link.h>
+#include <z80e/devices/link.h>
 
 long long get_time_nsec() {
 #ifdef EMSCRIPTEN
@@ -85,51 +85,51 @@ void link_socket_update(asic_t asic, int c) {
 	}
 
 #ifndef NOLINK
-	if (!asic->link->listenfd.fd) {
+	if (!asic->socket.listenfd.fd) {
 		return;
 	}
 
 	struct sockaddr_in clientaddr;
 	unsigned size = sizeof(clientaddr);
-	poll(&asic->link->listenfd, 1, 0);
+	poll(&asic->socket.listenfd, 1, 0);
 	int fd = -1;
-	if (asic->link->accept++ == 4096) { // stupid hack
-		fd = accept(asic->link->listenfd.fd, (struct sockaddr *)&clientaddr, &size);
-		asic->link->accept = 0;
+	if (asic->socket.accept++ == 4096) { // stupid hack
+		fd = accept(asic->socket.listenfd.fd, (struct sockaddr *)&clientaddr, &size);
+		asic->socket.accept = 0;
 	}
 
 	int i;
-	int length = sizeof(asic->link->clients) / sizeof(*asic->link->clients);
+	int length = sizeof(asic->socket.clients) / sizeof(*asic->socket.clients);
 	for (i = 0; i < length; ++i) {
-		struct pollfd client = asic->link->clients[i];
-		if (asic->link->clients[i].fd == 0) {
+		struct pollfd client = asic->socket.clients[i];
+		if (asic->socket.clients[i].fd == 0) {
 			if (fd != -1) {
-				asic->link->clients[i].fd = fd;
-				asic->link->clients[i].events = POLLIN | POLLHUP;
+				asic->socket.clients[i].fd = fd;
+				asic->socket.clients[i].events = POLLIN | POLLHUP;
 				printf("Client accepted with fd %d\n", fd);
 				fd = -1;
 			} else {
 				continue;
 			}
 		}
-		if (asic->link->clients[i].fd != 0) {
+		if (asic->socket.clients[i].fd != 0) {
 			uint8_t val;
-			poll(&asic->link->clients[i], 1, 0);
-			if (asic->link->clients[i].revents & POLLHUP) {
-				close(asic->link->clients[i].fd);
-				asic->link->clients[i].fd = 0;
+			poll(&asic->socket.clients[i], 1, 0);
+			if (asic->socket.clients[i].revents & POLLHUP) {
+				close(asic->socket.clients[i].fd);
+				asic->socket.clients[i].fd = 0;
 				continue;
 			}
-			if (asic->link->clients[i].revents & POLLIN) {
+			if (asic->socket.clients[i].revents & POLLIN) {
 				if (link_recv_ready(asic)) {
-					if (read(asic->link->clients[i].fd, &val, 1)) {
+					if (read(asic->socket.clients[i].fd, &val, 1)) {
 						link_recv_byte(asic, val);
 					}
 				}
 			}
 			if (c != EOF) {
 				val = c;
-				write(asic->link->clients[i].fd, &c, 1);
+				write(asic->socket.clients[i].fd, &c, 1);
 			}
 		}
 	}
