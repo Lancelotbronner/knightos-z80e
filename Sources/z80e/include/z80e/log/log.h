@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdarg.h>
-
 typedef enum {
 	L_ERROR = 0,
 	L_WARN = 1,
@@ -9,14 +7,13 @@ typedef enum {
 	L_DEBUG = 3,
 } loglevel_t;
 
-typedef void (*log_func)(void *, loglevel_t, const char *, const char *, va_list);
+typedef void (*log_callback_t)(void *data, loglevel_t level, const char *domain, const char *message);
 
-typedef struct {
-	void *data;
-	log_func log;
-	int logging_level;
-} log_t;
+void z80_log_callback(log_callback_t callback, void *data);
+void z80_log_filter(loglevel_t level);
 
-log_t *init_log_z80e(log_func, void *, int);
-void log_message(log_t *, loglevel_t, const char *, const char *, ...);
-void free_log(log_t *);
+void z80_log(loglevel_t level, const char *domain, const char *format, ...);
+void z80_debug(const char *domain, const char *format, ...);
+void z80_info(const char *domain, const char *format, ...);
+void z80_warning(const char *domain, const char *format, ...);
+void z80_error(const char *domain, const char *format, ...);

@@ -32,7 +32,6 @@ struct debugger_state {
 	debugger_t *debugger;
 	debugger_state_t *(*create_new_state)(debugger_state_t *, const char *command_name);
 	void (*close_window)(debugger_state_t *);
-	log_t *log;
 };
 
 typedef enum {

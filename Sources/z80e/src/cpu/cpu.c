@@ -25,8 +25,7 @@ struct ExecutionContext {
 	int8_t (*d)(struct ExecutionContext *);
 };
 
-void cpu_init(z80_cpu_t* cpu, log_t *log) {
-	cpu->log = log;
+void cpu_init(z80_cpu_t* cpu) {
 	struct device nullDevice = { NULL, NULL, NULL };
 	for (int i = 0; i < 0x100; i++)
 		cpu->devices[i] = nullDevice;
@@ -901,7 +900,7 @@ void handle_interrupt(struct ExecutionContext *context) {
 	z80_registers_t *r = &cpu->registers;
 	switch (cpu->int_mode) {
 	case 0:
-		log_message(cpu->log, L_WARN, "cpu", "Warning: z80e does not support interrupt mode 0.");
+		z80_warning("cpu", "Warning: z80e does not support interrupt mode 0.");
 		break;
 	case 1:
 		context->cycles += 13;
@@ -1565,7 +1564,7 @@ int cpu_execute(z80_cpu_t *cpu, int cycles) {
 	exit_loop:
 		cycles -= context.cycles;
 		if (context.cycles == 0) {
-			log_message(cpu->log, L_ERROR, "cpu", "Error: Unrecognized instruction 0x%02X.", context.opcode);
+			z80_error("cpu", "Error: Unrecognized instruction 0x%02X.", context.opcode);
 			cycles--;
 		}
 	}

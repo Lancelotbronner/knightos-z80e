@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type, log_t *log) {
+void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type) {
 	switch (device_type) {
 	case TI83p:
 	case TI73:
@@ -40,7 +40,6 @@ void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type, log_t *log) {
 	mmu->flash_unlocked = 0;
 	memset(mmu->flash_writes, 0, sizeof(flash_write_t) * 6);
 	mmu->flash_write_index = 0;
-	mmu->log = log;
 	// Default bank mappings
 	mmu->banks[0].page = 0; mmu->banks[0].flash = 1;
 	mmu->banks[1].page = 0; mmu->banks[1].flash = 1;
@@ -87,7 +86,7 @@ void chip_erase_sector(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 
 void chip_erase(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 	memset(mmu->flash, 0xFF, mmu->settings.flash_pages * 0x4000);
-	log_message(mmu->log, L_WARN, "mmu", "Erased entire Flash chip - you probably didn't want to do that.");
+	z80_warning("mmu", "Erased entire Flash chip - you probably didn't want to do that.");
 }
 
 uint8_t ti_read_byte(void *memory, uint16_t address) {

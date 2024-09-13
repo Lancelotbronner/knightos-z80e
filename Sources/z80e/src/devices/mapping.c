@@ -17,21 +17,7 @@ void mapping_reload(mapping_device_t mapping) {
 	banks[0].page = 0;
 	banks[0].flash = 1;
 
-	switch (mapping->mode) {
-	case 0:
-		banks[1].page = mapping->a;
-		banks[1].flash = mapping->flashA;
-		banks[2].page = mapping->b;
-		banks[2].flash = mapping->flashB;
-		if (mapping->asic->device == TI83p) {
-			banks[3].page = 0;
-			banks[3].flash = 0;
-		} else {
-			banks[3].page = mapping->page;
-			banks[3].flash = 0;
-		}
-		break;
-	case 1:
+	if (mapping->mode) {
 		banks[1].page = mapping->a & 0xFE;
 		banks[1].flash = mapping->flashA;
 		if (mapping->asic->device == TI83p) {
@@ -43,15 +29,26 @@ void mapping_reload(mapping_device_t mapping) {
 		}
 		banks[3].page = mapping->b;
 		banks[3].flash = mapping->flashB;
-		break;
+	} else {
+		banks[1].page = mapping->a;
+		banks[1].flash = mapping->flashA;
+		banks[2].page = mapping->b;
+		banks[2].flash = mapping->flashB;
+		if (mapping->asic->device == TI83p) {
+			banks[3].page = 0;
+			banks[3].flash = 0;
+		} else {
+			banks[3].page = mapping->page;
+			banks[3].flash = 0;
+		}
 	}
 
 	for (int i = 0; i < 4; i++) {
 		if (banks[i].flash && banks[i].page > mapping->asic->mmu.settings.flash_pages) {
-			log_message(mapping->asic->log, L_ERROR, "memorymapping", "ERROR: Flash page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
+			z80_error("memorymapping", "ERROR: Flash page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
 			banks[i].page &= mapping->asic->mmu.settings.flash_pages;
 		} else if (!banks[i].flash && banks[i].page > mapping->asic->mmu.settings.ram_pages) {
-			log_message(mapping->asic->log, L_ERROR, "memorymapping", "ERROR: RAM page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
+			z80_error("memorymapping", "ERROR: RAM page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
 			banks[i].page &= mapping->asic->mmu.settings.ram_pages;
 		}
 	}
@@ -61,17 +58,31 @@ void mapping_reload(mapping_device_t mapping) {
 
 static unsigned char __mapping_status_read(device_t device) {
 	mapping_device_t mapping = device->data;
-	return read_interrupting_device(&mapping->asic->cpu.devices[0x03]);
+	return mapping->asic->interrupts.interrupted.flags;
 }
 
 static void __mapping_status_write(device_t device, unsigned char value) {
 	mapping_device_t mapping = device->data;
 	mapping->mode = value;
 
-	log_message(mapping->asic->log, L_DEBUG, "memorymapping", "Set mapping mode to %d (at 0x%04X)", mapping->mode, mapping->asic->cpu.registers.PC);
+	z80_debug("memorymapping", "Set mapping mode to %d (at 0x%04X)", mapping->mode, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 
-	write_timer_speed(&mapping->asic->interrupts, value);
+	static double timer1[2][4] = {
+		{ 560, 248, 170, 118 },
+		{ 512, 227.55, 146.29, 107.79 }
+	};
+	static double timer2[2][4] = {
+		{ 1120, 497, 344, 236 },
+		{ 1024, 455.11, 292.57, 215.28 }
+	};
+
+	asic_t asic = mapping->asic;
+	bool isNotTi83p = asic->device != TI83p;
+	value >>= 1;
+	uint8_t speed = value & 3;
+	asic_timer1_frequency(asic, timer1[isNotTi83p][speed]);
+	asic_timer2_frequency(asic, timer2[isNotTi83p][speed]);
 }
 
 void device_mapping_status(device_t device, mapping_device_t mapping) {
@@ -90,7 +101,7 @@ static unsigned char __mapping_paging_read(device_t device) {
 static void __mapping_paging_write(device_t device, unsigned char value) {
 	mapping_device_t mapping = device->data;
 	mapping->page = value;
-	log_message(mapping->asic->log, L_DEBUG, "memorymapping", "Set ram banking page to %d (at 0x%04X)", mapping->page, mapping->asic->cpu.registers.PC);
+	z80_debug("memorymapping", "Set ram banking page to %d (at 0x%04X)", mapping->page, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 }
 
@@ -123,7 +134,7 @@ static void __mapping_bankA_write(device_t device, unsigned char value) {
 	mapping->flashA = is_flash;
 	mapping->a = value;
 
-	log_message(mapping->asic->log, L_DEBUG, "memorymapping", "Set bank A page to %c:%02X (at 0x%04X)", mapping->flashA ? 'F' : 'R',  mapping->a, mapping->asic->cpu.registers.PC);
+	z80_debug("memorymapping", "Set bank A page to %c:%02X (at 0x%04X)", mapping->flashA ? 'F' : 'R',  mapping->a, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 }
 
@@ -156,7 +167,7 @@ static void __mapping_bankB_write(device_t device, unsigned char value) {
 	mapping->flashB = is_flash;
 	mapping->b = value;
 
-	log_message(mapping->asic->log, L_DEBUG, "memorymapping", "Set bank B page to %c:%02X (at 0x%04X)", mapping->flashB ? 'F' : 'R',  mapping->b, mapping->asic->cpu.registers.PC);
+	z80_debug("memorymapping", "Set bank B page to %c:%02X (at 0x%04X)", mapping->flashB ? 'F' : 'R',  mapping->b, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 }
 

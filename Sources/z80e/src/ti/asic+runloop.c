@@ -54,7 +54,7 @@ long long get_time_nsec() {
 #endif
 }
 
-void runloop_init(asic_t asic, z80_runloop_t runloop) {
+void runloop_init(asic_t asic) {
 	asic->runloop.last_end = get_time_nsec();
 
 	for (int i = 0; i < asic->timers.capacity; i++) {

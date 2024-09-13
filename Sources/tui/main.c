@@ -199,15 +199,14 @@ void handleLongFlag(appContext_t *context, char *flag, int *i, char **argv) {
 	}
 }
 
-void frontend_log(void *data, loglevel_t level, const char *part, const char *message, va_list args) {
-	vprintf(message, args);
-	putc('\n', stdout);
+void frontend_log(void *data, loglevel_t level, const char *part, const char *message) {
+	printf("%s\n", message);
 }
 
 void sigint_handler(int sig) {
 	signal(SIGINT, sigint_handler);
 
-	log_message(context.device_asic->log, L_ERROR, "sigint", "Caught interrupt, stopping emulation");
+	z80_error("sigint", "Caught interrupt, stopping emulation");
 	context.device_asic->stopped = 1;
 
 	if (!context.device_asic->debugger || context.device_asic->debugger->state == DEBUGGER_ENABLED) {
@@ -248,10 +247,14 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	log_t *log = init_log_z80e(frontend_log, 0, context.log_level);
+	// Configure logging
+	z80_log_callback(frontend_log, nullptr);
+	z80_log_filter(context.log_level);
+
+	// Prepare the device
 	struct asic device_storage;
 	asic_t device = &device_storage;
-	asic_init(device, context.device, log);
+	asic_init(device, context.device);
 	context.device_asic = device;
 
 	if (enable_debug) {
@@ -260,7 +263,7 @@ int main(int argc, char **argv) {
 	}
 
 	if (context.rom_file == NULL && !enable_debug) {
-		log_message(device->log, L_WARN, "main", "No ROM file specified, starting debugger");
+		z80_warning("main", "No ROM file specified, starting debugger");
 		device->debugger = init_debugger(device);
 		device->debugger->state = DEBUGGER_ENABLED;
 	} else {

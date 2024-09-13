@@ -163,7 +163,7 @@ void break_callback(struct break_data *data, uint16_t address) {
 	}
 
 	if (data->log) {
-		log_message(data->asic->log, L_DEBUG, "break", "Breakpoint hit at 0x%04X", address);
+		z80_debug("break", "Breakpoint hit at 0x%04X", address);
 	}
 
 	data->asic->stopped = 1;

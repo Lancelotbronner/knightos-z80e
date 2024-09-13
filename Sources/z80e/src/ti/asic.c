@@ -8,6 +8,7 @@
 #include <z80e/ti/memory.h>
 #include <z80e/hardware/t6a04.h>
 #include <z80e/devices/flash.h>
+#include <z80e/devices/interrupts.h>
 #include <z80e/devices/keyboard.h>
 #include <z80e/devices/mapping.h>
 #include <z80e/devices/speed.h>
@@ -20,7 +21,7 @@
 static void plug_devices(asic_t asic);
 static void asic_mirror_ports(asic_t asic);
 
-void asic_init(asic_t asic, ti_device_type type, log_t *log) {
+void asic_init(asic_t asic, ti_device_type type) {
 	// Ensure everything is always zero-initialized.
 	*asic = (struct asic){};
 
@@ -28,31 +29,36 @@ void asic_init(asic_t asic, ti_device_type type, log_t *log) {
 	asic->device = type;
 	asic->battery = BATTERIES_GOOD;
 
-	// Configure logging
-	asic->log = log;
-
 	// Configure the Memory Management Unit
-	ti_mmu_init(&asic->mmu, type, log);
+	ti_mmu_init(&asic->mmu, type);
 
 	// Configure the CPU
-	cpu_init(&asic->cpu, log);
+	cpu_init(&asic->cpu);
 	asic->cpu.memory = (void*)&asic->mmu;
 	asic->cpu.read_byte = ti_read_byte;
 	asic->cpu.write_byte = ti_write_byte;
 	asic->clock_rate = 6000000;
 
-	// Configure hardware timers
+	// Configure timers
 	asic->timers.capacity = 20;
 	asic->timers.head = calloc(20, sizeof(z80_timer_t));
 
 	// Configure the runloop
+	runloop_init(asic);
 
+	// Configure interrupts
+	asic->interrupts.timer1 = -1;
+	asic->interrupts.timer2 = -1;
+	asic_power_release(asic);
+
+	// Configure debuggers
 	asic->stopped = 0;
 	asic->debugger = 0;
 	asic->hook = create_hook_set(asic);
 
 	asic->link = calloc(1, sizeof(z80_link_socket_t));
 
+	// Configure devices
 	plug_devices(asic);
 	asic_mirror_ports(asic);
 }
@@ -78,28 +84,16 @@ typedef struct {
 
 static uint8_t __unimplemented_read(device_t device) {
 	unimplemented_device_t *d = device->data;
-	log_message(d->asic->log, L_INFO, "asic",
-				"Warning: attempted to read from unimplemented port 0x%02x from 0x%04X.", d->port, d->asic->cpu.registers.PC);
+	z80_info("asic", "Warning: attempted to read from unimplemented port 0x%02x from 0x%04X.", d->port, d->asic->cpu.registers.PC);
 	return 0x00;
 }
 
 static void __unimplemented_write(device_t device, uint8_t value) {
 	unimplemented_device_t *d = device->data;
-	log_message(d->asic->log, L_INFO, "asic",
-				"Warning: attempted to write 0x%02x to unimplemented port 0x%02x from 0x%04X.", value, d->port, d->asic->cpu.registers.PC);
+	z80_info("asic", "Warning: attempted to write 0x%02x to unimplemented port 0x%02x from 0x%04X.", value, d->port, d->asic->cpu.registers.PC);
 }
 
 static void plug_devices(asic_t asic) {
-	/* Unimplemented devices */
-	int i;
-	for (i = 0; i < 0x100; i++) {
-		//TODO: Unimplemented devices cause a memory leak.
-		unimplemented_device_t *d = malloc(sizeof(unimplemented_device_t));
-		d->asic = asic;
-		d->port = i;
-		struct device device = { d, __unimplemented_read, __unimplemented_write };
-		asic->cpu.devices[i] = device;
-	}
 
 	if (asic->device != TI73 && asic->device != TI83p) {
 		device_speed(asic_device(asic, 0x20), asic);
@@ -127,7 +121,7 @@ static void plug_devices(asic_t asic) {
 	device_status(asic_device(asic, 0x02), asic);
 
 	// Initialize interrupts
-	asic->cpu.devices[0x03] = init_interrupts(asic, &asic->interrupts);
+	device_interrupt_mask(asic_device(asic, 0x03), asic);
 
 	// Initialize the LCD display
 	setup_lcd_display(asic, asic->hook);

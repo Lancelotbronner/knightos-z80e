@@ -24,9 +24,8 @@ struct z80_cpu {
 	void * _Nullable memory;
 	uint8_t (* _Nullable read_byte)(void * _Null_unspecified, uint16_t);
 	void (* _Nullable write_byte)(void * _Null_unspecified, uint16_t, uint8_t);
-	int interrupt;
+	bool interrupt;
 	hook_info_t * _Nullable hook;
-	log_t * _Nullable log;
 };
 
 int parity(uint8_t x);
@@ -38,7 +37,7 @@ uint16_t cpu_read_register_word(z80_cpu_t * _Nonnull, enum z80_registers);
 uint8_t cpu_write_register_byte(z80_cpu_t * _Nonnull, enum z80_registers, uint8_t);
 uint16_t cpu_write_register_word(z80_cpu_t * _Nonnull, enum z80_registers, uint16_t);
 
-void cpu_init(z80_cpu_t * _Nonnull cpu, log_t * _Nullable log);
+void cpu_init(z80_cpu_t * _Nonnull cpu);
 device_t _Nonnull cpu_device( z80_cpu_t * _Nonnull cpu, unsigned char i);
 uint8_t cpu_read_byte(z80_cpu_t * _Nonnull cpu, uint16_t address);
 void cpu_write_byte(z80_cpu_t * _Nonnull cpu, uint16_t address, uint8_t value);

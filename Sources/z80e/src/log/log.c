@@ -20,30 +20,50 @@ const char *loglevel_to_string(loglevel_t level) {
 	}
 }
 
-//TODO: Support os_log
+//TODO: Support os_log?
 
-log_t *init_log_z80e(log_func func, void *data, int log_level) {
-	log_t *log = calloc(sizeof(log_t), 1);
-	log->log = func;
-	log->data = data;
-	log->logging_level = log_level;
-	return log;
+#define LOG_CAPACITY 1024
+static log_callback_t Callback;
+static void *Data;
+static loglevel_t Level;
+static char Message[LOG_CAPACITY];
+
+void z80_log_callback(log_callback_t callback, void *data) {
+	Callback = callback;
+	Data = data;
 }
 
-void log_message(log_t *log, loglevel_t level, const char *part, const char *format, ...) {
-	if (log == 0) {
-		return;
-	}
-
-	if (level > log->logging_level) {
-		return;
-	}
-
-	va_list format_list;
-	va_start(format_list, format);
-	log->log(log->data, level, part, format, format_list);
+void z80_log_filter(loglevel_t level) {
+	Level = level;
 }
 
-void free_log(log_t *log) {
-	free(log);
+static void Log(loglevel_t level, const char *domain, const char *format, va_list args) {
+	vsnprintf(Message, LOG_CAPACITY, format, args);
+	Callback(Data, level, domain, Message);
+}
+
+#define ImplementLog(level) \
+if (level > Level) return; \
+va_list args; \
+va_start(args, format); \
+Log(level, domain, format, args)
+
+void z80_log(loglevel_t level, const char *domain, const char *format, ...) {
+	ImplementLog(level);
+}
+
+void z80_debug(const char *domain, const char *format, ...) {
+	ImplementLog(L_DEBUG);
+}
+
+void z80_info(const char *domain, const char *format, ...) {
+	ImplementLog(L_INFO);
+}
+
+void z80_warning(const char *domain, const char *format, ...) {
+	ImplementLog(L_WARN);
+}
+
+void z80_error(const char *domain, const char *format, ...) {
+	ImplementLog(L_ERROR);
 }

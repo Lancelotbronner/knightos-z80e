@@ -14,4 +14,4 @@ struct z80_runloop {
 	int ticks_capacity;
 };
 
-void runloop_init(asic_t asic, z80_runloop_t runloop);
+void runloop_init(asic_t asic);

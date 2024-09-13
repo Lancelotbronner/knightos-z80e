@@ -41,12 +41,12 @@ void device_mirror(device_t device, const device_t other) {
 
 //TODO: Once the asic is passed to device functions, use it to log in the unimplemented device
 static unsigned char __unimplemented_read(device_t device) {
-//	log_message(asic->log, L_INFO, "asic", "Warning: attempted to read from unimplemented port 0x%02x from 0x%04X.", (int)port, d->asic->cpu.registers.PC);
+//	z80_info("asic", "Warning: attempted to read from unimplemented port 0x%02x from 0x%04X.", (int)port, d->asic->cpu.registers.PC);
 	return 0x00;
 }
 
 static void __unimplemented_write(device_t device, unsigned char value) {
-//	log_message(asic->log, L_INFO, "asic", "Warning: attempted to write 0x%02x to unimplemented port 0x%02x from 0x%04X.", value, d->port, d->asic->cpu.registers.PC);
+//	z80_info("asic", "Warning: attempted to write 0x%02x to unimplemented port 0x%02x from 0x%04X.", value, d->port, d->asic->cpu.registers.PC);
 }
 
 void device_unimplemented(device_t device, unsigned char port) {

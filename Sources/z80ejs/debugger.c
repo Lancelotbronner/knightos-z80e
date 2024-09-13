@@ -45,7 +45,6 @@ debugger_state_t *openti_create_new_state(debugger_state_t *old_state, const cha
 	state->vprint = openti_state_vprint;
 	state->debugger = old_state->debugger;
 	state->asic = state->debugger->asic;
-	state->log = state->asic->log;
 	state->create_new_state = openti_create_new_state;
 	state->close_window = openti_close_window;
 
@@ -60,7 +59,6 @@ debugger_state_t *openti_new_state(debugger_t *debugger, int ref) {
 	state->vprint = openti_state_vprint;
 	state->debugger = debugger;
 	state->asic = debugger->asic;
-	state->log = state->asic->log;
 	state->create_new_state = openti_create_new_state;
 	state->close_window = openti_close_window;
 

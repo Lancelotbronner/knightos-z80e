@@ -33,7 +33,8 @@ static void __status_write(device_t device, uint8_t value) {
 	asic_t asic = device->data;
 	if (asic->device == TI83p || asic->device == TI73)
 		return;
-	write_acknowledged_interrupts(asic_device(asic, 0x03), value);
+	asic->interrupts.interrupted.link_activity &= value;
+	__asic_interrupt_update(asic);
 }
 
 void device_status(device_t device, asic_t asic) {

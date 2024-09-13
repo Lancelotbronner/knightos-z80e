@@ -54,7 +54,6 @@ struct asic {
 	} timers;
 
 	hook_info_t *hook;
-	log_t *log;
 	debugger_t *debugger;
 };
 
@@ -65,7 +64,7 @@ void asic_remove_timer(asic_t , int);
 
 //MARK: - Lifecycle Management
 
-void asic_init(asic_t asic, ti_device_type, log_t *);
+void asic_init(asic_t asic, ti_device_type);
 void asic_deinit(asic_t asic);
 
 //MARK: - Runloop Management
@@ -88,3 +87,25 @@ void asic_install(asic_t asic, const device_t device, unsigned char port);
 ///   - asic: The chip.
 ///   - port: The port at which to retrieve the device.
 device_t asic_device(asic_t asic, unsigned char port);
+
+//MARK: - Interrupts Management
+
+void __asic_interrupt_update(asic_t asic);
+
+/// Trigger an interrupt on the chip.
+/// - Parameters:
+///   - asic: The chip.
+///   - interrupt: The interrupts to trigger.
+void asic_interrupt(asic_t asic, enum ti_interrupt interrupt);
+
+void asic_allow(asic_t asic, enum ti_interrupt interrupt, bool enabled);
+
+void asic_acknowledge(asic_t asic, enum ti_interrupt interrupt);
+
+//MARK: - Control Management
+
+void asic_power_press(asic_t asic);
+void asic_power_release(asic_t asic);
+
+void asic_timer1_frequency(asic_t asic, double speed);
+void asic_timer2_frequency(asic_t asic, double speed);

@@ -4,19 +4,21 @@
 
 struct mapping_device {
 	asic_t asic;
-	struct {
-		unsigned char mode : 1;
-		/// Whether bank A points to flash memory
-		unsigned char flashA : 1;
-		/// Whether bank B points to flash memory
-		unsigned char flashB : 1;
-		/// The current RAM bank page
-		unsigned char page : 3;
-	};
+
 	/// The page of bank A
 	unsigned char a;
 	/// The page of bank B
 	unsigned char b;
+
+	struct {
+		bool mode : 1;
+		/// Whether bank A points to flash memory
+		bool flashA : 1;
+		/// Whether bank B points to flash memory
+		bool flashB : 1;
+		/// The current RAM bank page
+		unsigned char page : 3;
+	};
 };
 
 void mapping_init(mapping_device_t mapping, asic_t asic);
