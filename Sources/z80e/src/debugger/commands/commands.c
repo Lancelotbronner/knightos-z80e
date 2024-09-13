@@ -10,7 +10,7 @@
 
 struct mmu_disassemble_memory {
 	struct disassemble_memory mem;
-	z80cpu_t *cpu;
+	z80_cpu_t *cpu;
 	struct debugger_state *state;
 };
 
@@ -134,7 +134,7 @@ uint16_t parse_expression_z80e(debugger_state_t *state, const char *string) {
 	char operator_stack[20];
 	int operator_stack_pos = 0;
 
-	z80cpu_t *cpu = &state->asic->cpu;
+	z80_cpu_t *cpu = &state->asic->cpu;
 	uint16_t start = state->asic->cpu.registers.PC;
 	struct mmu_disassemble_memory mmudasm = { { parse_expression_dasm_read, start }, cpu, state };
 

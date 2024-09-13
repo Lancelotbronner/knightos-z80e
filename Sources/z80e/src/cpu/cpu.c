@@ -6,7 +6,7 @@
 
 struct ExecutionContext {
 	uint8_t cycles;
-	z80cpu_t *cpu;
+	z80_cpu_t *cpu;
 	union {
 		uint8_t opcode;
 		struct {
@@ -25,18 +25,18 @@ struct ExecutionContext {
 	int8_t (*d)(struct ExecutionContext *);
 };
 
-void cpu_init(z80cpu_t* cpu, log_t *log) {
+void cpu_init(z80_cpu_t* cpu, log_t *log) {
 	cpu->log = log;
 	struct device nullDevice = { NULL, NULL, NULL };
 	for (int i = 0; i < 0x100; i++)
 		cpu->devices[i] = nullDevice;
 }
 
-struct device *cpu_device(z80cpu_t *cpu, unsigned char i) {
+struct device *cpu_device(z80_cpu_t *cpu, unsigned char i) {
 	return &cpu->devices[i];
 }
 
-uint16_t cpu_read_register_word(z80cpu_t *cpu, enum z80_registers reg_to_read) {
+uint16_t cpu_read_register_word(z80_cpu_t *cpu, enum z80_registers reg_to_read) {
 	uint16_t return_value = 0;
 	switch(reg_to_read) {
 	case  AF:
@@ -72,7 +72,7 @@ uint16_t cpu_read_register_word(z80cpu_t *cpu, enum z80_registers reg_to_read) {
 	return return_value;
 }
 
-uint8_t cpu_read_register_byte(z80cpu_t *cpu, enum z80_registers reg_to_read) {
+uint8_t cpu_read_register_byte(z80_cpu_t *cpu, enum z80_registers reg_to_read) {
 	uint8_t return_value = 0;
 
 	switch(reg_to_read) {
@@ -127,7 +127,7 @@ uint8_t cpu_read_register_byte(z80cpu_t *cpu, enum z80_registers reg_to_read) {
 	return return_value;
 }
 
-uint16_t cpu_write_register_word(z80cpu_t *cpu, enum z80_registers reg_to_read, uint16_t value) {
+uint16_t cpu_write_register_word(z80_cpu_t *cpu, enum z80_registers reg_to_read, uint16_t value) {
 	uint16_t return_value = value;
 	return_value = hook_on_register_write(cpu->hook, reg_to_read, value);
 
@@ -163,7 +163,7 @@ uint16_t cpu_write_register_word(z80cpu_t *cpu, enum z80_registers reg_to_read, 
 	return return_value;
 }
 
-uint8_t cpu_write_register_byte(z80cpu_t *cpu, enum z80_registers reg_to_read, uint8_t value) {
+uint8_t cpu_write_register_byte(z80_cpu_t *cpu, enum z80_registers reg_to_read, uint8_t value) {
 	uint8_t return_value = value;
 	return_value = (uint8_t)hook_on_register_write(cpu->hook, reg_to_read, value);
 
@@ -217,24 +217,24 @@ uint8_t cpu_write_register_byte(z80cpu_t *cpu, enum z80_registers reg_to_read, u
 	return return_value;
 }
 
-uint8_t cpu_read_byte(z80cpu_t *cpu, uint16_t address) {
+uint8_t cpu_read_byte(z80_cpu_t *cpu, uint16_t address) {
 	return cpu->read_byte(cpu->memory, address);
 }
 
-void cpu_write_byte(z80cpu_t *cpu, uint16_t address, uint8_t value) {
+void cpu_write_byte(z80_cpu_t *cpu, uint16_t address, uint8_t value) {
 	cpu->write_byte(cpu->memory, address, value);
 }
 
-uint16_t cpu_read_word(z80cpu_t *cpu, uint16_t address) {
+uint16_t cpu_read_word(z80_cpu_t *cpu, uint16_t address) {
 	return cpu->read_byte(cpu->memory, address) | (cpu->read_byte(cpu->memory, address + 1) << 8);
 }
 
-void cpu_write_word(z80cpu_t *cpu, uint16_t address, uint16_t value) {
+void cpu_write_word(z80_cpu_t *cpu, uint16_t address, uint16_t value) {
 	cpu->write_byte(cpu->memory, address, value & 0xFF);
 	cpu->write_byte(cpu->memory, address + 1, value >> 8);
 }
 
-uint8_t cpu_port_in(z80cpu_t *cpu, uint8_t port) {
+uint8_t cpu_port_in(z80_cpu_t *cpu, uint8_t port) {
 	device_t device = &cpu->devices[port];
 	uint8_t val = 0;
 	if (device->read) {
@@ -244,7 +244,7 @@ uint8_t cpu_port_in(z80cpu_t *cpu, uint8_t port) {
 	return val;
 }
 
-void cpu_port_out(z80cpu_t *cpu, uint8_t port, uint8_t val) {
+void cpu_port_out(z80_cpu_t *cpu, uint8_t port, uint8_t val) {
 	device_t device = &cpu->devices[port];
 	if (device->write) {
 		val = hook_on_port_out(cpu->hook, port, val);
@@ -252,12 +252,12 @@ void cpu_port_out(z80cpu_t *cpu, uint8_t port, uint8_t val) {
 	}
 }
 
-void push(z80cpu_t *cpu, uint16_t value) {
+void push(z80_cpu_t *cpu, uint16_t value) {
 	cpu_write_word(cpu, cpu->registers.SP - 2, value);
 	cpu->registers.SP -= 2;
 }
 
-uint16_t pop(z80cpu_t *cpu) {
+uint16_t pop(z80_cpu_t *cpu) {
 	uint16_t a = cpu_read_word(cpu, cpu->registers.SP);
 	cpu->registers.SP += 2;
 	return a;
@@ -486,7 +486,7 @@ uint16_t write_rp2(int i, uint16_t value, struct ExecutionContext *context) {
 }
 
 uint8_t read_cc(int i, struct ExecutionContext *context) {
-	z80registers_t *r = &context->cpu->registers;
+	z80_registers_t *r = &context->cpu->registers;
 	switch (i) {
 	case 0: return !r->flags.Z;
 	case 1: return  r->flags.Z;
@@ -536,7 +536,7 @@ uint8_t read_cc(int i, struct ExecutionContext *context) {
 #define _flag_zero(a)       ((a) ? 0 : FLAG_Z)
 
 void daa(struct ExecutionContext *context) {
-	z80registers_t *r = &context->cpu->registers;
+	z80_registers_t *r = &context->cpu->registers;
 	uint8_t old = r->A;
 	uint8_t v = 0;
 	if ((r->A & 0xF) > 9 || r->flags.H) {
@@ -563,7 +563,7 @@ void daa(struct ExecutionContext *context) {
 void execute_alu(int i, uint8_t v, struct ExecutionContext *context) {
 	uint8_t old;
 	context->cycles += 4;
-	z80registers_t *r = &context->cpu->registers;
+	z80_registers_t *r = &context->cpu->registers;
 	switch (i) {
 	case 0: // ADD A, v
 		old = r->A;
@@ -638,8 +638,8 @@ void execute_rot(int y, int z, int switch_opcode_data, struct ExecutionContext *
 	uint8_t old_7 = (r & 0x80) > 0;
 	uint8_t old_0 = (r & 1) > 0;
 	uint8_t old_c = context->cpu->registers.flags.C > 0;
-	z80cpu_t *cpu = context->cpu;
-	z80registers_t *reg = &cpu->registers;
+	z80_cpu_t *cpu = context->cpu;
+	z80_registers_t *reg = &cpu->registers;
 	switch (y) {
 	case 0: // RLC r[z]
 		r <<= 1; r |= old_7;
@@ -694,7 +694,7 @@ void execute_rot(int y, int z, int switch_opcode_data, struct ExecutionContext *
 }
 
 void execute_bli(int y, int z, struct ExecutionContext *context) {
-	z80registers_t *r = &context->cpu->registers;
+	z80_registers_t *r = &context->cpu->registers;
 	uint8_t old, new, hc;
 	switch (y) {
 	case 4:
@@ -897,8 +897,8 @@ void handle_interrupt(struct ExecutionContext *context) {
 	// Note: Should we consider doing a proper raise/acknowledge mechanism
 	// with interrupting devices? It's probably not entirely required but it
 	// might be nice to follow the actual behavior more closely.
-	z80cpu_t *cpu = context->cpu;
-	z80registers_t *r = &cpu->registers;
+	z80_cpu_t *cpu = context->cpu;
+	z80_registers_t *r = &cpu->registers;
 	switch (cpu->int_mode) {
 	case 0:
 		log_message(cpu->log, L_WARN, "cpu", "Warning: z80e does not support interrupt mode 0.");
@@ -920,7 +920,7 @@ void handle_interrupt(struct ExecutionContext *context) {
 	}
 }
 
-int cpu_execute(z80cpu_t *cpu, int cycles) {
+int cpu_execute(z80_cpu_t *cpu, int cycles) {
 	struct ExecutionContext context = {0};
 	context.cpu = cpu;
 	while (cycles > 0 || cpu->prefix != 0) {
@@ -949,7 +949,7 @@ int cpu_execute(z80cpu_t *cpu, int cycles) {
 		uint8_t op; uint16_t op16;
 		int reset_prefix = 1;
 
-		z80registers_t *r = &cpu->registers;
+		z80_registers_t *r = &cpu->registers;
 
 		uint8_t old_r = r->R;
 		r->R++;

@@ -72,7 +72,7 @@ typedef struct {
 } hook_lcd_update_array_t;
 
 struct hook_info {
-	z80cpu_t *cpu;
+	z80_cpu_t *cpu;
 	ti_mmu_t mmu;
 
 	hook_memory_array_t *on_memory_read;
