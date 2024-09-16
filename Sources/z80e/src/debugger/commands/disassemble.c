@@ -10,7 +10,7 @@
 
 struct mmu_disassemble_memory {
 	struct disassemble_memory mem;
-	z80_cpu_t *cpu;
+	z80_cpu_t cpu;
 	struct debugger_state *state;
 };
 
@@ -39,7 +39,7 @@ int command_disassemble(struct debugger_state *state, int argc, char **argv) {
 		return 0;
 	}
 
-	z80_cpu_t *cpu = &state->asic->cpu;
+	z80_cpu_t cpu = &state->asic->cpu;
 
 	uint16_t start = state->asic->cpu.registers.PC;
 	uint16_t count = 10;

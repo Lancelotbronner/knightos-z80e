@@ -9,7 +9,7 @@ int parity(uint8_t x) {
 	return x & 1;
 }
 
-void print_state(z80_cpu_t *cpu) {
+void print_state(z80_cpu_t cpu) {
 	struct z80_regstate *r = &cpu->registers;
 	printf("   AF: 0x%04X   BC: 0x%04X   DE: 0x%04X  HL: 0x%04X\n", r->AF, r->BC, r->DE, r->HL);
 	printf("  'AF: 0x%04X  'BC: 0x%04X  'DE: 0x%04X 'HL: 0x%04X\n", r->_AF, r->_BC, r->_DE, r->_HL);

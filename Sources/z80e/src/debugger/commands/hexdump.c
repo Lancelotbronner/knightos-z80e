@@ -12,7 +12,7 @@ int command_hexdump(struct debugger_state *state, int argc, char **argv) {
 		return 0;
 	}
 
-	z80_cpu_t *cpu = &state->asic->cpu;
+	z80_cpu_t cpu = &state->asic->cpu;
 
 	uint16_t start = state->asic->cpu.registers.PC;
 	if (argc > 1) {
@@ -67,7 +67,7 @@ int command_backwards_hexdump(struct debugger_state *state, int argc, char **arg
 		return 0;
 	}
 
-	z80_cpu_t *cpu = &state->asic->cpu;
+	z80_cpu_t cpu = &state->asic->cpu;
 
 	uint16_t start = state->asic->cpu.registers.PC;
 	if (argc > 1) {

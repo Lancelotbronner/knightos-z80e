@@ -9,7 +9,7 @@ int command_print_registers(struct debugger_state *state, int argc, char **argv)
 		return 0;
 	}
 
-	z80_cpu_t *cpu = &state->asic->cpu;
+	z80_cpu_t cpu = &state->asic->cpu;
 
 	z80_registers_t r = cpu->registers;
 	state->print(state, "   AF: 0x%04X   BC: 0x%04X   DE: 0x%04X  HL: 0x%04X\n", r.AF, r.BC, r.DE, r.HL);
