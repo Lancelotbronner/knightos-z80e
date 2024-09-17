@@ -47,7 +47,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 		instructions = parse_expression_z80e(state, argv[1]);
 		state->debugger->state = DEBUGGER_LONG_OPERATION;
 		for (; instructions > 0; instructions--) {
-			hook_on_before_execution(state->asic->hook, state->asic->cpu.registers.PC);
+			hook_execution_trigger(&state->asic->hook.on_before_execution, state->asic->cpu.registers.PC);
 			if (!isFirstInstruction && state->asic->stopped) {
 				state->asic->stopped = 0;
 				break;
@@ -88,7 +88,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 				state->asic->cpu.IFF1 = iff1;
 				state->asic->cpu.IFF2 = iff2;
 			}
-			hook_on_after_execution(state->asic->hook, state->asic->cpu.registers.PC);
+			hook_execution_trigger(&state->asic->hook.on_after_execution, state->asic->cpu.registers.PC);
 			if (state->asic->stopped) {
 				state->asic->stopped = 0;
 				break;
@@ -100,7 +100,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 
 	state->debugger->state = DEBUGGER_LONG_OPERATION_INTERRUPTABLE;
 	while (1) {
-		hook_on_before_execution(state->asic->hook, state->asic->cpu.registers.PC);
+		hook_execution_trigger(&state->asic->hook.on_before_execution, state->asic->cpu.registers.PC);
 		if (!isFirstInstruction && state->asic->stopped) {
 			state->asic->stopped = 0;
 			break;
@@ -139,7 +139,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 
 		asic_tick_cycles(state->asic, 1);
 
-		hook_on_before_execution(state->asic->hook, state->asic->cpu.registers.PC);
+		hook_execution_trigger(&state->asic->hook.on_after_execution, state->asic->cpu.registers.PC);
 		if (state->asic->stopped) {
 			state->debugger->state = DEBUGGER_ENABLED;
 			return 0;

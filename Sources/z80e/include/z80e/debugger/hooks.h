@@ -2,66 +2,158 @@
 
 #include <stdint.h>
 
-typedef struct hook_info hook_info_t;
+typedef struct hook_info *hook_info_t;
 
 #include <z80e/cpu/z80_types.h>
 #include <z80e/hardware/t6a04.h>
 
-hook_info_t *create_hook_set(asic_t asic);
+#include <z80e/debugger/hooks.h>
+
+// Note: All `hook_<domain>` structs have the following assumptions:
+// - callback is the first field
+// - Their size is at most 3 `void*`
+
+typedef struct hook {
+	void *list;
+	void *callback;
+} hook_t;
+
+//MARK: - Lifecycle
+
+size_t sizeof_hook();
+void hook_init(hook_info_t hooks, asic_t asic);
+
+void hook_cancel(hook_t hook);
 
 //MARK: - Memory Hooks
 
-uint8_t hook_on_memory_read(hook_info_t *, uint16_t address, uint8_t value);
-uint8_t hook_on_memory_write(hook_info_t *, uint16_t address, uint8_t value);
-
+typedef struct hook_memory *hook_memory_t;
+typedef struct hooks_memory *hooks_memory_t;
 typedef uint8_t (*hook_memory_callback_t)(void *data, uint16_t address, uint8_t value);
 
-void hook_remove_memory_read(hook_info_t *, int);
-int hook_add_memory_read(hook_info_t *, uint16_t address_start, uint16_t address_end, void *data, hook_memory_callback_t);
-void hook_remove_register_write(hook_info_t *, int);
-int hook_add_memory_write(hook_info_t *, uint16_t address_start, uint16_t address_end, void *data, hook_memory_callback_t);
+struct hook_memory {
+	hook_memory_callback_t callback;
+	void *data;
+	uint16_t range_start;
+	uint16_t range_end;
+};
+
+struct hooks_memory {
+	int count;
+	int capacity;
+	struct hook_memory *storage;
+};
+
+hook_t hook_memory_insert(hooks_memory_t hooks, hook_memory_t const hook);
+hook_t hook_memory_emplace(hooks_memory_t hooks, uint16_t address_start, uint16_t address_end, void *data, hook_memory_callback_t callback);
+
+uint8_t hook_memory_trigger(hooks_memory_t hooks, uint16_t address, uint8_t value);
 
 //MARK: - Register Hooks
 
-uint16_t hook_on_register_read(hook_info_t *, enum z80_registers flags, uint16_t value);
-uint16_t hook_on_register_write(hook_info_t *, enum z80_registers flags, uint16_t value);
-
+typedef struct hook_register *hook_register_t;
+typedef struct hooks_register *hooks_register_t;
 typedef uint16_t (*hook_register_callback_t)(void *data, enum z80_registers reg, uint16_t value);
 
-void hook_remove_register_read(hook_info_t *, int);
-int hook_add_register_read(hook_info_t *, enum z80_registers flags, void *data, hook_register_callback_t);
-void hook_remove_register_write(hook_info_t *, int);
-int hook_add_register_write(hook_info_t *, enum z80_registers flags, void *data, hook_register_callback_t);
+struct hook_register {
+	hook_register_callback_t callback;
+	void *data;
+	enum z80_registers registers;
+};
+
+struct hooks_register {
+	int count;
+	int capacity;
+	struct hook_register *storage;
+};
+
+hook_t hook_register(hooks_register_t hooks, hook_register_t const hook);
+hook_t hook_register_emplace(hooks_register_t hooks, enum z80_registers registers, void *data, hook_register_callback_t callback);
+
+uint8_t hook_register_trigger(hooks_register_t hooks, enum z80_registers registers, uint8_t value);
 
 //MARK: - Port Hooks
 
-uint8_t hook_on_port_in(hook_info_t *, uint8_t port, uint8_t value);
-uint8_t hook_on_port_out(hook_info_t *, uint8_t port, uint8_t value);
-
+typedef struct hook_port *hook_port_t;
+typedef struct hooks_port *hooks_port_t;
 typedef uint8_t (*hook_port_callback_t)(void *data, uint8_t port, uint8_t value);
 
-void hook_remove_port_in(hook_info_t *, int);
-int hook_add_port_in(hook_info_t *, uint8_t port_range_start, uint8_t port_range_end, void *data, hook_port_callback_t);
-void hook_remove_port_out(hook_info_t *, int);
-int hook_add_port_out(hook_info_t *, uint8_t port_range_start, uint8_t port_range_end, void *data, hook_port_callback_t);
+struct hook_port {
+	hook_port_callback_t callback;
+	void *data;
+	uint8_t range_start;
+	uint8_t range_end;
+};
+
+struct hooks_port {
+	int count;
+	int capacity;
+	struct hook_port *storage;
+};
+
+hook_t hook_port(hooks_port_t hooks, hook_port_t const hook);
+hook_t hook_port_emplace(hooks_port_t hooks, uint8_t range_start, uint8_t range_end, void *data, hook_port_callback_t callback);
+
+uint8_t hook_port_trigger(hooks_port_t hooks, uint8_t port, uint8_t value);
 
 //MARK: - Execution Hooks
 
-void hook_on_before_execution(hook_info_t *, uint16_t address);
-void hook_on_after_execution(hook_info_t *, uint16_t address);
-
+typedef struct hook_execution *hook_execution_t;
+typedef struct hooks_execution *hooks_execution_t;
 typedef void (*hook_execution_callback_t)(void *data, uint16_t address);
 
-void hook_remove_before_execution(hook_info_t *, int);
-int hook_add_before_execution(hook_info_t *, void *data, hook_execution_callback_t);
-void hook_remove_after_execution(hook_info_t *, int);
-int hook_add_after_execution(hook_info_t *, void *data, hook_execution_callback_t);
+struct hook_execution {
+	hook_execution_callback_t callback;
+	void *data;
+};
+
+struct hooks_execution {
+	int count;
+	int capacity;
+	struct hook_execution *storage;
+};
+
+hook_t hook_execution(hooks_execution_t hooks, hook_execution_t const hook);
+hook_t hook_execution_emplace(hooks_execution_t hooks, void *data, hook_execution_callback_t callback);
+
+void hook_execution_trigger(hooks_execution_t hooks, uint16_t address);
 
 //MARK: - LCD Hooks
 
-void hook_on_lcd_update(hook_info_t *, ti_bw_lcd_t *);
+typedef struct hook_lcd *hook_lcd_t;
+typedef struct hooks_lcd *hooks_lcd_t;
+typedef void (*hook_lcd_callback_t)(void *data, ti_bw_lcd_t *lcd);
 
-typedef void (*hook_lcd_update_callback_t)(void *data, ti_bw_lcd_t *lcd);
+struct hook_lcd {
+	hook_lcd_callback_t callback;
+	void *data;
+};
 
-void hook_remove_lcd_update(hook_info_t *, int);
-int hook_add_lcd_update(hook_info_t *, void *data, hook_lcd_update_callback_t);
+struct hooks_lcd {
+	int count;
+	int capacity;
+	struct hook_lcd *storage;
+};
+
+hook_t hook_lcd(hooks_lcd_t hooks, hook_lcd_t const hook);
+hook_t hook_lcd_emplace(hooks_lcd_t hooks, void *data, hook_lcd_callback_t callback);
+
+void hook_lcd_trigger(hooks_lcd_t hooks, ti_bw_lcd_t *lcd);
+
+//MARK: - Asic Hooks
+
+struct hook_info {
+	struct hooks_memory on_memory_read;
+	struct hooks_memory on_memory_write;
+
+	struct hooks_register on_register_read;
+	struct hooks_register on_register_write;
+
+	struct hooks_port on_port_in;
+	struct hooks_port on_port_out;
+
+	struct hooks_execution on_before_execution;
+	struct hooks_execution on_after_execution;
+
+	struct hooks_lcd on_lcd_update;
+};

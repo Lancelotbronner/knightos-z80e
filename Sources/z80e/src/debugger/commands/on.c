@@ -20,10 +20,7 @@ enum {
 	WRITE = (1 << 1)
 };
 int register_from_string(char *string) {
-	#define REGISTER(num, len, print) \
-		if (strncasecmp(string, print, len) == 0) {\
-			return num; \
-		}
+	#define REGISTER(num, len, print) if (strncasecmp(string, print, len) == 0) return num;
 	REGISTER(A, 1, "A");
 	REGISTER(B, 1, "B");
 	REGISTER(C, 1, "C");
@@ -89,17 +86,14 @@ int command_on(struct debugger_state *state, int argc, char **argv) {
 	}
 
 	int thing = 0;
-	if (*argv[2] == 'r') {
+	if (*argv[2] == 'r')
 		thing = READ;
-	}
 
-	if (*argv[2] == 'w') {
+	if (*argv[2] == 'w')
 		thing = WRITE;
-	}
 
-	if (strncasecmp(argv[2], "rw", 2) == 0) {
+	if (strncasecmp(argv[2], "rw", 2) == 0)
 		thing = READ | WRITE;
-	}
 
 	if (thing == 0) {
 		state->print(state, "ERROR: First argument must be read, write, or rw\n");
@@ -118,28 +112,22 @@ int command_on(struct debugger_state *state, int argc, char **argv) {
 			free(sta);
 			return 1;
 		}
-		if (thing & READ) {
-			hook_add_register_read(state->asic->hook, sta->look_for, sta, command_on_register_hook);
-		}
-		if (thing & WRITE) {
-			hook_add_register_write(state->asic->hook, sta->look_for, sta, command_on_register_hook);
-		}
+		if (thing & READ)
+			hook_register_emplace(&state->asic->hook.on_register_read, sta->look_for, sta, command_on_register_hook);
+		if (thing & WRITE)
+			hook_register_emplace(&state->asic->hook.on_register_write, sta->look_for, sta, command_on_register_hook);
 	} else if (strncasecmp(argv[1], "memory", 6) == 0) {
 		sta->look_for = parse_expression_z80e(state, argv[3]);
-		if (thing & READ) {
-			hook_add_memory_read(state->asic->hook, sta->look_for, sta->look_for, sta, command_on_memory_hook);
-		}
-		if (thing & WRITE) {
-			hook_add_memory_write(state->asic->hook, sta->look_for, sta->look_for, sta, command_on_memory_hook);
-		}
+		if (thing & READ)
+			hook_memory_emplace(&state->asic->hook.on_memory_read, sta->look_for, sta->look_for, sta, command_on_memory_hook);
+		if (thing & WRITE)
+			hook_memory_emplace(&state->asic->hook.on_memory_write, sta->look_for, sta->look_for, sta, command_on_memory_hook);
 	} else if (strncasecmp(argv[1], "port", 4) == 0) {
 		sta->look_for = parse_expression_z80e(state, argv[3]);
-		if (thing & READ) {
-			hook_add_port_in(state->asic->hook, sta->look_for, sta->look_for, sta, command_on_port_hook);
-		}
-		if (thing & WRITE) {
-			hook_add_port_out(state->asic->hook, sta->look_for, sta->look_for, sta, command_on_port_hook);
-		}
+		if (thing & READ)
+			hook_port_emplace(&state->asic->hook.on_port_in, sta->look_for, sta->look_for, sta, command_on_port_hook);
+		if (thing & WRITE)
+			hook_port_emplace(&state->asic->hook.on_port_out, sta->look_for, sta->look_for, sta, command_on_port_hook);
 	} else {
 		free(sta);
 		state->print(state, "ERROR: Second argument must be memory or register!\n");
@@ -152,25 +140,22 @@ int command_on(struct debugger_state *state, int argc, char **argv) {
 struct break_data {
 	uint16_t address;
 	asic_t asic;
-	int hook_id;
+	hook_t hook_id;
 	int count;
 	int log;
 };
 
 void break_callback(struct break_data *data, uint16_t address) {
-	if(data->address != address) {
+	if(data->address != address)
 		return;
-	}
 
-	if (data->log) {
+	if (data->log)
 		z80_debug("break", "Breakpoint hit at 0x%04X", address);
-	}
 
 	data->asic->stopped = 1;
 
-	if (data->count != -1 && !(--data->count)) {
-		hook_remove_before_execution(data->asic->hook, data->hook_id);
-	}
+	if (data->count != -1 && !(--data->count))
+		hook_cancel(data->hook_id);
 }
 
 int command_break(struct debugger_state *state, int argc, char **argv) {
@@ -182,16 +167,15 @@ int command_break(struct debugger_state *state, int argc, char **argv) {
 	uint16_t address = parse_expression_z80e(state, argv[1]);
 
 	int count = -1;
-	if (argc == 3) {
+	if (argc == 3)
 		count = parse_expression_z80e(state, argv[2]);
-	}
 
 	struct break_data *data = malloc(sizeof(struct break_data));
 	data->address = address;
 	data->asic = state->asic;
 	data->count = count;
 	data->log = 1;
-	data->hook_id = hook_add_before_execution(state->asic->hook, data, (hook_execution_callback_t)break_callback);
+	data->hook_id = hook_execution_emplace(&state->asic->hook.on_before_execution, data, (hook_execution_callback_t)break_callback);
 	return 0;
 }
 
@@ -211,9 +195,8 @@ int step_over_disasm_write(struct disassemble_memory *mem, const char *thing, ..
 		va_list list;
 		va_start(list, thing);
 		return extra->state->vprint(extra->state, thing, list);
-	} else {
-		return 0;
 	}
+	return 0;
 }
 
 int command_step_over(struct debugger_state *state, int argc, char **argv) {
@@ -224,35 +207,33 @@ int command_step_over(struct debugger_state *state, int argc, char **argv) {
 	command_step_over_dism_extra_t extra = { &state->asic->mmu, state };
 	struct disassemble_memory mem = { step_over_read_byte, state->asic->cpu.registers.PC, &extra };
 
-	if (state->debugger->flags.echo) {
+	if (state->debugger->flags.echo)
 		state->print(state, "0x%04X: ", state->asic->cpu.registers.PC);
-	}
+
 	uint16_t size = parse_instruction(&mem, step_over_disasm_write, state->debugger->flags.knightos);
-	if (state->debugger->flags.echo) {
+	if (state->debugger->flags.echo)
 		state->print(state, "\n");
-	}
+
 	// Note: 0x18, 0xFE is JR $, i.e. an infinite loop, which we step over as a special case
 	const uint8_t jumps[] = { 0x18, 0x28, 0x38, 0x30, 0x20 };
 	int i;
-	for (i = 0; i < sizeof(jumps) / sizeof(uint8_t); ++i) {
+	for (i = 0; i < sizeof(jumps) / sizeof(uint8_t); ++i)
 		if (cpu_read_byte(&state->asic->cpu, state->asic->cpu.registers.PC) == jumps[i] &&
 			cpu_read_byte(&state->asic->cpu, state->asic->cpu.registers.PC + 1) == 0xFE) {
 			state->asic->cpu.registers.PC += 2;
 			return 0;
 		}
-	}
-	if (state->debugger->flags.knightos) {
-		if (cpu_read_byte(&state->asic->cpu, state->asic->cpu.registers.PC) == 0xE7) {
+
+	if (state->debugger->flags.knightos)
+		if (cpu_read_byte(&state->asic->cpu, state->asic->cpu.registers.PC) == 0xE7)
 			size += 2;
-		}
-	}
 
 	struct break_data *data = malloc(sizeof(struct break_data));
 	data->address = state->asic->cpu.registers.PC + size;
 	data->asic = state->asic;
 	data->count = 1;
 	data->log = 0;
-	data->hook_id = hook_add_before_execution(state->asic->hook, data, (hook_execution_callback_t) break_callback);
+	data->hook_id = hook_execution_emplace(&state->asic->hook.on_before_execution, data, (hook_execution_callback_t) break_callback);
 
 	char *_argv[] = { "run" };
 	int orig_echo = state->debugger->flags.echo;

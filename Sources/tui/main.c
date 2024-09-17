@@ -288,7 +288,7 @@ int main(int argc, char **argv) {
 		fclose(file);
 	}
 
-	hook_add_lcd_update(device->hook, NULL, lcd_changed_hook);
+	hook_lcd_emplace(&device->hook.on_lcd_update, nullptr, lcd_changed_hook);
 	asic_add_timer(device, 0, 60, lcd_timer_tick, device->cpu.devices[0x10].data);
 
 	if (device->debugger) {

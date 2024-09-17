@@ -54,8 +54,7 @@ struct asic {
 		z80_timer_t head;
 	} timers;
 
-	//TODO: Inline hooks & debugger
-	hook_info_t *hook;
+	struct hook_info hook;
 	debugger_t *debugger;
 };
 

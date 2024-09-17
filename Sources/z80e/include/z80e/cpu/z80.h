@@ -25,7 +25,7 @@ struct z80_cpu {
 	uint8_t (* _Nullable read_byte)(void * _Null_unspecified, uint16_t);
 	void (* _Nullable write_byte)(void * _Null_unspecified, uint16_t, uint8_t);
 	bool interrupt;
-	hook_info_t * _Nullable hook;
+	hook_info_t  _Nullable hook;
 };
 
 int parity(uint8_t x);

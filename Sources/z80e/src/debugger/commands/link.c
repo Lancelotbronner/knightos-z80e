@@ -17,7 +17,7 @@
 
 FILE *link_output = NULL;
 FILE *link_input = NULL;
-int hook;
+hook_t hook;
 
 void send_byte_from_input(struct debugger_state *state) {
 	if (!link_input) {
@@ -26,7 +26,7 @@ void send_byte_from_input(struct debugger_state *state) {
 	int c = getc(link_input);
 	if (c == EOF) {
 		fclose(link_input);
-		hook_remove_port_in(state->asic->hook, hook);
+		hook_cancel(hook);
 		return;
 	}
 	if (!link_recv_byte(state->asic, (uint8_t)c)) {
@@ -55,7 +55,7 @@ int handle_send(struct debugger_state *state, int argc, char **argv) {
 	link_input = fopen(path, "r");
 	if (link_input) {
 		state->print(state, "Sending file: %s\n", path);
-		hook = hook_add_port_in(state->asic->hook, 0x0A, 0x0A, state, on_link_rx_buffer_read);
+		hook = hook_port_emplace(&state->asic->hook.on_port_in, 0x0A, 0x0A, state, on_link_rx_buffer_read);
 		send_byte_from_input(state);
 		free(path);
 		return 0;

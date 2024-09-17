@@ -20,11 +20,11 @@ struct ti_bw_lcd {
 	uint8_t read_reg; // on the hardware, reads are buffered in a register
 	uint8_t *ram; // [X * 64 + Y]
 
-	hook_info_t *hook;
+	hook_info_t hook;
 	asic_t asic;
 };
 
-void setup_lcd_display(asic_t , hook_info_t *);
+void setup_lcd_display(asic_t , hook_info_t );
 
 uint8_t bw_lcd_read_screen(ti_bw_lcd_t *, int, int);
 int bw_lcd_write_screen(ti_bw_lcd_t *, int, int, char);

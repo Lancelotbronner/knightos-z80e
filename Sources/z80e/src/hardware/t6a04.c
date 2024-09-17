@@ -17,7 +17,7 @@
 #define lcd_print(...) printf( __VA_ARGS__)
 #endif
 
-void setup_lcd_display(asic_t asic, hook_info_t *hook) {
+void setup_lcd_display(asic_t asic, hook_info_t hook) {
 	ti_bw_lcd_t *lcd = malloc(sizeof(ti_bw_lcd_t));
 
 	bw_lcd_reset(lcd);
@@ -125,7 +125,7 @@ void bw_lcd_status_write(device_t device, uint8_t val) {
 	} else if (val & 0x02) { // 0b0000001X
 		lcd->display_on = !!(val & 0x01);
 		z80_debug("lcd", "\tDisplay turned %s", lcd->display_on ? "ON" : "OFF");
-		hook_on_lcd_update(lcd->hook, lcd);
+		hook_lcd_trigger(&lcd->hook->on_lcd_update, lcd);
 	} else { // 0b0000000X
 		lcd->word_length = !!(val & 0x01);
 		z80_debug("lcd", "\tWord Length set to %d", lcd->word_length ? 8 : 6);
@@ -217,7 +217,6 @@ void bw_lcd_data_write(device_t device, uint8_t val) {
 		lcd->Y, lcd->X);
 
 	bw_lcd_advance_pointer(lcd);
-	if (dirty) {
-		hook_on_lcd_update(lcd->hook, lcd);
-	}
+	if (dirty)
+		hook_lcd_trigger(&lcd->hook->on_lcd_update, lcd);
 }
