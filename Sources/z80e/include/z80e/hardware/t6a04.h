@@ -5,23 +5,25 @@
 
 #include <stdint.h>
 
-struct ti_bw_lcd {
+#define LCD_T6A04_RAM 7'680 // 64 * 120
+
+struct lcd_t6a04 {
 
 	asic_t asic;
 
 	/// [X * 64 + Y]
-	uint8_t *ram;
+	uint8_t ram[LCD_T6A04_RAM];
 
 	struct {
 		struct hooks_lcd update;
 	} hook;
 
-	/// Which is up-down.
-	int X;
-	/// Which is left-right.
-	int Y;
+	/// Which is up-down. 6-bit
+	int8_t X;
+	/// Which is left-right. 7-bit
+	int8_t Y;
 	/// Which is which y is rendered at top.
-	int Z;
+	int8_t Z;
 	/// On the hardware, reads are buffered in a register.
 	uint8_t read_reg;
 	/// 0-63
@@ -41,18 +43,10 @@ struct ti_bw_lcd {
 	uint8_t op_amp2: 2;
 };
 
-void setup_lcd_display(asic_t );
+void lcd_t6a04_init(lcd_t6a04_t lcd);
 
-uint8_t bw_lcd_read_screen(ti_bw_lcd_t *, int, int);
-int bw_lcd_write_screen(ti_bw_lcd_t *, int, int, char);
+void lcd_t6a04_clear(lcd_t6a04_t lcd);
+void lcd_t6a04_reset(lcd_t6a04_t lcd);
 
-void bw_lcd_reset(ti_bw_lcd_t *);
-
-uint8_t bw_lcd_status_read(device_t device);
-void bw_lcd_status_write(device_t device, uint8_t);
-
-uint8_t bw_lcd_data_read(device_t device);
-void bw_lcd_data_write(device_t device, uint8_t);
-
-void bw_lcd_advance_int_pointer(ti_bw_lcd_t *, int *, int *);
-void bw_lcd_advance_pointer(ti_bw_lcd_t *);
+bool lcd_t6a04_read(lcd_t6a04_t lcd, int x, int y);
+bool lcd_t6a04_write(lcd_t6a04_t lcd, int x, int y, bool value);

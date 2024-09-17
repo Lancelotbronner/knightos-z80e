@@ -16,6 +16,7 @@
 #include <z80e/devices/mapping.h>
 #include <z80e/hardware/interrupts.h>
 #include <z80e/hardware/mmu.h>
+#include <z80e/hardware/t6a04.h>
 #include <z80e/ti/runloop.h>
 #include <z80e/ti/ti.h>
 
@@ -40,8 +41,9 @@ struct asic {
 	struct z80_runloop runloop;
 	struct ti_mmu mmu;
 	struct ti_interrupts interrupts;
-	struct keyboard_device keyboard;
+	struct lcd_t6a04 lcd;
 	struct mapping_device mapping;
+	struct keyboard_device keyboard;
 	struct link_device link;
 
 #ifndef NOLINK

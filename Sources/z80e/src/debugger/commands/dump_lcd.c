@@ -12,7 +12,7 @@ void dump_lcd_unicode_to_utf8(char *b, uint32_t c) {
 }
 
 int command_dump_lcd(debugger_state_t *state, int argc, char **argv) {
-	ti_bw_lcd_t *lcd = state->asic->cpu.devices[0x10].data;
+	lcd_t6a04_t lcd = state->asic->cpu.devices[0x10].data;
 	int cY;
 	int cX;
 
@@ -27,14 +27,14 @@ int command_dump_lcd(debugger_state_t *state, int argc, char **argv) {
 	#else
 		for (cX = 0; cX < 64; cX += 4) {
 			for (cY = 0; cY < 120; cY += 2) {
-				int a = bw_lcd_read_screen(lcd, cY + 0, cX + 0);
-				int b = bw_lcd_read_screen(lcd, cY + 0, cX + 1);
-				int c = bw_lcd_read_screen(lcd, cY + 0, cX + 2);
-				int d = bw_lcd_read_screen(lcd, cY + 1, cX + 0);
-				int e = bw_lcd_read_screen(lcd, cY + 1, cX + 1);
-				int f = bw_lcd_read_screen(lcd, cY + 1, cX + 2);
-				int g = bw_lcd_read_screen(lcd, cY + 0, cX + 3);
-				int h = bw_lcd_read_screen(lcd, cY + 1, cX + 3);
+				bool a = lcd_t6a04_read(lcd, cY + 0, cX + 0);
+				bool b = lcd_t6a04_read(lcd, cY + 0, cX + 1);
+				bool c = lcd_t6a04_read(lcd, cY + 0, cX + 2);
+				bool d = lcd_t6a04_read(lcd, cY + 1, cX + 0);
+				bool e = lcd_t6a04_read(lcd, cY + 1, cX + 1);
+				bool f = lcd_t6a04_read(lcd, cY + 1, cX + 2);
+				bool g = lcd_t6a04_read(lcd, cY + 0, cX + 3);
+				bool h = lcd_t6a04_read(lcd, cY + 1, cX + 3);
 				uint32_t byte_value = 0x2800;
 				byte_value += (
 					(a << 0) |

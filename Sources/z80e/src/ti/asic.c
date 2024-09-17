@@ -4,6 +4,7 @@
 #include <z80e/hardware/mmu.h>
 #include <z80e/hardware/t6a04.h>
 #include <z80e/hardware/timer.h>
+#include <z80e/devices/crystal.h>
 #include <z80e/devices/flash.h>
 #include <z80e/devices/interrupts.h>
 #include <z80e/devices/keyboard.h>
@@ -11,7 +12,7 @@
 #include <z80e/devices/mapping.h>
 #include <z80e/devices/speed.h>
 #include <z80e/devices/status.h>
-#include <z80e/devices/crystal.h>
+#include <z80e/devices/t6a04.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -121,7 +122,9 @@ static void plug_devices(asic_t asic) {
 	port_interrupt_mask(asic_device(asic, 0x03), asic);
 
 	// Initialize the LCD display
-	setup_lcd_display(asic);
+	lcd_t6a04_init(&asic->lcd);
+	port_t6a04_status(asic_device(asic, 0x10), &asic->lcd);
+	port_t6a04_data(asic_device(asic, 0x11), &asic->lcd);
 
 	// Initialize link ports
 	init_link_ports(asic);

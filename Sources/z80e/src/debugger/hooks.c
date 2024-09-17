@@ -163,7 +163,7 @@ hook_t hook_lcd_emplace(hooks_lcd_t hooks, void *data, hook_lcd_callback_t callb
 	return hook_lcd(hooks, &hook);
 }
 
-void hook_lcd_trigger(hooks_lcd_t hooks, ti_bw_lcd_t *lcd) {
+void hook_lcd_trigger(hooks_lcd_t hooks, lcd_t6a04_t lcd) {
 	for (int i = 0; i < hooks->count; i++) {
 		hook_lcd_t hook = &hooks->storage[i];
 		hook->callback(hook->data, lcd);

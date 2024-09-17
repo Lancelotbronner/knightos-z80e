@@ -51,7 +51,7 @@ appContext_t create_context(void) {
 }
 
 int lcd_changed = 0;
-void lcd_changed_hook(void *data, ti_bw_lcd_t *lcd) {
+void lcd_changed_hook(void *data, lcd_t6a04_t lcd) {
 	lcd_changed = 1;
 }
 
@@ -63,7 +63,7 @@ void tui_unicode_to_utf8(char *b, uint32_t c) {
 	else if (c<0x110000) *b++=240+c/262144, *b++=128+c/4096%64, *b++=128+c/64%64, *b++=128+c%64;
 }
 
-void print_lcd(void *data, ti_bw_lcd_t *lcd) {
+void print_lcd(void *data, lcd_t6a04_t lcd) {
 	int cY;
 	int cX;
 
@@ -78,14 +78,14 @@ void print_lcd(void *data, ti_bw_lcd_t *lcd) {
 #else
 	for (cX = 0; cX < 64; cX += 4) {
 		for (cY = 0; cY < 120; cY += 2) {
-			int a = bw_lcd_read_screen(lcd, cY + 0, cX + 0);
-			int b = bw_lcd_read_screen(lcd, cY + 0, cX + 1);
-			int c = bw_lcd_read_screen(lcd, cY + 0, cX + 2);
-			int d = bw_lcd_read_screen(lcd, cY + 1, cX + 0);
-			int e = bw_lcd_read_screen(lcd, cY + 1, cX + 1);
-			int f = bw_lcd_read_screen(lcd, cY + 1, cX + 2);
-			int g = bw_lcd_read_screen(lcd, cY + 0, cX + 3);
-			int h = bw_lcd_read_screen(lcd, cY + 1, cX + 3);
+			int a = lcd_t6a04_read(lcd, cY + 0, cX + 0);
+			int b = lcd_t6a04_read(lcd, cY + 0, cX + 1);
+			int c = lcd_t6a04_read(lcd, cY + 0, cX + 2);
+			int d = lcd_t6a04_read(lcd, cY + 1, cX + 0);
+			int e = lcd_t6a04_read(lcd, cY + 1, cX + 1);
+			int f = lcd_t6a04_read(lcd, cY + 1, cX + 2);
+			int g = lcd_t6a04_read(lcd, cY + 0, cX + 3);
+			int h = lcd_t6a04_read(lcd, cY + 1, cX + 3);
 			uint32_t byte_value = 0x2800;
 			byte_value += (
 					(a << 0) |
@@ -111,7 +111,7 @@ void print_lcd(void *data, ti_bw_lcd_t *lcd) {
 }
 
 void lcd_timer_tick(asic_t asic, void *data) {
-	ti_bw_lcd_t *lcd = data;
+	lcd_t6a04_t lcd = data;
 	if (lcd_changed) {
 		print_lcd(asic, lcd);
 		lcd_changed = 0;

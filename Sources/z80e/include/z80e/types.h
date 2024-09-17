@@ -24,7 +24,7 @@ typedef struct z80_regstate z80_registers_t;
 
 typedef struct ti_interrupts *ti_interrupts_t;
 
-typedef struct ti_bw_lcd ti_bw_lcd_t;
+typedef struct lcd_t6a04 *lcd_t6a04_t;
 
 typedef void (*timer_callback_t)(asic_t _Nonnull asic, void * _Nullable data);
 

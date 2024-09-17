@@ -65,7 +65,7 @@ appContext_t create_context(void) {
 }
 
 int lcd_changed = 0;
-void lcd_changed_hook(void *data, ti_bw_lcd_t *lcd) {
+void lcd_changed_hook(void *data, lcd_t6a04_t lcd) {
 	lcd_changed = 1;
 }
 
@@ -77,14 +77,14 @@ void tui_unicode_to_utf8(char *b, uint32_t c) {
 	else if (c<0x110000) *b++=240+c/262144, *b++=128+c/4096%64, *b++=128+c/64%64, *b++=128+c%64;
 }
 
-static uint8_t _bw_lcd_read_screen(ti_bw_lcd_t *lcd, int Y, int X) {
+static uint8_t _bw_lcd_read_screen(lcd_t6a04_t lcd, int Y, int X) {
 	if (!lcd->display_on) {
 		return 0;
 	}
 	return bw_lcd_read_screen(lcd, Y, X);
 }
 
-void print_lcd(void *data, ti_bw_lcd_t *lcd) {
+void print_lcd(void *data, lcd_t6a04_t lcd) {
 	int cY;
 	int cX;
 
@@ -144,7 +144,7 @@ void print_lcd(void *data, ti_bw_lcd_t *lcd) {
 }
 
 void lcd_timer_tick(asic_t asic, void *data) {
-	ti_bw_lcd_t *lcd = data;
+	lcd_t6a04_t lcd = data;
 	if (lcd_changed) {
 		print_lcd(asic, lcd);
 		lcd_changed = 0;

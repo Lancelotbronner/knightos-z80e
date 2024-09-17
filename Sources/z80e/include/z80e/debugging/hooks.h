@@ -120,7 +120,7 @@ void hook_execution_trigger(hooks_execution_t hooks, uint16_t address);
 
 typedef struct hook_lcd *hook_lcd_t;
 typedef struct hooks_lcd *hooks_lcd_t;
-typedef void (*hook_lcd_callback_t)(void *data, ti_bw_lcd_t *lcd);
+typedef void (*hook_lcd_callback_t)(void *data, lcd_t6a04_t lcd);
 
 struct hook_lcd {
 	hook_lcd_callback_t callback;
@@ -136,4 +136,4 @@ struct hooks_lcd {
 hook_t hook_lcd(hooks_lcd_t hooks, hook_lcd_t const hook);
 hook_t hook_lcd_emplace(hooks_lcd_t hooks, void *data, hook_lcd_callback_t callback);
 
-void hook_lcd_trigger(hooks_lcd_t hooks, ti_bw_lcd_t *lcd);
+void hook_lcd_trigger(hooks_lcd_t hooks, lcd_t6a04_t lcd);
