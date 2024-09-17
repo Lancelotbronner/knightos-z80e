@@ -1,4 +1,4 @@
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/debugger.h>
 
 #include <stdarg.h>
 #include <stdio.h>

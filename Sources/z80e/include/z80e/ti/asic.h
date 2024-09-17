@@ -1,24 +1,27 @@
-#pragma once
+//
+//  ti/asic.h
+//  z80e
+//
+//  Created by Christophe Bronner on 2024-03-08.
+//
 
-#include <stdint.h>
-#ifndef NOLINK
-#include <poll.h>
-#endif
+#pragma once
 
 #include <z80e/types.h>
 
 #include <z80e/cpu/z80.h>
-#include <z80e/debugger/hooks.h>
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/debugger.h>
 #include <z80e/devices/keyboard.h>
 #include <z80e/devices/link.h>
 #include <z80e/devices/mapping.h>
-#include <z80e/log/log.h>
-#include <z80e/ti/runloop.h>
-#include <z80e/ti/memory.h>
-#include <z80e/ti/ti.h>
 #include <z80e/hardware/interrupts.h>
-#include <z80e/hardware/timer.h>
+#include <z80e/ti/memory.h>
+#include <z80e/ti/runloop.h>
+#include <z80e/ti/ti.h>
+
+#ifndef NOLINK
+#include <poll.h>
+#endif
 
 typedef enum {
 	BATTERIES_REMOVED,
@@ -79,7 +82,7 @@ void asic_tick(asic_t asic);
 
 void asic_tick_cycles(asic_t asic, int cycles);
 
-//MARK: - Device Management
+//MARK: - Port Management
 
 /// Installs the provided device onto the chip at the specified port.
 /// - Parameters:

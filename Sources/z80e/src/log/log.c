@@ -1,4 +1,4 @@
-#include <z80e/log/log.h>
+#include <z80e/log.h>
 
 #include <limits.h>
 #include <stdio.h>
@@ -28,12 +28,12 @@ static void *Data;
 static loglevel_t Level;
 static char Message[LOG_CAPACITY];
 
-void z80_log_callback(log_callback_t callback, void *data) {
+void z80e_log_callback(log_callback_t callback, void *data) {
 	Callback = callback;
 	Data = data;
 }
 
-void z80_log_filter(loglevel_t level) {
+void z80e_log_filter(loglevel_t level) {
 	Level = level;
 }
 
@@ -48,22 +48,22 @@ va_list args; \
 va_start(args, format); \
 Log(level, domain, format, args)
 
-void z80_log(loglevel_t level, const char *domain, const char *format, ...) {
+void z80e_log(loglevel_t level, const char *domain, const char *format, ...) {
 	ImplementLog(level);
 }
 
-void z80_debug(const char *domain, const char *format, ...) {
+void z80e_debug(const char *domain, const char *format, ...) {
 	ImplementLog(L_DEBUG);
 }
 
-void z80_info(const char *domain, const char *format, ...) {
+void z80e_info(const char *domain, const char *format, ...) {
 	ImplementLog(L_INFO);
 }
 
-void z80_warning(const char *domain, const char *format, ...) {
+void z80e_warning(const char *domain, const char *format, ...) {
 	ImplementLog(L_WARN);
 }
 
-void z80_error(const char *domain, const char *format, ...) {
+void z80e_error(const char *domain, const char *format, ...) {
 	ImplementLog(L_ERROR);
 }

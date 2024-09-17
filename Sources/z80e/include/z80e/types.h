@@ -7,6 +7,7 @@
 
 #pragma once
 
+// Only needed when imported into Swift tests
 #include <stdbool.h>
 
 //MARK: - Hardware
@@ -31,7 +32,7 @@ typedef struct z80_hardware_timer *z80_timer_t;
 
 typedef struct z80_link_socket *z80_link_t;
 
-//MARK: - Device Management
+//MARK: - Port Management
 
 typedef struct device *device_t;
 

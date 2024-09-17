@@ -1,6 +1,6 @@
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
-#include <z80e/ti/memory.h>
+#include <z80e/debugging/debugger.h>
+
+#include <z80e/ti/asic.h>
 
 int command_stack(struct debugger_state *state, int argc, char **argv) {
 	if (argc > 1) {

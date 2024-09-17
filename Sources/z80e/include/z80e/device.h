@@ -19,23 +19,23 @@ unsigned char device_read(const device_t _Nonnull device);
 
 void device_write(const device_t _Nonnull device, unsigned char value);
 
-//MARK: - Device Configuration
+//MARK: - Port Configuration
 
 /// Configures a device to mirror to another device.
 /// - Parameters:
 ///   - device: The device to configure.
 ///   - other: The device to mirror.
-void device_mirror(device_t _Nonnull device, const device_t _Nonnull other);
+void port_mirror(device_t _Nonnull device, const device_t _Nonnull other);
 
 /// Configures a device to be considered unimplemented.
 /// - Parameters:
 ///  - device: The device to configure.
 ///  - port: The port of the device for logging purposes.
-void device_unimplemented(device_t _Nonnull device, unsigned char port);
+void port_unimplemented(device_t _Nonnull device, unsigned char port);
 
 /// Configures a device to ignore reads and/or writes.
 /// - Parameters:
 ///   - device: The device to configure.
 ///   - read: Whether to ignore reads.
 ///   - write: Whether to ignore writes.
-void device_null(device_t _Nonnull device, bool read, bool write);
+void port_null(device_t _Nonnull device, bool read, bool write);

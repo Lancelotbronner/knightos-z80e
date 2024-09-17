@@ -1,10 +1,10 @@
 #include <z80e/ti/asic.h>
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/debugger.h>
 #include <z80e/disassembler/disassemble.h>
 #include <z80e/ti/runloop.h>
 #include "tui.h"
-#include <z80e/debugger/commands.h>
-#include <z80e/log/log.h>
+#include <z80e/debugging/commands.h>
+#include <z80e/log.h>
 #include <z80e/hardware/t6a04.h>
 #include <z80e/devices/keyboard.h>
 #include <z80e/hardware/interrupts.h>
@@ -252,7 +252,7 @@ void frontend_log(void *data, loglevel_t level, const char *part, const char *me
 void sigint_handler(int sig) {
 	signal(SIGINT, sigint_handler);
 
-	z80_error("sigint", "Caught interrupt, stopping emulation");
+	z80e_error("sigint", "Caught interrupt, stopping emulation");
 	context.device_asic->stopped = 1;
 
 	if (!context.device_asic->debugger || context.device_asic->debugger->state == DEBUGGER_ENABLED) {
@@ -581,7 +581,7 @@ int main(int argc, char **argv) {
 	}
 
 	if (context.rom_file == NULL && !enable_debug) {
-		z80_warning("main", "No ROM file specified, starting debugger");
+		z80e_warning("main", "No ROM file specified, starting debugger");
 		device->debugger = init_debugger(device);
 		device->debugger->state = DEBUGGER_ENABLED;
 	} else {

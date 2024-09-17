@@ -1,7 +1,7 @@
 #pragma once
 
 #include <z80e/types.h>
-#include <z80e/debugger/hooks.h>
+#include <z80e/debugging/hooks.h>
 
 #include <stdint.h>
 

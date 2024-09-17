@@ -1,7 +1,8 @@
 #pragma once
 
-#include <z80e/debugger/debugger.h>
-#include <z80e/ti/memory.h>
+#include <z80e/debugging/debugger.h>
+
+#include <stdint.h>
 
 int command_hexdump(debugger_state_t *state, int argc, char **argv);
 int command_backwards_hexdump(debugger_state_t *state, int argc, char **argv);

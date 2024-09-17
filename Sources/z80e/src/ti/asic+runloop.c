@@ -1,20 +1,22 @@
+#include <z80e/hardware/timer.h>
 #include <z80e/ti/asic.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <limits.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+//#include <time.h>
+//#include <limits.h>
 #include <unistd.h>
-#include <sys/types.h>
+//#include <sys/types.h>
+//
+//#include <errno.h>
+
 #ifndef NOLINK
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h>
-#include <sys/un.h>
-#include <poll.h>
 #endif
-#include <errno.h>
+
+//MARK: - Get Current Time
+
 /* Why the heck does "get the current time" have to be so god-dammed platform specific */
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -26,7 +28,6 @@
 static double orwl_timebase = 0.0;
 static uint64_t orwl_timestart = 0;
 #endif
-#include <z80e/devices/link.h>
 
 long long get_time_nsec() {
 #ifdef EMSCRIPTEN
@@ -53,6 +54,8 @@ long long get_time_nsec() {
 #endif
 #endif
 }
+
+//MARK: - Runloop Management
 
 void runloop_init(asic_t asic) {
 	asic->runloop.last_end = get_time_nsec();

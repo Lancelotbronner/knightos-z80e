@@ -1,8 +1,8 @@
+#include <z80e/debugging/commands.h>
+#include <z80e/debugging/keys.h>
+#include <z80e/ti/asic.h>
+
 #include <strings.h>
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
-#include <z80e/devices/keyboard.h>
-#include <z80e/debugger/keys.h>
 
 int command_release_key(debugger_state_t *state, int argc, char **argv) {
 	if (argc != 2) {

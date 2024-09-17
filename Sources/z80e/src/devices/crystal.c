@@ -17,19 +17,19 @@ static void __crystal_write(device_t device, unsigned char value) {
 	device->data = value;
 }
 
-void device_crystal_frequency(device_t device) {
+void port_crystal_frequency(device_t device) {
 	device->data = 0;
 	device->read = __crystal_read;
 	device->write = __crystal_write;
 }
 
-void device_crystal_loop(device_t device) {
+void port_crystal_loop(device_t device) {
 	device->data = 0;
 	device->read = __crystal_read;
 	device->write = __crystal_write;
 }
 
-void device_crystal_count(device_t device) {
+void port_crystal_count(device_t device) {
 	device->data = 0;
 	device->read = __crystal_read;
 	device->write = __crystal_write;

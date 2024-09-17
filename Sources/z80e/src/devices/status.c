@@ -37,7 +37,7 @@ static void __status_write(device_t device, uint8_t value) {
 	__asic_interrupt_update(asic);
 }
 
-void device_status(device_t device, asic_t asic) {
+void port_status(device_t device, asic_t asic) {
 	device->data = asic;
 	device->read = __status_read;
 	device->write = __status_write;

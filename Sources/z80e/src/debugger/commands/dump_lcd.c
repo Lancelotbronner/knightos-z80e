@@ -1,6 +1,7 @@
+#include <z80e/debugging/debugger.h>
+
 #include <z80e/hardware/t6a04.h>
-#include <z80e/debugger/debugger.h>
-#include <z80e/debugger/commands.h>
+#include <z80e/ti/asic.h>
 
 void dump_lcd_unicode_to_utf8(char *b, uint32_t c) {
 	if (c<0x80) *b++=c;

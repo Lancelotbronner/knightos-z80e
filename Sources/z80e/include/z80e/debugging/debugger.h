@@ -1,14 +1,12 @@
 #pragma once
 
+#include <z80e/types.h>
+
 #include <stdarg.h>
-#include <stdio.h>
 
 typedef struct debugger_state debugger_state_t;
 typedef struct debugger debugger_t;
 typedef int (*debugger_function_t)(debugger_state_t *, int, char **);
-
-#include <z80e/ti/asic.h>
-#include <z80e/log/log.h>
 
 typedef struct {
 	const char *name;

@@ -1,19 +1,17 @@
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
-#include <z80e/devices/link.h>
-#include <z80e/debugger/hooks.h>
+#include <z80e/debugging/commands.h>
+#include <z80e/ti/asic.h>
 
 #ifndef NOLINK
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <wordexp.h>
 #endif
-#include <sys/types.h>
-#include <unistd.h>
+
+#include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <fcntl.h>
+#include <unistd.h>
 
 FILE *link_output = NULL;
 FILE *link_input = NULL;

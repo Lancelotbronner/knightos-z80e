@@ -1,12 +1,18 @@
+//
+//  cpu/z80.h
+//  z80e
+//
+//  Created by Christophe Bronner on 2024-03-08.
+//
+
 #pragma once
 
-#include <stdint.h>
-
-#include <z80e/types.h>
 #include <z80e/device.h>
+#include <z80e/types.h>
 #include <z80e/cpu/z80_types.h>
-#include <z80e/debugger/hooks.h>
-#include <z80e/log/log.h>
+#include <z80e/debugging/hooks.h>
+
+#include <stdint.h>
 
 struct z80_cpu {
 	struct device devices[0x100];

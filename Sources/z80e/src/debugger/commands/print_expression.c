@@ -1,5 +1,5 @@
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/commands.h>
+#include <z80e/debugging/debugger.h>
 
 #include <stdlib.h>
 #include <string.h>

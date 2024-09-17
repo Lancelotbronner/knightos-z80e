@@ -24,7 +24,7 @@ static void __mask_write(const device_t device, unsigned char value) {
 	__asic_interrupt_update(asic);
 }
 
-void device_interrupt_mask(device_t device, asic_t asic) {
+void port_interrupt_mask(device_t device, asic_t asic) {
 	device->data = asic;
 	device->read = __mask_read;
 	device->write = __mask_write;

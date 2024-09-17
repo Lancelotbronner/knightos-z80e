@@ -1,8 +1,6 @@
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
-#include <z80e/ti/memory.h>
+#include <z80e/debugging/commands.h>
+#include <z80e/ti/asic.h>
 
-#include <stdlib.h>
 #include <ctype.h>
 
 int command_hexdump(struct debugger_state *state, int argc, char **argv) {

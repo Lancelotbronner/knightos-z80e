@@ -1,3 +1,10 @@
+//
+//  devices/mapping.h
+//  z80e
+//
+//  Created by Christophe Bronner on 2024-04-10.
+//
+
 #pragma once
 
 #include <z80e/types.h>
@@ -25,9 +32,9 @@ void mapping_init(mapping_device_t mapping, asic_t asic);
 
 void mapping_reload(mapping_device_t mapping);
 
-//MARK: - Device Configuration
+//MARK: - Port Configuration
 
-void device_mapping_status(device_t device, mapping_device_t mapping);
-void device_mapping_paging(device_t device, mapping_device_t mapping);
-void device_mapping_bankA(device_t device, mapping_device_t mapping);
-void device_mapping_bankB(device_t device, mapping_device_t mapping);
+void port_mapping_status(device_t device, mapping_device_t mapping);
+void port_mapping_paging(device_t device, mapping_device_t mapping);
+void port_mapping_bankA(device_t device, mapping_device_t mapping);
+void port_mapping_bankB(device_t device, mapping_device_t mapping);

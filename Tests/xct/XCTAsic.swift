@@ -10,7 +10,7 @@ import z80e
 
 open class XCTestCaseAsic: XCTestCase {
 
-	//MARK: - Device Management
+	//MARK: - Port Management
 
 	open var _type: ti_device_type { TI83p }
 
@@ -47,7 +47,7 @@ open class XCTestCaseAsic: XCTestCase {
 		cpu_device(&asic.cpu, UInt8(truncatingIfNeeded: position)).pointee
 	}
 
-	//MARK: - Test Device
+	//MARK: - Test Port
 
 	public var _value: UInt8 = 0
 

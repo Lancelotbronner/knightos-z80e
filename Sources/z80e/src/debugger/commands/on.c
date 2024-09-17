@@ -1,12 +1,12 @@
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/commands.h>
+#include <z80e/debugging/debugger.h>
 #include <z80e/disassembler/disassemble.h>
-#include <z80e/log/log.h>
+#include <z80e/log.h>
+#include <z80e/ti/asic.h>
 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdarg.h>
 
 enum {
 	REGISTER,
@@ -150,7 +150,7 @@ void break_callback(struct break_data *data, uint16_t address) {
 		return;
 
 	if (data->log)
-		z80_debug("break", "Breakpoint hit at 0x%04X", address);
+		z80e_debug("break", "Breakpoint hit at 0x%04X", address);
 
 	data->asic->stopped = 1;
 

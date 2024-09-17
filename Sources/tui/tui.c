@@ -1,9 +1,9 @@
 #include "tui.h"
 
-#include <z80e/debugger/debugger.h>
-#include <z80e/debugger/commands.h>
+#include <z80e/debugging/debugger.h>
+#include <z80e/debugging/commands.h>
 #include <z80e/disassembler/disassemble.h>
-#include <z80e/log/log.h>
+#include <z80e/log.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,7 +47,7 @@ tui_state_t *current_state;
 void tui_init(tui_state_t *state) {
 	debugger_state_t dstate = { print_tui, vprint_tui, 0, state, state->debugger->asic, state->debugger, tui_new_state, tui_close_window };
 	debugger_state_t *used_state = tui_new_state(&dstate, "Sourcing z80erc...");
-	z80_debug("TUI", "Running commands in z80erc...");
+	z80e_debug("TUI", "Running commands in z80erc...");
 	debugger_source_rc(used_state, "z80erc");
 	tui_close_window(used_state);
 }

@@ -1,4 +1,5 @@
 #include <z80e/cpu/z80.h>
+#include <z80e/log.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -900,7 +901,7 @@ void handle_interrupt(struct ExecutionContext *context) {
 	z80_registers_t *r = &cpu->registers;
 	switch (cpu->int_mode) {
 	case 0:
-		z80_warning("cpu", "Warning: z80e does not support interrupt mode 0.");
+		z80e_warning("cpu", "Warning: z80e does not support interrupt mode 0.");
 		break;
 	case 1:
 		context->cycles += 13;
@@ -1564,7 +1565,7 @@ int cpu_execute(z80_cpu_t cpu, int cycles) {
 	exit_loop:
 		cycles -= context.cycles;
 		if (context.cycles == 0) {
-			z80_error("cpu", "Error: Unrecognized instruction 0x%02X.", context.opcode);
+			z80e_error("cpu", "Error: Unrecognized instruction 0x%02X.", context.opcode);
 			cycles--;
 		}
 	}

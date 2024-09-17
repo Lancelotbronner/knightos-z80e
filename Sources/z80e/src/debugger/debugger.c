@@ -1,13 +1,11 @@
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
-#include <z80e/disassembler/disassemble.h>
-#include <z80e/log/log.h>
+#include <z80e/debugging/commands.h>
 
+#include <errno.h>
 #include <limits.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <errno.h>
 
 int debugger_list_commands(debugger_state_t *state, int argc, char **argv) {
 	if (argc != 1) {

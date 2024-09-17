@@ -17,13 +17,13 @@ static void __flash_control_write(device_t device, unsigned char value) {
 	asic->mmu.flash_unlocked = value & 1;
 }
 
-void device_flash_control(device_t device, asic_t asic) {
+void port_flash_control(device_t device, asic_t asic) {
 	device->data = asic;
 	device->read = __flash_mirror_read;
 	device->write = __flash_control_write;
 
 	if (asic->device == TI83p)
-		device_null(device, true, false);
+		port_null(device, true, false);
 }
 
 //MARK: - Flash Exclusion
@@ -32,13 +32,13 @@ static void __flash_exclusion_write(device_t device, unsigned char value) {
 	// TODO: Implement flash exclusion writes
 }
 
-void device_flash_exclusion(device_t device, asic_t asic) {
+void port_flash_exclusion(device_t device, asic_t asic) {
 	device->data = asic;
 	device->read = __flash_mirror_read;
 	device->write = __flash_exclusion_write;
 
 	if (asic->device == TI83p)
-		device_null(device, true, false);
+		port_null(device, true, false);
 }
 
 //MARK: - Flash Size
@@ -51,7 +51,7 @@ static void __flash_size_write(device_t device, unsigned char value) {
 	device->data = value & 0x33;
 }
 
-void device_flash_size(device_t device) {
+void port_flash_size(device_t device) {
 	device->data = 0x33;
 	device->read = __flash_size_read;
 	device->write = __flash_size_write;

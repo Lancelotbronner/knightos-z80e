@@ -1,11 +1,8 @@
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
-#include <z80e/devices/crystal.h>
+#include <z80e/debugging/commands.h>
+#include <z80e/debugging/debugger.h>
+#include <z80e/ti/asic.h>
 
-#include <sys/types.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 int command_timer(struct debugger_state *state, int argc, char **argv) {
 	if (argc < 3) {

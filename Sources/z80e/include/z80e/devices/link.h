@@ -1,18 +1,13 @@
+//
+//  devices/link.h
+//  z80e
+//
+//  Created by Christophe Bronner on 2024-09-12.
+//
+
 #pragma once
 
 #include <z80e/types.h>
-
-union TMP {
-	unsigned char mask;
-	struct {
-		bool rx : 1;
-		bool tx : 1;
-		bool error : 1;
-		unsigned char : 4;
-		bool disabled : 1;
-	};
-};
-//static_assert(sizeof(union TMP) == 1);
 
 struct link_device {
 	asic_t asic;

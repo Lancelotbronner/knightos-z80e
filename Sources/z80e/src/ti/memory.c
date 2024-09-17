@@ -1,9 +1,9 @@
 #include <z80e/ti/memory.h>
 #include <z80e/cpu/z80.h>
 #include <z80e/ti/ti.h>
-#include <z80e/log/log.h>
+#include <z80e/log.h>
 
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/debugger.h>
 #include <z80e/disassembler/disassemble.h>
 
 #include <stdarg.h>
@@ -33,8 +33,7 @@ void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type) {
 		mmu->settings.flash_pages = 0x100;
 		break;
 	}
-	mmu->ram = malloc(mmu->settings.ram_pages * 0x4000);
-	memset(mmu->ram, 0, mmu->settings.ram_pages * 0x4000);
+	mmu->ram = calloc(mmu->settings.ram_pages, 0x4000);
 	mmu->flash = malloc(mmu->settings.flash_pages * 0x4000);
 	memset(mmu->flash, 0xFF, mmu->settings.flash_pages * 0x4000);
 	mmu->flash_unlocked = 0;
@@ -86,7 +85,7 @@ void chip_erase_sector(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 
 void chip_erase(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 	memset(mmu->flash, 0xFF, mmu->settings.flash_pages * 0x4000);
-	z80_warning("mmu", "Erased entire Flash chip - you probably didn't want to do that.");
+	z80e_warning("mmu", "Erased entire Flash chip - you probably didn't want to do that.");
 }
 
 uint8_t ti_read_byte(void *memory, uint16_t address) {

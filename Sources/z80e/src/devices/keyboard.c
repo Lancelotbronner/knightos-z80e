@@ -25,7 +25,7 @@ void keyboard_release(keyboard_device_t keyboard, unsigned char keycode) {
 	keyboard->groups[group] |= mask;
 }
 
-//MARK: - Keyboard Device
+//MARK: - Keyboard Port
 
 static unsigned char __keyboard_read(const device_t device) {
 	keyboard_device_t keyboard = device->data;
@@ -49,7 +49,7 @@ static void __keyboard_write(const device_t device, unsigned char value) {
 	keyboard->mask |= ~value;
 }
 
-void device_keyboard(device_t device, const keyboard_device_t keyboard) {
+void port_keyboard(device_t device, const keyboard_device_t keyboard) {
 	device->data = keyboard;
 	device->read = __keyboard_read;
 	device->write = __keyboard_write;

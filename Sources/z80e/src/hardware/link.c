@@ -1,10 +1,7 @@
 #include <z80e/ti/asic.h>
-#include <z80e/log/log.h>
-#include <z80e/ti/memory.h>
-#include <z80e/devices/link.h>
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 uint8_t read_link_port(device_t device) {
 	link_device_t state = device->data;

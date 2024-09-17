@@ -2,8 +2,8 @@
 
 #include <z80e/ti/asic.h>
 #include <z80e/ti/runloop.h>
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/commands.h>
+#include <z80e/debugging/debugger.h>
 #include <z80e/disassembler/disassemble.h>
 #include <z80e/hardware/t6a04.h>
 

@@ -1,11 +1,8 @@
 #pragma once
 
-#include <stdint.h>
-
-#include <z80e/cpu/z80.h>
-#include <z80e/debugger/hooks.h>
+#include <z80e/debugging/hooks.h>
 #include <z80e/ti/ti.h>
-#include <z80e/log/log.h>
+
 #include <stdint.h>
 
 typedef struct {

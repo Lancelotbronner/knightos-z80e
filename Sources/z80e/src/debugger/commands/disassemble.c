@@ -1,12 +1,10 @@
-#include <z80e/cpu/z80.h>
-
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
 #include <z80e/disassembler/disassemble.h>
 
-#include <stdarg.h>
-#include <string.h>
-#include <stdlib.h>
+#include <z80e/debugging/commands.h>
+#include <z80e/debugging/debugger.h>
+#include <z80e/ti/asic.h>
+
+#include <stdio.h>
 
 struct mmu_disassemble_memory {
 	struct disassemble_memory mem;

@@ -1,6 +1,7 @@
-#include <z80e/debugger/commands.h>
-#include <z80e/debugger/debugger.h>
-#include <z80e/hardware/interrupts.h>
+#include <z80e/debugging/debugger.h>
+#include <z80e/debugging/commands.h>
+
+#include <z80e/ti/asic.h>
 
 int command_turn_on(debugger_state_t *state, int argc, char **argv) {
 	if (argc != 1) {

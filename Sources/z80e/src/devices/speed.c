@@ -22,7 +22,7 @@ static void __speed_write(device_t device, unsigned char value) {
 	// TODO: set overclock
 }
 
-void device_speed(device_t device, asic_t asic) {
+void port_speed(device_t device, asic_t asic) {
 	device->data = asic;
 	device->read = __speed_read;
 	device->write = __speed_write;

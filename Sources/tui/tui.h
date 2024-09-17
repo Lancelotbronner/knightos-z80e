@@ -1,7 +1,7 @@
 #pragma once
 
 #include <z80e/ti/asic.h>
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/debugger.h>
 
 typedef struct {
 	debugger_t *debugger;

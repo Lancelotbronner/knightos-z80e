@@ -1,5 +1,5 @@
 #include <z80e/devices/mapping.h>
-
+#include <z80e/log.h>
 #include <z80e/ti/asic.h>
 
 void mapping_init(mapping_device_t mapping, asic_t asic) {
@@ -45,10 +45,10 @@ void mapping_reload(mapping_device_t mapping) {
 
 	for (int i = 0; i < 4; i++) {
 		if (banks[i].flash && banks[i].page > mapping->asic->mmu.settings.flash_pages) {
-			z80_error("memorymapping", "ERROR: Flash page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
+			z80e_error("memorymapping", "ERROR: Flash page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
 			banks[i].page &= mapping->asic->mmu.settings.flash_pages;
 		} else if (!banks[i].flash && banks[i].page > mapping->asic->mmu.settings.ram_pages) {
-			z80_error("memorymapping", "ERROR: RAM page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
+			z80e_error("memorymapping", "ERROR: RAM page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
 			banks[i].page &= mapping->asic->mmu.settings.ram_pages;
 		}
 	}
@@ -65,7 +65,7 @@ static void __mapping_status_write(device_t device, unsigned char value) {
 	mapping_device_t mapping = device->data;
 	mapping->mode = value;
 
-	z80_debug("memorymapping", "Set mapping mode to %d (at 0x%04X)", mapping->mode, mapping->asic->cpu.registers.PC);
+	z80e_debug("memorymapping", "Set mapping mode to %d (at 0x%04X)", mapping->mode, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 
 	static double timer1[2][4] = {
@@ -85,7 +85,7 @@ static void __mapping_status_write(device_t device, unsigned char value) {
 	asic_timer2_frequency(asic, timer2[isNotTi83p][speed]);
 }
 
-void device_mapping_status(device_t device, mapping_device_t mapping) {
+void port_mapping_status(device_t device, mapping_device_t mapping) {
 	device->data = mapping;
 	device->read = __mapping_status_read;
 	device->write = __mapping_status_write;
@@ -101,11 +101,11 @@ static unsigned char __mapping_paging_read(device_t device) {
 static void __mapping_paging_write(device_t device, unsigned char value) {
 	mapping_device_t mapping = device->data;
 	mapping->page = value;
-	z80_debug("memorymapping", "Set ram banking page to %d (at 0x%04X)", mapping->page, mapping->asic->cpu.registers.PC);
+	z80e_debug("memorymapping", "Set ram banking page to %d (at 0x%04X)", mapping->page, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 }
 
-void device_mapping_paging(device_t device, mapping_device_t mapping) {
+void port_mapping_paging(device_t device, mapping_device_t mapping) {
 	device->data = mapping;
 	device->read = __mapping_paging_read;
 	device->write = __mapping_paging_write;
@@ -134,11 +134,11 @@ static void __mapping_bankA_write(device_t device, unsigned char value) {
 	mapping->flashA = is_flash;
 	mapping->a = value;
 
-	z80_debug("memorymapping", "Set bank A page to %c:%02X (at 0x%04X)", mapping->flashA ? 'F' : 'R',  mapping->a, mapping->asic->cpu.registers.PC);
+	z80e_debug("memorymapping", "Set bank A page to %c:%02X (at 0x%04X)", mapping->flashA ? 'F' : 'R',  mapping->a, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 }
 
-void device_mapping_bankA(device_t device, mapping_device_t mapping) {
+void port_mapping_bankA(device_t device, mapping_device_t mapping) {
 	device->data = mapping;
 	device->read = __mapping_bankA_read;
 	device->write = __mapping_bankA_write;
@@ -167,11 +167,11 @@ static void __mapping_bankB_write(device_t device, unsigned char value) {
 	mapping->flashB = is_flash;
 	mapping->b = value;
 
-	z80_debug("memorymapping", "Set bank B page to %c:%02X (at 0x%04X)", mapping->flashB ? 'F' : 'R',  mapping->b, mapping->asic->cpu.registers.PC);
+	z80e_debug("memorymapping", "Set bank B page to %c:%02X (at 0x%04X)", mapping->flashB ? 'F' : 'R',  mapping->b, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 }
 
-void device_mapping_bankB(device_t device, mapping_device_t mapping) {
+void port_mapping_bankB(device_t device, mapping_device_t mapping) {
 	device->data = mapping;
 	device->read = __mapping_bankB_read;
 	device->write = __mapping_bankB_write;

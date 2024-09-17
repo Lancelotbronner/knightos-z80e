@@ -1,4 +1,6 @@
-#include <z80e/debugger/debugger.h>
+#include <z80e/debugging/debugger.h>
+
+#include <z80e/ti/asic.h>
 #include <z80e/cpu/z80.h>
 
 int command_unhalt(struct debugger_state *state, int argc, char **argv) {
