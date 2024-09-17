@@ -55,7 +55,7 @@ int handle_send(struct debugger_state *state, int argc, char **argv) {
 	link_input = fopen(path, "r");
 	if (link_input) {
 		state->print(state, "Sending file: %s\n", path);
-		hook = hook_port_emplace(&state->asic->hook.on_port_in, 0x0A, 0x0A, state, on_link_rx_buffer_read);
+		hook = hook_port_emplace(&state->asic->cpu.hook.port_in, 0x0A, 0x0A, state, on_link_rx_buffer_read);
 		send_byte_from_input(state);
 		free(path);
 		return 0;

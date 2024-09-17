@@ -66,7 +66,7 @@ uint16_t cpu_read_register_word(z80_cpu_t cpu, enum z80_registers reg_to_read) {
 		return_value = -1;
 	}
 
-	return_value = hook_register_trigger(&cpu->hook->on_register_read, reg_to_read, return_value);
+	return_value = hook_register_trigger(&cpu->hook.register_read, reg_to_read, return_value);
 
 	return return_value;
 }
@@ -121,14 +121,14 @@ uint8_t cpu_read_register_byte(z80_cpu_t cpu, enum z80_registers reg_to_read) {
 		return_value = -1;
 	}
 
-	return_value = (uint8_t) hook_register_trigger(&cpu->hook->on_register_read, reg_to_read, return_value);
+	return_value = (uint8_t) hook_register_trigger(&cpu->hook.register_read, reg_to_read, return_value);
 
 	return return_value;
 }
 
 uint16_t cpu_write_register_word(z80_cpu_t cpu, enum z80_registers reg_to_read, uint16_t value) {
 	uint16_t return_value = value;
-	return_value = hook_register_trigger(&cpu->hook->on_register_write, reg_to_read, value);
+	return_value = hook_register_trigger(&cpu->hook.register_write, reg_to_read, value);
 
 	switch(reg_to_read) {
 	case  AF:
@@ -164,7 +164,7 @@ uint16_t cpu_write_register_word(z80_cpu_t cpu, enum z80_registers reg_to_read, 
 
 uint8_t cpu_write_register_byte(z80_cpu_t cpu, enum z80_registers reg_to_read, uint8_t value) {
 	uint8_t return_value = value;
-	return_value = (uint8_t)hook_register_trigger(&cpu->hook->on_register_write, reg_to_read, value);
+	return_value = (uint8_t)hook_register_trigger(&cpu->hook.register_write, reg_to_read, value);
 
 	switch(reg_to_read) {
 	case A:
@@ -238,7 +238,7 @@ uint8_t cpu_port_in(z80_cpu_t cpu, uint8_t port) {
 	uint8_t val = 0;
 	if (device->read) {
 		val = device->read(device);
-		val = hook_port_trigger(&cpu->hook->on_port_in, port, val);
+		val = hook_port_trigger(&cpu->hook.port_in, port, val);
 	}
 	return val;
 }
@@ -246,7 +246,7 @@ uint8_t cpu_port_in(z80_cpu_t cpu, uint8_t port) {
 void cpu_port_out(z80_cpu_t cpu, uint8_t port, uint8_t val) {
 	device_t device = &cpu->devices[port];
 	if (device->write) {
-		val = hook_port_trigger(&cpu->hook->on_port_out, port, val);
+		val = hook_port_trigger(&cpu->hook.port_out, port, val);
 		device->write(device, val);
 	}
 }

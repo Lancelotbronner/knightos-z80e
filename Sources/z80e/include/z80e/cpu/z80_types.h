@@ -2,6 +2,8 @@
 
 #include <z80e/types.h>
 
+#include <stdint.h>
+
 enum z80_flags : uint8_t {
 	FLAG_S =  0x80,
 	FLAG_Z =  0x40,

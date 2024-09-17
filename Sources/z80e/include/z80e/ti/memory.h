@@ -33,7 +33,11 @@ struct ti_mmu {
 	int flash_unlocked;
 	int flash_write_index;
 	flash_write_t flash_writes[6];
-	hook_info_t hook;
+
+	struct {
+		struct hooks_memory memory_read;
+		struct hooks_memory memory_write;
+	} hook;
 };
 
 uint8_t ti_read_byte(void *memory, uint16_t address);

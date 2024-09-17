@@ -54,7 +54,6 @@ void asic_init(asic_t asic, ti_device_type type) {
 	// Configure debuggers
 	asic->stopped = 0;
 	asic->debugger = 0;
-	hook_init(&asic->hook, asic);
 
 	// Configure devices
 	plug_devices(asic);
@@ -122,7 +121,7 @@ static void plug_devices(asic_t asic) {
 	device_interrupt_mask(asic_device(asic, 0x03), asic);
 
 	// Initialize the LCD display
-	setup_lcd_display(asic, &asic->hook);
+	setup_lcd_display(asic);
 
 	// Initialize link ports
 	init_link_ports(asic);

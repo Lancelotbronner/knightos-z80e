@@ -113,21 +113,21 @@ int command_on(struct debugger_state *state, int argc, char **argv) {
 			return 1;
 		}
 		if (thing & READ)
-			hook_register_emplace(&state->asic->hook.on_register_read, sta->look_for, sta, command_on_register_hook);
+			hook_register_emplace(&state->asic->cpu.hook.register_read, sta->look_for, sta, command_on_register_hook);
 		if (thing & WRITE)
-			hook_register_emplace(&state->asic->hook.on_register_write, sta->look_for, sta, command_on_register_hook);
+			hook_register_emplace(&state->asic->cpu.hook.register_write, sta->look_for, sta, command_on_register_hook);
 	} else if (strncasecmp(argv[1], "memory", 6) == 0) {
 		sta->look_for = parse_expression_z80e(state, argv[3]);
 		if (thing & READ)
-			hook_memory_emplace(&state->asic->hook.on_memory_read, sta->look_for, sta->look_for, sta, command_on_memory_hook);
+			hook_memory_emplace(&state->asic->mmu.hook.memory_read, sta->look_for, sta->look_for, sta, command_on_memory_hook);
 		if (thing & WRITE)
-			hook_memory_emplace(&state->asic->hook.on_memory_write, sta->look_for, sta->look_for, sta, command_on_memory_hook);
+			hook_memory_emplace(&state->asic->mmu.hook.memory_write, sta->look_for, sta->look_for, sta, command_on_memory_hook);
 	} else if (strncasecmp(argv[1], "port", 4) == 0) {
 		sta->look_for = parse_expression_z80e(state, argv[3]);
 		if (thing & READ)
-			hook_port_emplace(&state->asic->hook.on_port_in, sta->look_for, sta->look_for, sta, command_on_port_hook);
+			hook_port_emplace(&state->asic->cpu.hook.port_in, sta->look_for, sta->look_for, sta, command_on_port_hook);
 		if (thing & WRITE)
-			hook_port_emplace(&state->asic->hook.on_port_out, sta->look_for, sta->look_for, sta, command_on_port_hook);
+			hook_port_emplace(&state->asic->cpu.hook.port_out, sta->look_for, sta->look_for, sta, command_on_port_hook);
 	} else {
 		free(sta);
 		state->print(state, "ERROR: Second argument must be memory or register!\n");

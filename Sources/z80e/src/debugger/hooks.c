@@ -7,19 +7,6 @@
 #include <z80e/ti/asic.h>
 #include <z80e/ti/memory.h>
 
-//MARK: - Lifecycle
-
-size_t sizeof_hook() {
-	return sizeof(struct hook_info);
-}
-
-void hook_init(hook_info_t info, asic_t asic) {
-	*info = (struct hook_info){};
-	asic->cpu.hook = info;
-	asic->mmu.hook = info;
-	return info;
-}
-
 //MARK: - Hooks
 
 typedef struct hook_list *hook_list_t;

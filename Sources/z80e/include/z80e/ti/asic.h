@@ -54,7 +54,12 @@ struct asic {
 		z80_timer_t head;
 	} timers;
 
-	struct hook_info hook;
+	struct {
+		struct hooks_execution on_before_execution;
+		struct hooks_execution on_after_execution;
+		struct hooks_lcd on_lcd_update;
+	} hook;
+
 	debugger_t *debugger;
 };
 

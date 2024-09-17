@@ -1,13 +1,9 @@
 #pragma once
 
-#include <stdint.h>
-
-typedef struct hook_info *hook_info_t;
-
+#include <z80e/types.h>
 #include <z80e/cpu/z80_types.h>
-#include <z80e/hardware/t6a04.h>
 
-#include <z80e/debugger/hooks.h>
+#include <stdint.h>
 
 // Note: All `hook_<domain>` structs have the following assumptions:
 // - callback is the first field
@@ -17,11 +13,6 @@ typedef struct hook {
 	void *list;
 	void *callback;
 } hook_t;
-
-//MARK: - Lifecycle
-
-size_t sizeof_hook();
-void hook_init(hook_info_t hooks, asic_t asic);
 
 void hook_cancel(hook_t hook);
 
@@ -139,21 +130,3 @@ hook_t hook_lcd(hooks_lcd_t hooks, hook_lcd_t const hook);
 hook_t hook_lcd_emplace(hooks_lcd_t hooks, void *data, hook_lcd_callback_t callback);
 
 void hook_lcd_trigger(hooks_lcd_t hooks, ti_bw_lcd_t *lcd);
-
-//MARK: - Asic Hooks
-
-struct hook_info {
-	struct hooks_memory on_memory_read;
-	struct hooks_memory on_memory_write;
-
-	struct hooks_register on_register_read;
-	struct hooks_register on_register_write;
-
-	struct hooks_port on_port_in;
-	struct hooks_port on_port_out;
-
-	struct hooks_execution on_before_execution;
-	struct hooks_execution on_after_execution;
-
-	struct hooks_lcd on_lcd_update;
-};

@@ -25,7 +25,13 @@ struct z80_cpu {
 	uint8_t (* _Nullable read_byte)(void * _Null_unspecified, uint16_t);
 	void (* _Nullable write_byte)(void * _Null_unspecified, uint16_t, uint8_t);
 	bool interrupt;
-	hook_info_t  _Nullable hook;
+
+	struct {
+		struct hooks_register register_read;
+		struct hooks_register register_write;
+		struct hooks_port port_in;
+		struct hooks_port port_out;
+	} hook;
 };
 
 int parity(uint8_t x);
