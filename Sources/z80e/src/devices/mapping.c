@@ -12,45 +12,37 @@ void mapping_init(mapping_device_t mapping, asic_t asic) {
 }
 
 void mapping_reload(mapping_device_t mapping) {
-	ti_mmu_bank_state_t *banks = mapping->asic->mmu.banks;
+	ti_mmu_t mmu = &mapping->asic->mmu;
 
-	banks[0].page = 0;
-	banks[0].flash = 1;
+	mmu_configure(mmu, 0, 0, true);
 
 	if (mapping->mode) {
-		banks[1].page = mapping->a & 0xFE;
-		banks[1].flash = mapping->flashA;
-		if (mapping->asic->device == TI83p) {
-			banks[2].page = mapping->a;
-			banks[2].flash = mapping->flashA;
-		} else {
-			banks[2].page = mapping->a | 1;
-			banks[2].flash = mapping->flashA;
-		}
-		banks[3].page = mapping->b;
-		banks[3].flash = mapping->flashB;
+		uint8_t page2 = mapping->a;
+		if (mapping->asic->device == TI83p)
+			page2 |= 1;
+
+		mmu_configure(mmu, 1, mapping->a & 0xFE, mapping->flashA);
+		mmu_configure(mmu, 2, mapping->a, mapping->flashA);
+		mmu_configure(mmu, 3, mapping->b, mapping->flashB);
 	} else {
-		banks[1].page = mapping->a;
-		banks[1].flash = mapping->flashA;
-		banks[2].page = mapping->b;
-		banks[2].flash = mapping->flashB;
-		if (mapping->asic->device == TI83p) {
-			banks[3].page = 0;
-			banks[3].flash = 0;
-		} else {
-			banks[3].page = mapping->page;
-			banks[3].flash = 0;
-		}
+		uint8_t page3 = 0;
+		if (mapping->asic->device != TI83p)
+			page3 = mapping->page;
+
+		mmu_configure(mmu, 1, mapping->a, mapping->flashA);
+		mmu_configure(mmu, 2, mapping->b, mapping->flashB);
+		mmu_configure(mmu, 3, page3, false);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		if (banks[i].flash && banks[i].page > mapping->asic->mmu.settings.flash_pages) {
-			z80e_error("memorymapping", "ERROR: Flash page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
-			banks[i].page &= mapping->asic->mmu.settings.flash_pages;
-		} else if (!banks[i].flash && banks[i].page > mapping->asic->mmu.settings.ram_pages) {
-			z80e_error("memorymapping", "ERROR: RAM page 0x%02X doesn't exist! (at 0x%04X)", banks[i].page, mapping->asic->cpu.registers.PC);
-			banks[i].page &= mapping->asic->mmu.settings.ram_pages;
-		}
+		mmu_bank_t bank;
+		if (mmu_validate(mmu, i, &bank))
+			continue;
+		
+		if (bank.flash)
+			z80e_error("memorymapping", "ERROR: Flash page 0x%02X doesn't exist! (at 0x%04X)", bank.page, mapping->asic->cpu.registers.PC);
+		else
+			z80e_error("memorymapping", "ERROR: RAM page 0x%02X doesn't exist! (at 0x%04X)", bank.page, mapping->asic->cpu.registers.PC);
 	}
 }
 

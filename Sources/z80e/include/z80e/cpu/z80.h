@@ -49,7 +49,6 @@ uint16_t cpu_read_register_word(z80_cpu_t _Nonnull, enum z80_registers);
 uint8_t cpu_write_register_byte(z80_cpu_t _Nonnull, enum z80_registers, uint8_t);
 uint16_t cpu_write_register_word(z80_cpu_t _Nonnull, enum z80_registers, uint16_t);
 
-void cpu_init(z80_cpu_t _Nonnull cpu);
 device_t _Nonnull cpu_device( z80_cpu_t _Nonnull cpu, unsigned char i);
 uint8_t cpu_read_byte(z80_cpu_t _Nonnull cpu, uint16_t address);
 void cpu_write_byte(z80_cpu_t _Nonnull cpu, uint16_t address, uint8_t value);

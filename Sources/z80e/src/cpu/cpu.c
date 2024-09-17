@@ -26,12 +26,6 @@ struct ExecutionContext {
 	int8_t (*d)(struct ExecutionContext *);
 };
 
-void cpu_init(z80_cpu_t cpu) {
-	struct device nullDevice = { NULL, NULL, NULL };
-	for (int i = 0; i < 0x100; i++)
-		cpu->devices[i] = nullDevice;
-}
-
 struct device *cpu_device(z80_cpu_t cpu, unsigned char i) {
 	return &cpu->devices[i];
 }

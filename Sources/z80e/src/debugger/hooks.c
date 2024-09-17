@@ -5,7 +5,7 @@
 #include <z80e/debugging/hooks.h>
 #include <z80e/cpu/z80.h>
 #include <z80e/ti/asic.h>
-#include <z80e/ti/memory.h>
+#include <z80e/hardware/mmu.h>
 
 //MARK: - Hooks
 

@@ -3,6 +3,7 @@
 #include <z80e/debugging/debugger.h>
 #include <z80e/debugging/commands.h>
 #include <z80e/disassembler/disassemble.h>
+#include <z80e/hardware/mmu.h>
 #include <z80e/log.h>
 
 #include <stdlib.h>
@@ -79,8 +80,8 @@ void tui_tick(tui_state_t *state) {
 	while (1) {
 		char prompt_buffer[80];
 		char *current_pointer = prompt_buffer;
-		ti_mmu_bank_state_t *st = &asic->mmu.banks[asic->cpu.registers.PC / 0x4000];
-		current_pointer += sprintf(prompt_buffer, "z80e [%c:%02X:0x%04X ", st->flash ? 'F' : 'R', st->page, asic->cpu.registers.PC);
+		mmu_bank_t bank = mmu_bank(&asic->mmu, asic->cpu.registers.PC / 0x4000);
+		current_pointer += sprintf(prompt_buffer, "z80e [%c:%02X:0x%04X ", bank.flash ? 'F' : 'R', bank.page, asic->cpu.registers.PC);
 
 		disasm_custom.string_pointer = current_pointer;
 		disasm.current = asic->cpu.registers.PC;

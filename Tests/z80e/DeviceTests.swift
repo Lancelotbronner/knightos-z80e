@@ -11,7 +11,7 @@ final class DeviceTests: XCTestCaseTI83p {
 		keyboard_init(&keyboard)
 
 		var device = device()
-		device_keyboard(&device, &keyboard)
+		port_keyboard(&device, &keyboard)
 
 		keyboard_press(&keyboard, 0)
 		device_write(&device, 0xFE)
@@ -135,7 +135,7 @@ final class DeviceTests: XCTestCaseTI83p {
 
 	func test_battery() {
 		var device = device()
-		device_status(&device, _asic)
+		port_status(&device, _asic)
 
 		asic.battery = BATTERIES_GOOD
 		asic.battery_remove_check = 0
@@ -145,13 +145,13 @@ final class DeviceTests: XCTestCaseTI83p {
 
 	func test_flash() {
 		var device = device()
-		device_status(&device, _asic)
+		port_status(&device, _asic)
 
-		asic.mmu.flash_unlocked = 1
+		asic.mmu.flash_unlocked = true
 		var value = device_read(&device) & 0x4
 		XCTAssertEqual(value, 0x4)
 
-		asic.mmu.flash_unlocked = 0;
+		asic.mmu.flash_unlocked = false;
 		value = device_read(&device) & 0x4
 		XCTAssertEqual(value, 0)
 	}

@@ -1,7 +1,7 @@
 #include <z80e/ti/asic.h>
 #include <z80e/log.h>
 #include <z80e/cpu/z80.h>
-#include <z80e/ti/memory.h>
+#include <z80e/hardware/mmu.h>
 #include <z80e/hardware/t6a04.h>
 #include <z80e/hardware/timer.h>
 #include <z80e/devices/flash.h>
@@ -34,7 +34,6 @@ void asic_init(asic_t asic, ti_device_type type) {
 	ti_mmu_init(&asic->mmu, type);
 
 	// Configure the CPU
-	cpu_init(&asic->cpu);
 	asic->cpu.memory = (void*)&asic->mmu;
 	asic->cpu.read_byte = ti_read_byte;
 	asic->cpu.write_byte = ti_write_byte;

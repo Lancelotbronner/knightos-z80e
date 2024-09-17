@@ -1,4 +1,4 @@
-#include <z80e/ti/memory.h>
+#include <z80e/hardware/mmu.h>
 #include <z80e/cpu/z80.h>
 #include <z80e/ti/ti.h>
 #include <z80e/log.h>
@@ -11,6 +11,82 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+//MARK: - Utilities
+
+static void __mmu_page(ti_mmu_t mmu, unsigned int bank, uint8_t page) {
+	mmu->banks.page[bank] = page;
+}
+
+static void __mmu_flash(ti_mmu_t mmu, unsigned int bank, bool flash) {
+	if (flash)
+		mmu->banks.flash |= 1 << bank;
+	else
+		mmu->banks.flash &= ~(1 << bank);
+}
+
+static mmu_bank_t __mmu_bank(ti_mmu_t const mmu, unsigned int bank) {
+	return (mmu_bank_t){
+		.page = mmu->banks.page[bank],
+		.flash = !!(mmu->banks.flash & (1 << bank)),
+	};
+}
+
+static uint32_t __mmu_address(ti_mmu_t const mmu, mmu_bank_t bank, uint16_t address) {
+	uint32_t mapped_address = address;
+	mapped_address %= 0x4000;
+	mapped_address += bank.page * 0x4000;
+	return mapped_address;
+}
+
+static uint8_t *__mmu_destination(ti_mmu_t const mmu, uint16_t address) {
+	mmu_bank_t bank = __mmu_bank(mmu, address / 0x4000);
+	uint8_t *destination = bank.flash ? mmu->flash : mmu->ram;
+	return &destination[__mmu_address(mmu, bank, address)];
+}
+
+//MARK: - Bank Management
+
+mmu_bank_t mmu_bank(ti_mmu_t const mmu, unsigned int bank) {
+	if (bank < 4)
+		return __mmu_bank(mmu, bank);
+	return (mmu_bank_t){};
+}
+
+void mmu_configure(ti_mmu_t mmu, unsigned int bank, uint8_t page, bool flash) {
+	if (bank > 3)
+		return;
+	__mmu_page(mmu, bank, page);
+	__mmu_flash(mmu, bank, flash);
+}
+
+void mmu_page(ti_mmu_t mmu, unsigned int bank, uint8_t page) {
+	if (bank > 3)
+		return;
+	__mmu_page(mmu, bank, page);
+}
+
+void mmu_flash(ti_mmu_t mmu, unsigned int bank, bool flash) {
+	if (bank > 3)
+		return;
+	__mmu_flash(mmu, bank, flash);
+}
+
+bool mmu_validate(ti_mmu_t mmu, unsigned int bank, mmu_bank_t *info) {
+	if (bank > 3)
+		return false;
+
+	mmu_bank_t _info = __mmu_bank(mmu, bank);
+	if (info) *info = _info;
+
+	uint16_t mask = _info.flash ? mmu->settings.flash_pages : mmu->settings.ram_pages;
+	uint8_t page = _info.page & mask;
+	__mmu_page(mmu, bank, page);
+
+	return _info.page == page;
+}
+
+//MARK: - Memory Unit Management
 
 void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type) {
 	switch (device_type) {
@@ -36,14 +112,11 @@ void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type) {
 	mmu->ram = calloc(mmu->settings.ram_pages, 0x4000);
 	mmu->flash = malloc(mmu->settings.flash_pages * 0x4000);
 	memset(mmu->flash, 0xFF, mmu->settings.flash_pages * 0x4000);
-	mmu->flash_unlocked = 0;
+	mmu->flash_unlocked = false;
 	memset(mmu->flash_writes, 0, sizeof(flash_write_t) * 6);
 	mmu->flash_write_index = 0;
 	// Default bank mappings
-	mmu->banks[0].page = 0; mmu->banks[0].flash = 1;
-	mmu->banks[1].page = 0; mmu->banks[1].flash = 1;
-	mmu->banks[2].page = 0; mmu->banks[2].flash = 1;
-	mmu->banks[3].page = 0; mmu->banks[3].flash = 0;
+	mmu->banks.flash = 0b1110;
 	return mmu;
 }
 
@@ -90,19 +163,17 @@ void chip_erase(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 
 uint8_t ti_read_byte(void *memory, uint16_t address) {
 	ti_mmu_t mmu = memory;
-	ti_mmu_bank_state_t bank = mmu->banks[address / 0x4000];
-	uint32_t mapped_address = address;
-	mapped_address %= 0x4000;
-	mapped_address += bank.page * 0x4000;
-	uint8_t byte = 0;
-	if (bank.flash) {
+
+	mmu_bank_t bank = mmu_bank(mmu, address / 0x4000);
+	uint8_t mapped_address = __mmu_address(mmu, bank, address);
+	uint8_t *destination = bank.flash ? mmu->flash : mmu->ram;
+
+	if (bank.flash)
 		chip_reset(mmu, mapped_address, 0);
-		byte = mmu->flash[mapped_address];
-	} else {
-		byte = mmu->ram[mapped_address];
-	}
-	byte = hook_memory_trigger(&mmu->hook.memory_read, address, byte);
-	return byte;
+
+	uint8_t value = destination[mapped_address];;
+	value = hook_memory_trigger(&mmu->hook.memory_read, address, value);
+	return value;
 }
 
 struct flash_pattern {
@@ -111,7 +182,7 @@ struct flash_pattern {
 	void (*handler)(ti_mmu_t memory, uint32_t address, uint8_t value);
 };
 
-struct flash_pattern patterns[] = {
+static struct flash_pattern Patterns[] = {
 	{
 		.length = 4,
 		.pattern = {
@@ -154,55 +225,49 @@ struct flash_pattern patterns[] = {
 
 void ti_write_byte(void *memory, uint16_t address, uint8_t value) {
 	ti_mmu_t mmu = memory;
-	ti_mmu_bank_state_t bank = mmu->banks[address / 0x4000];
-	uint32_t mapped_address = address;
-	mapped_address %= 0x4000;
-	mapped_address += bank.page * 0x4000;
 
 	value = hook_memory_trigger(&mmu->hook.memory_write, address, value);
+	mmu_bank_t bank = mmu_bank(mmu, address / 0x4000);
+	uint32_t mapped_address = __mmu_address(mmu, bank, address);
 
-	if (!bank.flash)
+	if (!bank.flash) {
 		mmu->ram[mapped_address] = value;
-	else {
-		if (mmu->flash_unlocked) {
-			flash_write_t *w = &mmu->flash_writes[mmu->flash_write_index++];
-			w->address = address;
-			w->value = value;
-			int partial_match = 0;
-			struct flash_pattern *pattern;
-			for (pattern = patterns; pattern->length; pattern++) {
-				int i;
-				for (i = 0; i < mmu->flash_write_index && i < pattern->length &&
-						 (mmu->flash_writes[i].address & pattern->pattern[i].address_mask) == pattern->pattern[i].address &&
-						 (mmu->flash_writes[i].value & pattern->pattern[i].value_mask) == pattern->pattern[i].value; i++) {
-				}
-				if (i == pattern->length) {
-					pattern->handler(mmu, mapped_address, value);
-					partial_match = 0;
-					break;
-				} else if (i == mmu->flash_write_index) {
-					partial_match = 1;
-				}
-			}
-			if (!partial_match) {
-				chip_reset(mmu, mapped_address, value);
-			}
+		return;
+	}
+
+	if (!mmu->flash_unlocked)
+		return;
+
+	flash_write_t *w = &mmu->flash_writes[mmu->flash_write_index++];
+	w->address = address;
+	w->value = value;
+
+	bool partial_match = false;
+	struct flash_pattern *pattern;
+
+	//TODO: what?
+	for (pattern = Patterns; pattern->length; pattern++) {
+		int i = 0;
+		while (i < mmu->flash_write_index && i < pattern->length &&
+			   (mmu->flash_writes[i].address & pattern->pattern[i].address_mask) == pattern->pattern[i].address &&
+			   (mmu->flash_writes[i].value & pattern->pattern[i].value_mask) == pattern->pattern[i].value)
+			i++;
+
+		if (i == pattern->length) {
+			pattern->handler(mmu, mapped_address, value);
+			partial_match = false;
+			break;
+		} else if (i == mmu->flash_write_index) {
+			partial_match = true;
 		}
 	}
+
+	if (!partial_match)
+		chip_reset(mmu, mapped_address, value);
 }
 
 void mmu_force_write(void *memory, uint16_t address, uint8_t value) {
 	ti_mmu_t mmu = memory;
-	ti_mmu_bank_state_t bank = mmu->banks[address / 0x4000];
-	uint32_t mapped_address = address;
-	mapped_address %= 0x4000;
-	mapped_address += bank.page * 0x4000;
-
 	value = hook_memory_trigger(&mmu->hook.memory_write, address, value);
-
-	if (!bank.flash)
-		mmu->ram[mapped_address] = value;
-	else {
-		mmu->flash[mapped_address] = value;
-	}
+	__mmu_destination(mmu, address)[0] = value;
 }

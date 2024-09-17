@@ -15,7 +15,7 @@
 #include <z80e/devices/link.h>
 #include <z80e/devices/mapping.h>
 #include <z80e/hardware/interrupts.h>
-#include <z80e/ti/memory.h>
+#include <z80e/hardware/mmu.h>
 #include <z80e/ti/runloop.h>
 #include <z80e/ti/ti.h>
 
