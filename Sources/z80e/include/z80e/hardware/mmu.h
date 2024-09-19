@@ -31,7 +31,15 @@ struct ti_mmu {
 
 	struct {
 		uint8_t page[4];
-		uint8_t flash;
+		union {
+			uint8_t flash;
+			struct {
+				bool flash0 : 1;
+				bool flash1 : 1;
+				bool flash2 : 1;
+				bool flash3 : 1;
+			};
+		};
 	} banks;
 
 	struct {

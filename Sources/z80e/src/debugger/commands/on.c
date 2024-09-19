@@ -152,7 +152,7 @@ void break_callback(struct break_data *data, uint16_t address) {
 	if (data->log)
 		z80e_debug("break", "Breakpoint hit at 0x%04X", address);
 
-	data->asic->stopped = 1;
+	data->asic->stopped = true;
 
 	if (data->count != -1 && !(--data->count))
 		hook_cancel(data->hook_id);

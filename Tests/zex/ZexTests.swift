@@ -68,15 +68,15 @@ final class ZexTests: XCTestCaseAsic {
 		asic.mmu.ram[6] = 0x00;
 		asic.mmu.ram[7] = 0xc9; /* RET */
 
-		asic.mmu.banks.0.page = 0;
-		asic.mmu.banks.1.page = 1;
-		asic.mmu.banks.2.page = 2;
-		asic.mmu.banks.3.page = 3;
+		asic.mmu.banks.page.0 = 0;
+		asic.mmu.banks.page.1 = 1;
+		asic.mmu.banks.page.2 = 2;
+		asic.mmu.banks.page.3 = 3;
 
-		asic.mmu.banks.0.flash = 0;
-		asic.mmu.banks.1.flash = 0;
-		asic.mmu.banks.2.flash = 0;
-		asic.mmu.banks.3.flash = 0;
+		asic.mmu.banks.flash0 = false;
+		asic.mmu.banks.flash1 = false;
+		asic.mmu.banks.flash2 = false;
+		asic.mmu.banks.flash3 = false;
 
 		asic.cpu.registers.PC = 0x100;
 

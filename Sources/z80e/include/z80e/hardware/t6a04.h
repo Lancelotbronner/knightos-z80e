@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-#define LCD_T6A04_RAM 7'680 // 64 * 120
+#define LCD_T6A04_RAM 7680 // 64 * 120
 
 struct lcd_t6a04 {
 

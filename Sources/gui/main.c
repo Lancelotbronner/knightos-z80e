@@ -253,7 +253,7 @@ void sigint_handler(int sig) {
 	signal(SIGINT, sigint_handler);
 
 	z80e_error("sigint", "Caught interrupt, stopping emulation");
-	context.device_asic->stopped = 1;
+	context.device_asic->stopped = true;
 
 	if (!context.device_asic->debugger || context.device_asic->debugger->state == DEBUGGER_ENABLED) {
 #ifdef CURSES
@@ -624,9 +624,8 @@ int main(int argc, char **argv) {
 		if (context.cycles == -1) { // Run indefinitely
 			while (1) {
 				runloop_tick(device->runloop);
-				if (device->stopped) {
+				if (device->stopped)
 					break;
-				}
 				nanosleep((struct timespec[]){{0, (1.f / 60.f) * 1000000000}}, NULL);
 			}
 		} else {

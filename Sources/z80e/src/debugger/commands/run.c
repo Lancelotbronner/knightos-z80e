@@ -28,7 +28,7 @@ int run_command_write(struct disassemble_memory *state, const char *format, ...)
 }
 
 int command_run(debugger_state_t *state, int argc, char **argv) {
-	state->asic->stopped = 0;
+	state->asic->stopped = false;
 	uint16_t instructions = -1;
 
 	struct run_disassemble_state dstate;
@@ -49,12 +49,12 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 		for (; instructions > 0; instructions--) {
 			hook_execution_trigger(&state->asic->hook.on_before_execution, state->asic->cpu.registers.PC);
 			if (!isFirstInstruction && state->asic->stopped) {
-				state->asic->stopped = 0;
+				state->asic->stopped = false;
 				break;
 			}
 
 			if (isFirstInstruction) {
-				state->asic->stopped = 0;
+				state->asic->stopped = false;
 				isFirstInstruction = 0;
 			}
 
@@ -71,9 +71,8 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 				}
 			}
 
-			if (state->debugger->flags.echo_reg) {
+			if (state->debugger->flags.echo_reg)
 				print_state(&state->asic->cpu);
-			}
 
 			oldHalted = state->asic->cpu.halted;
 
@@ -90,7 +89,7 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 			}
 			hook_execution_trigger(&state->asic->hook.on_after_execution, state->asic->cpu.registers.PC);
 			if (state->asic->stopped) {
-				state->asic->stopped = 0;
+				state->asic->stopped = false;
 				break;
 			}
 		}
@@ -102,12 +101,12 @@ int command_run(debugger_state_t *state, int argc, char **argv) {
 	while (1) {
 		hook_execution_trigger(&state->asic->hook.on_before_execution, state->asic->cpu.registers.PC);
 		if (!isFirstInstruction && state->asic->stopped) {
-			state->asic->stopped = 0;
+			state->asic->stopped = false;
 			break;
 		}
 
 		if (isFirstInstruction) {
-			state->asic->stopped = 0;
+			state->asic->stopped = false;
 			isFirstInstruction = 0;
 		}
 

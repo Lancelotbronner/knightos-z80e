@@ -207,7 +207,7 @@ void sigint_handler(int sig) {
 	signal(SIGINT, sigint_handler);
 
 	z80e_error("sigint", "Caught interrupt, stopping emulation");
-	context.device_asic->stopped = 1;
+	context.device_asic->stopped = true;
 
 	if (!context.device_asic->debugger || context.device_asic->debugger->state == DEBUGGER_ENABLED) {
 #ifdef CURSES
@@ -288,30 +288,26 @@ int main(int argc, char **argv) {
 		fclose(file);
 	}
 
-	hook_lcd_emplace(&device->hook.on_lcd_update, nullptr, lcd_changed_hook);
+	hook_lcd_emplace(&device->lcd.hook.update, nullptr, lcd_changed_hook);
 	asic_add_timer(device, 0, 60, lcd_timer_tick, device->cpu.devices[0x10].data);
 
 	if (device->debugger) {
 		tui_state_t state = { device->debugger };
 		tui_init(&state);
 		tui_tick(&state);
-	} else {
-		if (context.cycles == -1) { // Run indefinitely
-			while (1) {
-				asic_tick(device);
-				if (device->stopped) {
-					break;
-				}
-				nanosleep((struct timespec[]){{0, (1.f / 60.f) * 1000000000}}, NULL);
-			}
-		} else {
-			asic_tick_cycles(device, context.cycles);
+	} else if (context.cycles == -1) { // Run indefinitely
+		while (true) {
+			asic_tick(device);
+			if (device->stopped)
+				break;
+			nanosleep((struct timespec[]){{0, (1.f / 60.f) * 1000000000}}, NULL);
 		}
-	}
+	} else
+		asic_tick_cycles(device, context.cycles);
 
-	if (context.print_state) {
+	if (context.print_state)
 		print_state(&device->cpu);
-	}
+
 	asic_deinit(device);
-	return 0;
+	return EXIT_SUCCESS;
 }

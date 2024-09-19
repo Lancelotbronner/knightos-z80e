@@ -31,11 +31,14 @@ typedef enum {
 } battery_state;
 
 struct asic {
-	int stopped;
 	ti_device_type device;
 	battery_state battery;
-	int battery_remove_check;
 	int clock_rate;
+
+	// TODO: Merge runloop, clock_rate and timers into new scheduler?
+	// TODO: Merge socket into link?
+	// TODO: Merge on_before_execution and on_after_execution into debugger?
+	// TODO: Merge battery_remove_check into new power?
 
 	struct z80_cpu cpu;
 	struct z80_runloop runloop;
@@ -59,13 +62,16 @@ struct asic {
 		z80_timer_t head;
 	} timers;
 
+
 	struct {
 		struct hooks_execution on_before_execution;
 		struct hooks_execution on_after_execution;
-		struct hooks_lcd on_lcd_update;
 	} hook;
 
 	debugger_t *debugger;
+
+	bool stopped : 1;
+	bool battery_remove_check : 1;
 };
 
 int asic_set_clock_rate(asic_t , int);
