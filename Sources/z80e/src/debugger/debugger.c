@@ -117,9 +117,8 @@ int debugger_source_rc(debugger_state_t *state, const char *rc_name) {
 
 	struct stat stat_buf;
 	if (stat(realloced, &stat_buf) == -1) {
-		if (errno != ENOENT) {
+		if (errno != ENOENT)
 			state->print(state, "Couldn't read %s: '%s'\n", rc_name, strerror(errno));
-		}
 		free(realloced);
 		return 0;
 	}
@@ -128,11 +127,12 @@ int debugger_source_rc(debugger_state_t *state, const char *rc_name) {
 
 	int ret = command_source(state, 2, argv);
 
+	//TODO: Avoid this temporary allocation.
 	free(realloced);
 	return ret;
 }
 
-debugger_command_t default_commands[] = {
+static debugger_command_t default_commands[] = {
 	{ "list_commands", debugger_list_commands, 0 },
 	{ "?", debugger_list_commands, 0 },
 	{ "source", command_source, 0 },
@@ -166,30 +166,25 @@ debugger_command_t default_commands[] = {
 	{ "timer", command_timer, 0 },
 };
 
-int default_command_count = sizeof(default_commands) / sizeof(debugger_command_t);
+static int default_command_count = sizeof(default_commands) / sizeof(debugger_command_t);
 
-debugger_t *init_debugger(asic_t asic) {
-	debugger_t *debugger = calloc(1, sizeof(debugger_t));
+void debugger_init(debugger_t debugger, asic_t asic) {
+	*debugger = (struct debugger) {
+		.asic = asic,
+		.commands.count = default_commands,
+		.commands.capacity = default_command_count,
+		.commands.commands = calloc(sizeof(debugger_command_t *), debugger->commands.capacity),
+	};
 
-	debugger->commands.count = default_command_count;
-	debugger->commands.capacity = default_command_count + 10;
-	debugger->commands.commands = calloc(sizeof(debugger_command_t *), debugger->commands.capacity);
-	int i = 0;
-	for (i = 0; i < default_command_count; i++) {
+	for (int i = 0; i < default_command_count; i++)
 		debugger->commands.commands[i] = &default_commands[i];
-	}
-
-	debugger->asic = asic;
-
-	return debugger;
 }
 
-void free_debugger(debugger_t *debugger) {
+void debugger_deinit(debugger_t debugger) {
 	free(debugger->commands.commands);
-	free(debugger);
 }
 
-int compare_strings(const char *a, const char *b) {
+static int compare_strings(const char *a, const char *b) {
 	int i = 0;
 	while (*a != 0 && *b != 0 && *(a++) == *(b++)) {
 		i++;
@@ -197,7 +192,7 @@ int compare_strings(const char *a, const char *b) {
 	return i;
 }
 
-int find_best_command(debugger_t *debugger, const char *f_command, debugger_command_t ** pointer) {
+int debugger_find(debugger_t debugger, const char *f_command, debugger_command_t ** pointer) {
 	int i;
 	int max_match = 0;
 	int match_numbers = 0;
@@ -251,7 +246,8 @@ int find_best_command(debugger_t *debugger, const char *f_command, debugger_comm
 	return 0;
 }
 
-void register_command(debugger_t *debugger, const char *name, debugger_function_t function, void *state, int priority) {
+//TODO: This debugger doesn't need to support custom commands right?
+void __debugger_register(debugger_t debugger, const char *name, debugger_function_t function, void *state, int priority) {
 	debugger_list_t *list = &debugger->commands;
 	debugger_command_t *command = malloc(sizeof(debugger_command_t));
 	command->name = name;
@@ -268,7 +264,7 @@ void register_command(debugger_t *debugger, const char *name, debugger_function_
 	list->commands[list->count - 1] = command;
 }
 
-char **debugger_parse_commandline(const char *cmdline, int *argc) {
+char **debugger_parse(const char *cmdline, int *argc) {
 	char *buffer[10];
 	int buffer_pos = 0;
 	while (*cmdline != 0 && *cmdline != '\n') {
@@ -340,10 +336,10 @@ char **debugger_parse_commandline(const char *cmdline, int *argc) {
 int debugger_exec(debugger_state_t *state, const char *command_str) {
 	debugger_command_t *command;
 	int argc;
-	char **cmdline = debugger_parse_commandline(command_str, &argc);
+	char **cmdline = debugger_parse(command_str, &argc);
 	int return_value = 0;
 
-	int status = find_best_command(state->debugger, cmdline[0], &command);
+	int status = debugger_find(state->debugger, cmdline[0], &command);
 	if (status == -1) {
 		state->print(state, "Error: Ambiguous command %s\n", cmdline[0]);
 		return_value = -1;

@@ -21,7 +21,7 @@ import XCTz80e
 //
 //	func test_debugger_init() {
 //		asic_t uninit;
-//		debugger_t *debugger = init_debugger(&uninit);
+//		debugger_t debugger = init_debugger(&uninit);
 //
 //XCTAssertEqual(debugger.asic, &)
 //			free_debugger(debugger);
@@ -43,7 +43,7 @@ import XCTz80e
 //
 //	func test_debugger_find_command() {
 //		asic_t uninit;
-//		debugger_t *debugger = init_debugger(&uninit);
+//		debugger_t debugger = init_debugger(&uninit);
 //		register_command(debugger, "alwaysok", debugger_alwaysok, NULL, 0);
 //		register_command(debugger, "alwaysfail", debugger_alwaysfail, NULL, 0);
 //

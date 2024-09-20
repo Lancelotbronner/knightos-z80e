@@ -15,7 +15,7 @@ int debugger_alwaysfail(debugger_state_t *state, int argc, char **argv) {
 
 int test_debugger_init() {
 	struct asic uninit;
-	debugger_t *debugger = init_debugger(&uninit);
+	debugger_t debugger = init_debugger(&uninit);
 
 	if (debugger->asic != &uninit) {
 		free_debugger(debugger);
@@ -37,7 +37,7 @@ int test_debugger_init() {
 
 int test_debugger_find_command() {
 	struct asic uninit;
-	debugger_t *debugger = init_debugger(&uninit);
+	debugger_t debugger = init_debugger(&uninit);
 	register_command(debugger, "alwaysok", debugger_alwaysok, NULL, 0);
 	register_command(debugger, "alwaysfail", debugger_alwaysfail, NULL, 0);
 

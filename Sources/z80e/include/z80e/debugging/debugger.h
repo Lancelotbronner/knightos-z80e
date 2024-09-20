@@ -1,11 +1,11 @@
 #pragma once
 
 #include <z80e/types.h>
+#include <z80e/debugging/hooks.h>
 
 #include <stdarg.h>
 
 typedef struct debugger_state debugger_state_t;
-typedef struct debugger debugger_t;
 typedef int (*debugger_function_t)(debugger_state_t *, int, char **);
 
 typedef struct {
@@ -27,7 +27,7 @@ struct debugger_state {
 	void *state;
 	void *interface_state;
 	asic_t asic;
-	debugger_t *debugger;
+	debugger_t debugger;
 	debugger_state_t *(*create_new_state)(debugger_state_t *, const char *command_name);
 	void (*close_window)(debugger_state_t *);
 };
@@ -40,26 +40,31 @@ typedef enum {
 } debugger_operation_state;
 
 struct debugger {
-	struct {
-		int echo : 1;
-		int echo_reg : 1;
-		int auto_on : 1;
-		int knightos : 1;
-		int nointonstep : 1;
-	} flags;
-
 	debugger_list_t commands;
 	asic_t asic;
 	debugger_operation_state state;
+
+	struct {
+		struct hooks_execution before_execution;
+		struct hooks_execution after_execution;
+	} hook;
+
+	struct {
+		bool echo : 1;
+		bool echo_reg : 1;
+		bool auto_on : 1;
+		bool knightos : 1;
+		bool nointonstep : 1;
+	} flags;
 };
 
 int debugger_source_rc(debugger_state_t *, const char *rc_name);
 
-debugger_t *init_debugger(asic_t );
-void free_debugger(debugger_t *);
+void debugger_init(debugger_t debugger, asic_t asic);
+void debugger_deinit(debugger_t );
 
-int find_best_command(debugger_t *, const char *, debugger_command_t **);
-void register_command(debugger_t *, const char *, debugger_function_t, void *, int);
+int debugger_find(debugger_t , const char *, debugger_command_t **);
+void __debugger_register(debugger_t , const char *, debugger_function_t, void *, int);
 
-char **debugger_parse_commandline(const char *, int *);
+char **debugger_parse(const char *, int *);
 int debugger_exec(debugger_state_t *, const char *);

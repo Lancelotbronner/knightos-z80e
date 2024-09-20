@@ -51,3 +51,7 @@ typedef struct keyboard_device *keyboard_device_t;
 typedef struct mapping_device *mapping_device_t;
 
 typedef struct link_device *link_device_t;
+
+//MARK: - Debugging Management
+
+typedef struct debugger *debugger_t;

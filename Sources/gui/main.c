@@ -576,13 +576,13 @@ int main(int argc, char **argv) {
 	context.device_asic = device;
 
 	if (enable_debug) {
-		device->debugger = init_debugger(device);
+		device->debugger = debugger_init(device);
 		device->debugger->state = DEBUGGER_ENABLED;
 	}
 
 	if (context.rom_file == NULL && !enable_debug) {
 		z80e_warning("main", "No ROM file specified, starting debugger");
-		device->debugger = init_debugger(device);
+		device->debugger = debugger_init(device);
 		device->debugger->state = DEBUGGER_ENABLED;
 	} else {
 		FILE *file = fopen(context.rom_file, "r");

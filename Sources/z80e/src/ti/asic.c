@@ -52,9 +52,8 @@ void asic_init(asic_t asic, ti_device_type type) {
 	asic->interrupts.timer2 = -1;
 	asic_power_release(asic);
 
-	// Configure debugger
+	// Configure debugging
 	asic->stopped = false;
-	asic->debugger = 0;
 
 	// Configure devices
 	plug_devices(asic);

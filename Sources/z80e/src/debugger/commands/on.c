@@ -175,7 +175,7 @@ int command_break(struct debugger_state *state, int argc, char **argv) {
 	data->asic = state->asic;
 	data->count = count;
 	data->log = 1;
-	data->hook_id = hook_execution_emplace(&state->asic->hook.on_before_execution, data, (hook_execution_callback_t)break_callback);
+	data->hook_id = hook_execution_emplace(&state->debugger->hook.before_execution, data, (hook_execution_callback_t)break_callback);
 	return 0;
 }
 
@@ -233,7 +233,7 @@ int command_step_over(struct debugger_state *state, int argc, char **argv) {
 	data->asic = state->asic;
 	data->count = 1;
 	data->log = 0;
-	data->hook_id = hook_execution_emplace(&state->asic->hook.on_before_execution, data, (hook_execution_callback_t) break_callback);
+	data->hook_id = hook_execution_emplace(&state->debugger->hook.before_execution, data, (hook_execution_callback_t) break_callback);
 
 	char *_argv[] = { "run" };
 	int orig_echo = state->debugger->flags.echo;

@@ -5,8 +5,8 @@
 void mapping_init(mapping_device_t mapping, asic_t asic) {
 	*mapping = (struct mapping_device){
 		.asic = asic,
-		.flashA = 1,
-		.flashB = 1,
+		.flashA = true,
+		.flashB = true,
 	};
 	mapping_reload(mapping);
 }

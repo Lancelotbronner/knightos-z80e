@@ -5,7 +5,7 @@
 #include <z80e/debugging/debugger.h>
 
 typedef struct {
-	debugger_t *debugger;
+	debugger_t debugger;
 } tui_state_t;
 
 void tui_init(tui_state_t *state);

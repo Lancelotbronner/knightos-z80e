@@ -53,7 +53,7 @@ debugger_state_t *openti_create_new_state(debugger_state_t *old_state, const cha
 	return state;
 }
 
-debugger_state_t *openti_new_state(debugger_t *debugger, int ref) {
+debugger_state_t *openti_new_state(debugger_t debugger, int ref) {
 	debugger_state_t *state = calloc(sizeof(debugger_state_t), 1);
 	state->print = openti_state_print;
 	state->vprint = openti_state_vprint;

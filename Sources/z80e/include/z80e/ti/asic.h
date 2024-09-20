@@ -62,14 +62,6 @@ struct asic {
 		z80_timer_t head;
 	} timers;
 
-
-	struct {
-		struct hooks_execution on_before_execution;
-		struct hooks_execution on_after_execution;
-	} hook;
-
-	debugger_t *debugger;
-
 	bool stopped : 1;
 	bool battery_remove_check : 1;
 };

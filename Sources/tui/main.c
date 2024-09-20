@@ -30,6 +30,7 @@ const loglevel_options_t log_options[] = {
 typedef struct {
 	ti_device_type device;
 	asic_t device_asic;
+	debugger_t debugger;
 	char *rom_file;
 	int cycles;
 	int print_state;
@@ -209,7 +210,7 @@ void sigint_handler(int sig) {
 	z80e_error("sigint", "Caught interrupt, stopping emulation");
 	context.device_asic->stopped = true;
 
-	if (!context.device_asic->debugger || context.device_asic->debugger->state == DEBUGGER_ENABLED) {
+	if (!context.debugger || context.debugger->state == DEBUGGER_ENABLED) {
 #ifdef CURSES
 		endwin();
 #endif
@@ -251,6 +252,9 @@ int main(int argc, char **argv) {
 	z80e_log_callback(frontend_log, nullptr);
 	z80e_log_filter(context.log_level);
 
+	// Prepare the debugger
+	struct debugger debugger;
+
 	// Prepare the device
 	struct asic device_storage;
 	asic_t device = &device_storage;
@@ -258,14 +262,14 @@ int main(int argc, char **argv) {
 	context.device_asic = device;
 
 	if (enable_debug) {
-		device->debugger = init_debugger(device);
-		device->debugger->state = DEBUGGER_ENABLED;
+		debugger_init(&debugger, device);
+		debugger.state = DEBUGGER_ENABLED;
 	}
 
 	if (context.rom_file == NULL && !enable_debug) {
 		z80e_warning("main", "No ROM file specified, starting debugger");
-		device->debugger = init_debugger(device);
-		device->debugger->state = DEBUGGER_ENABLED;
+		debugger_init(&debugger, device);
+		debugger.state = DEBUGGER_ENABLED;
 	} else {
 		FILE *file = fopen(context.rom_file, "r");
 		if (!file) {
@@ -291,8 +295,8 @@ int main(int argc, char **argv) {
 	hook_lcd_emplace(&device->lcd.hook.update, nullptr, lcd_changed_hook);
 	asic_add_timer(device, 0, 60, lcd_timer_tick, device->cpu.devices[0x10].data);
 
-	if (device->debugger) {
-		tui_state_t state = { device->debugger };
+	if (debugger.state == DEBUGGER_ENABLED) {
+		tui_state_t state = { &debugger };
 		tui_init(&state);
 		tui_tick(&state);
 	} else if (context.cycles == -1) { // Run indefinitely
@@ -309,5 +313,6 @@ int main(int argc, char **argv) {
 		print_state(&device->cpu);
 
 	asic_deinit(device);
+	debugger_deinit(&debugger);
 	return EXIT_SUCCESS;
 }
