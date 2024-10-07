@@ -56,6 +56,4 @@ typedef struct link_device *link_device_t;
 
 typedef struct debugger *debugger_t;
 
-typedef struct debugger_state *debugger_state_t;
-
 typedef struct debugger_command const *debugger_command_t;

@@ -16,15 +16,15 @@
 
 //MARK: - List Command
 
-static int command_list(debugger_state_t state, void *data, int argc, char **argv) {
+static int command_list(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 1) {
-		state->print(state,
+		debugger_print(state,
 			"list_commands - List all registered commands\nThis command takes no arguments.\n");
 		return 0;
 	}
 
-	for (int i = 0; i < state->debugger->commands.count; i++) {
-		state->print(state, "%d. %s\n", i, state->debugger->commands.storage[i]->name);
+	for (int i = 0; i < state->commands.count; i++) {
+		debugger_print(state, "%d. %s\n", i, state->commands.storage[i]->name);
 	}
 	return 0;
 }
@@ -52,15 +52,15 @@ const struct debugger_command HelpCommand1 = {
 
 //MARK: - Source Command
 
-static int command_source(debugger_state_t state, void *data, int argc, char **argv) {
+static int command_source(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 2) {
-		state->print(state, "%s `file` - read a file and run its commands\n", argv[0]);
+		debugger_print(state, "%s `file` - read a file and run its commands\n", argv[0]);
 		return 0;
 	}
 
 	FILE *rc = fopen(argv[1], "r");
 	if (rc == 0) {
-		state->print(state, "File couldn't be read: '%s'\n", strerror(errno));
+		debugger_print(state, "File couldn't be read: '%s'\n", strerror(errno));
 		return 1;
 	}
 	char filebuffer[256];
@@ -70,7 +70,7 @@ static int command_source(debugger_state_t state, void *data, int argc, char **a
 			continue;
 		}
 
-		if (debugger_exec(state, filebuffer) < 0) {
+		if (debugger_execute(state, filebuffer) < 0) {
 			return 1;
 		}
 	}
@@ -86,24 +86,24 @@ const struct debugger_command SourceCommand = {
 
 //MARK: - Set Command
 
-static int command_set(debugger_state_t state, void *data, int argc, char **argv) {
+static int command_set(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 2) {
-		state->print(state, "%s Set a setting. Available settings: \n 1. echo \n 2. echo_reg \n 3. auto_on \n 4. knightos \n 5. nointonstep \n", argv[0]);
+		debugger_print(state, "%s Set a setting. Available settings: \n 1. echo \n 2. echo_reg \n 3. auto_on \n 4. knightos \n 5. nointonstep \n", argv[0]);
 		return 0;
 	}
 
 	if (strcmp(argv[1], "echo") == 0) {
-		state->debugger->flags.echo = !state->debugger->flags.echo;
+		state->flags.echo = !state->flags.echo;
 	} else if (strcmp(argv[1], "echo_reg") == 0) {
-		state->debugger->flags.echo_reg = !state->debugger->flags.echo_reg;
+		state->flags.echo_reg = !state->flags.echo_reg;
 	} else if (strcmp(argv[1], "auto_on") == 0) {
-		state->debugger->flags.auto_on = !state->debugger->flags.auto_on;
+		state->flags.auto_on = !state->flags.auto_on;
 	} else if (strcmp(argv[1], "knightos") == 0) {
-		state->debugger->flags.knightos = !state->debugger->flags.knightos;
+		state->flags.knightos = !state->flags.knightos;
 	} else if (strcmp(argv[1], "nointonstep") == 0) {
-		state->debugger->flags.nointonstep = !state->debugger->flags.nointonstep;
+		state->flags.nointonstep = !state->flags.nointonstep;
 	} else {
-		state->print(state, "Unknown variable '%s'!\n", argv[1]);
+		debugger_print(state, "Unknown variable '%s'!\n", argv[1]);
 		return 1;
 	}
 
@@ -119,24 +119,24 @@ const struct debugger_command SetCommand = {
 
 //MARK: - Unset Command
 
-static int command_unset(debugger_state_t state, void *data, int argc, char **argv) {
+static int command_unset(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 2) {
-		state->print(state, "%s `val` - unset a setting\n", argv[0]);
+		debugger_print(state, "%s `val` - unset a setting\n", argv[0]);
 		return 0;
 	}
 
 	if (strcmp(argv[1], "echo") == 0) {
-		state->debugger->flags.echo = 0;
+		state->flags.echo = 0;
 	} else if (strcmp(argv[1], "echo_reg") == 0) {
-		state->debugger->flags.echo_reg = 0;
+		state->flags.echo_reg = 0;
 	} else if (strcmp(argv[1], "auto_on") == 0) {
-		state->debugger->flags.auto_on = 0;
+		state->flags.auto_on = 0;
 	} else if (strcmp(argv[1], "knightos") == 0) {
-		state->debugger->flags.knightos = 0;
+		state->flags.knightos = 0;
 	} else if (strcmp(argv[1], "nointonstep") == 0) {
-		state->debugger->flags.nointonstep = 0;
+		state->flags.nointonstep = 0;
 	} else {
-		state->print(state, "Unknown variable '%s'!\n", argv[1]);
+		debugger_print(state, "Unknown variable '%s'!\n", argv[1]);
 		return 1;
 	}
 

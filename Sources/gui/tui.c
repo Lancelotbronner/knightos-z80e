@@ -12,30 +12,28 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-int print_tui(struct debugger_state *a, const char *b, ...) {
+int print_tui(debugger_t a, const char *b, ...) {
 	va_list list;
 	va_start(list, b);
 	return vprintf(b, list);
 }
 
-int vprint_tui(struct debugger_state *a, const char *b, va_list list) {
+int vprint_tui(debugger_t a, const char *b, va_list list) {
 	return vprintf(b, list);
 }
 
-void tui_close_window(struct debugger_state *state) {
+void tui_close_window(debugger_t state) {
 	free(state);
 }
 
-debugger_state_t tui_new_state(struct debugger_state *state, const char *title) {
-	debugger_state_t stat = calloc(sizeof(debugger_state_t), 1);
-	stat->print = print_tui;
+debugger_t tui_new_state(debugger_t state, const char *title) {
+	debugger_t stat = calloc(sizeof(debugger_t), 1);
 	stat->vprint = vprint_tui;
-	stat->state = 0;
-	stat->interface_state = state->interface_state;
+	stat->data = state->data;
 	stat->asic = state->asic;
 	stat->debugger = state->debugger;
 	stat->create_new_state = tui_new_state;
-	stat->close_window = tui_close_window;
+	stat->deinit = tui_close_window;
 	init_link(stat);
 	return stat;
 }
@@ -44,8 +42,8 @@ tui_state_t *current_state;
 
 #define dprint(...) printf(__VA_ARGS__)
 void tui_init(tui_state_t *state) {
-	debugger_state_t dstate = { print_tui, vprint_tui, 0, state, state->debugger->asic, state->debugger, tui_new_state, tui_close_window };
-	debugger_state_t used_state = tui_new_state(&dstate, "Sourcing z80erc...");
+	debugger_t dstate = { print_tui, vprint_tui, 0, state, state->debugger->asic, state->debugger, tui_new_state, tui_close_window };
+	debugger_t used_state = tui_new_state(&dstate, "Sourcing z80erc...");
 	z80e_debug("TUI", "Running commands in z80erc...");
 	debugger_source_rc(used_state, "z80erc");
 	tui_close_window(used_state);
@@ -106,10 +104,10 @@ void tui_tick(tui_state_t *state) {
 
 			add_history(result);
 
-			debugger_state_t dstate = { print_tui, vprint_tui, 0, state, asic, state->debugger, tui_new_state, tui_close_window };
-			debugger_state_t used_state = tui_new_state(&dstate, result);
+			debugger_t dstate = { print_tui, vprint_tui, 0, state, asic, state->debugger, tui_new_state, tui_close_window };
+			debugger_t used_state = tui_new_state(&dstate, result);
 
-			int retval = debugger_exec(used_state, result);
+			int retval = debugger_execute(used_state, result);
 			if (retval > 0) {
 				dprint("The command returned %d\n", retval);
 			}

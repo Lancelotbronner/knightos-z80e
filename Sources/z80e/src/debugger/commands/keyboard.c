@@ -6,9 +6,9 @@
 
 //MARK: - Press Command
 
-static int command_press(debugger_state_t state, void *data, int argc, char **argv) {
+static int command_press(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 2) {
-		state->print(state, "%s - Depress the specified key code, in hex or by name.\n", argv[0]);
+		debugger_print(state, "%s - Depress the specified key code, in hex or by name.\n", argv[0]);
 		return 0;
 	}
 	uint8_t key;
@@ -39,9 +39,9 @@ const struct debugger_command PressCommand = {
 
 //MARK: - Release Command
 
-static int command_release(debugger_state_t state, void *data, int argc, char **argv) {
+static int command_release(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 2) {
-		state->print(state, "%s - Release the specified key code, in hex or by name.\n", argv[0]);
+		debugger_print(state, "%s - Release the specified key code, in hex or by name.\n", argv[0]);
 		return 0;
 	}
 	uint8_t key;
@@ -72,9 +72,9 @@ const struct debugger_command ReleaseCommand = {
 
 //MARK: - Tap Command
 
-static int command_tap_key(debugger_state_t state, int argc, char **argv) {
+static int command_tap_key(debugger_t state, int argc, char **argv) {
 	if (argc != 2) {
-		state->print(state, "%s - Depress the specified key code, in hex or by name.\n", argv[0]);
+		debugger_print(state, "%s - Depress the specified key code, in hex or by name.\n", argv[0]);
 		return 0;
 	}
 	uint8_t key;

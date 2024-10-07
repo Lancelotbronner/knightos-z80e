@@ -6,9 +6,9 @@
 
 //MARK: - Print Command
 
-static int __command_print(struct debugger_state *state, void *data, int argc, char **argv) {
+static int __command_print(debugger_t state, void *data, int argc, char **argv) {
 	if (argc == 1) {
-		state->print(state, "%s `expression` - Print an expression\n Don't forget to quote your expression!\n", argv[0]);
+		debugger_print(state, "%s `expression` - Print an expression\n Don't forget to quote your expression!\n", argv[0]);
 		return 0;
 	}
 
@@ -29,7 +29,7 @@ static int __command_print(struct debugger_state *state, void *data, int argc, c
 
 	uint16_t expr = debugger_evaluate(state, tmp);
 
-	state->print(state, "%s = 0x%04X (%u)\n", tmp, expr, expr);
+	debugger_print(state, "%s = 0x%04X (%u)\n", tmp, expr, expr);
 
 	free(tmp);
 	return 0;

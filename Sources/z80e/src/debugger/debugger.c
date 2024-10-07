@@ -112,7 +112,7 @@ void debugger_deinit(debugger_t debugger) {
 	free(debugger->commands.storage);
 }
 
-int debugger_source_rc(debugger_state_t state, const char *rc_name) {
+int debugger_source_rc(debugger_t state, const char *rc_name) {
 	char *env = getenv("XDG_CONFIG_HOME");
 	char *realloced;
 	size_t strsize = 0;
@@ -136,7 +136,7 @@ int debugger_source_rc(debugger_state_t state, const char *rc_name) {
 	struct stat stat_buf;
 	if (stat(realloced, &stat_buf) == -1) {
 		if (errno != ENOENT)
-			state->print(state, "Couldn't read %s: '%s'\n", rc_name, strerror(errno));
+			debugger_print(state, "Couldn't read %s: '%s'\n", rc_name, strerror(errno));
 		free(realloced);
 		return 0;
 	}
@@ -199,7 +199,7 @@ int debugger_find(debugger_t debugger, const char *f_command, debugger_command_t
 	return 0;
 }
 
-char **debugger_parse(const char *cmdline, int *argc) {
+static char **debugger_parse(const char *cmdline, int *argc) {
 	//TODO: Simplify and optimize debugger_parse
 	// Note: Write n values to provided array so I can reuse it
 	char *buffer[10];
@@ -270,21 +270,20 @@ char **debugger_parse(const char *cmdline, int *argc) {
 	return result;
 }
 
-int debugger_exec(debugger_state_t state, const char *command_str) {
+int debugger_execute(debugger_t state, const char *command_str) {
 	debugger_command_t command;
 	int argc;
 	char **argv = debugger_parse(command_str, &argc);
 	int return_value = 0;
 
-	int status = debugger_find(state->debugger, argv[0], &command);
+	int status = debugger_find(state, argv[0], &command);
 	if (status == -1) {
-		state->print(state, "Error: Ambiguous command %s\n", argv[0]);
+		debugger_print(state, "Error: Ambiguous command %s\n", argv[0]);
 		return_value = -1;
 	} else if (status == 0) {
-		state->print(state, "Error: Unknown command %s\n", argv[0]);
+		debugger_print(state, "Error: Unknown command %s\n", argv[0]);
 		return_value = -2;
 	} else {
-		state->state = command->data;
 		return_value = command_executev(command, state, argc, argv);
 	}
 
@@ -294,4 +293,17 @@ int debugger_exec(debugger_state_t state, const char *command_str) {
 	free(argv);
 
 	return return_value;
+}
+
+//MARK: - Debugger Utilities
+
+int debugger_print(debugger_t debugger, const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	debugger->vprint(debugger, format, args);
+	va_end(args);
+}
+
+int debugger_vprint(debugger_t debugger, const char *format, va_list args) {
+	debugger->vprint(debugger, format, args);
 }

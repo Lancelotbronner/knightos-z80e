@@ -5,33 +5,28 @@
 
 #include <stdarg.h>
 
+typedef int (*debugger_vprint_t)(debugger_t debugger, const char *format, va_list args);
+typedef void (*debugger_callback_t)(debugger_t debugger);
+
 struct debugger_commands {
 	int count;
 	int capacity;
 	debugger_command_t *storage;
 };
 
-struct debugger_state {
-	int (*print)(debugger_state_t , const char *, ...);
-	int (*vprint)(debugger_state_t , const char *, va_list);
-	void *state;
-	void *interface_state;
-	asic_t asic;
-	debugger_t debugger;
-	debugger_state_t (*create_new_state)(debugger_state_t , const char *command_name);
-	void (*close_window)(debugger_state_t );
-};
-
-typedef enum {
+enum debugger_op_state {
 	DEBUGGER_DISABLED,
 	DEBUGGER_ENABLED,
 	DEBUGGER_LONG_OPERATION,
 	DEBUGGER_LONG_OPERATION_INTERRUPTABLE
-} debugger_operation_state;
+};
 
 struct debugger {
-	debugger_operation_state state;
+	debugger_callback_t deinit;
+	debugger_vprint_t vprint;
+
 	asic_t asic;
+	void *data;
 
 	struct debugger_commands commands;
 
@@ -47,17 +42,19 @@ struct debugger {
 		bool knightos : 1;
 		bool nointonstep : 1;
 	} flags;
+
+	enum debugger_op_state state : 2;
 };
 
-int debugger_source_rc(debugger_state_t , const char *rc_name);
+int debugger_source_rc(debugger_t , const char *rc_name);
 
 void debugger_init(debugger_t debugger, asic_t asic);
 void debugger_deinit(debugger_t debugger);
 
-int debugger_find(debugger_t debugger, const char *, debugger_command_t *);
+int debugger_find(debugger_t debugger, const char *name, debugger_command_t *result);
 bool debugger_register(debugger_t debugger, const debugger_command_t command, void *data);
 
-char **debugger_parse(const char *, int *);
-int debugger_exec(debugger_state_t , const char *);
-
-uint16_t debugger_evaluate(debugger_state_t , const char *);
+int debugger_print(debugger_t debugger, const char *format, ...);
+int debugger_vprint(debugger_t debugger, const char *format, va_list args);
+int debugger_execute(debugger_t debugger, const char *command);
+uint16_t debugger_evaluate(debugger_t debugger, const char *expression);

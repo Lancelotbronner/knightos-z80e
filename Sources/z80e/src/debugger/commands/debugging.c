@@ -13,7 +13,7 @@
 
 struct run_disassemble_state {
 	struct disassemble_memory memory;
-	debugger_state_t state;
+	debugger_t state;
 };
 
 static uint8_t __run_read(struct disassemble_memory *state, uint16_t pointer) {
@@ -28,10 +28,10 @@ static int __run_write(struct disassemble_memory *state, const char *format, ...
 	va_list list;
 	va_start(list, format);
 
-	return dstate->state->vprint(dstate->state, format, list);
+	return debugger_vprint(dstate->state, format, list);
 }
 
-static int __command_run(debugger_state_t state, void *data, int argc, char **argv) {
+static int __command_run(debugger_t state, void *data, int argc, char **argv) {
 	state->asic->stopped = false;
 	uint16_t instructions = -1;
 
@@ -44,17 +44,17 @@ static int __command_run(debugger_state_t state, void *data, int argc, char **ar
 	int isFirstInstruction = 1;
 
 	if ((argc == 2 && strcmp(argv[1], "--help") == 0) || argc > 2) {
-		state->print(state, "run [instructions] - run a specified number of instructions\n"
+		debugger_print(state, "run [instructions] - run a specified number of instructions\n"
 				" If no number is specified, the emulator will run until interrupted (^C).\n");
 		return 0;
 	}
 
 	if(argc == 2) {
 		instructions = debugger_evaluate(state, argv[1]);
-		state->debugger->state = DEBUGGER_LONG_OPERATION;
+		state->state = DEBUGGER_LONG_OPERATION;
 
 		for (; instructions > 0; instructions--) {
-			hook_execution_trigger(&state->debugger->hook.before_execution, state->asic->cpu.registers.PC);
+			hook_execution_trigger(&state->hook.before_execution, state->asic->cpu.registers.PC);
 			if (!isFirstInstruction && state->asic->stopped) {
 				state->asic->stopped = false;
 				break;
@@ -65,46 +65,46 @@ static int __command_run(debugger_state_t state, void *data, int argc, char **ar
 				isFirstInstruction = 0;
 			}
 
-			if (state->debugger->flags.echo) {
+			if (state->flags.echo) {
 				if (!state->asic->cpu.halted) {
-					state->print(state, "0x%04X: ", state->asic->cpu.registers.PC);
+					debugger_print(state, "0x%04X: ", state->asic->cpu.registers.PC);
 					dstate.memory.current = state->asic->cpu.registers.PC;
-					parse_instruction(&(dstate.memory), __run_write, state->debugger->flags.knightos);
-					state->print(state, "\n");
+					parse_instruction(&(dstate.memory), __run_write, state->flags.knightos);
+					debugger_print(state, "\n");
 				}
 			} else if (state->asic->cpu.halted && !oldHalted) {
-				state->print(state, "CPU is halted\n");
+				debugger_print(state, "CPU is halted\n");
 			}
 
-			if (state->debugger->flags.echo_reg)
+			if (state->flags.echo_reg)
 				print_state(&state->asic->cpu);
 
 			oldHalted = state->asic->cpu.halted;
 
 			int iff1 = state->asic->cpu.IFF1;
 			int iff2 = state->asic->cpu.IFF2;
-			if (state->debugger->flags.nointonstep) {
+			if (state->flags.nointonstep) {
 				state->asic->cpu.IFF1 = 0;
 				state->asic->cpu.IFF2 = 0;
 			}
 			asic_tick_cycles(state->asic, 1);
-			if (state->debugger->flags.nointonstep) {
+			if (state->flags.nointonstep) {
 				state->asic->cpu.IFF1 = iff1;
 				state->asic->cpu.IFF2 = iff2;
 			}
-			hook_execution_trigger(&state->debugger->hook.after_execution, state->asic->cpu.registers.PC);
+			hook_execution_trigger(&state->hook.after_execution, state->asic->cpu.registers.PC);
 			if (state->asic->stopped) {
 				state->asic->stopped = false;
 				break;
 			}
 		}
-		state->debugger->state = DEBUGGER_ENABLED;
+		state->state = DEBUGGER_ENABLED;
 		return 0;
 	}
 
-	state->debugger->state = DEBUGGER_LONG_OPERATION_INTERRUPTABLE;
+	state->state = DEBUGGER_LONG_OPERATION_INTERRUPTABLE;
 	while (1) {
-		hook_execution_trigger(&state->debugger->hook.before_execution, state->asic->cpu.registers.PC);
+		hook_execution_trigger(&state->hook.before_execution, state->asic->cpu.registers.PC);
 
 		if (!isFirstInstruction && state->asic->stopped) {
 			state->asic->stopped = false;
@@ -116,38 +116,38 @@ static int __command_run(debugger_state_t state, void *data, int argc, char **ar
 			isFirstInstruction = 0;
 		}
 
-		if (state->debugger->flags.echo) {
+		if (state->flags.echo) {
 			if (!state->asic->cpu.halted) {
-				state->print(state, "0x%04X: ", state->asic->cpu.registers.PC);
+				debugger_print(state, "0x%04X: ", state->asic->cpu.registers.PC);
 				dstate.memory.current = state->asic->cpu.registers.PC;
-				parse_instruction(&(dstate.memory), __run_write, state->debugger->flags.knightos);
-				state->print(state, "\n");
+				parse_instruction(&(dstate.memory), __run_write, state->flags.knightos);
+				debugger_print(state, "\n");
 			}
 		} else if (state->asic->cpu.halted && !oldHalted) {
-			if (state->debugger->flags.auto_on) {
+			if (state->flags.auto_on) {
 				if (!state->asic->lcd.display_on) {
 					state->asic->cpu.halted = 0;
-					state->print(state, "Turned on calculator via auto_on\n");
+					debugger_print(state, "Turned on calculator via auto_on\n");
 				}
 			} else {
-				state->print(state, "CPU is halted\n");
+				debugger_print(state, "CPU is halted\n");
 			}
 		}
 
-		if (state->debugger->flags.echo_reg)
+		if (state->flags.echo_reg)
 			print_state(&state->asic->cpu);
 
 		oldHalted = state->asic->cpu.halted;
 
 		asic_tick_cycles(state->asic, 1);
 
-		hook_execution_trigger(&state->debugger->hook.after_execution, state->asic->cpu.registers.PC);
+		hook_execution_trigger(&state->hook.after_execution, state->asic->cpu.registers.PC);
 		if (state->asic->stopped) {
-			state->debugger->state = DEBUGGER_ENABLED;
+			state->state = DEBUGGER_ENABLED;
 			return 0;
 		}
 	}
-	state->debugger->state = DEBUGGER_ENABLED;
+	state->state = DEBUGGER_ENABLED;
 	return 0;
 }
 
@@ -183,9 +183,9 @@ static void break_callback(void *data, uint16_t address) {
 		hook_cancel(breakpoint->hook);
 }
 
-static int __command_break(struct debugger_state *state, void *data, int argc, char **argv) {
+static int __command_break(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 2 && argc != 3) {
-		state->print(state, "%s `address` [count] - break at address\n", argv[0]);
+		debugger_print(state, "%s `address` [count] - break at address\n", argv[0]);
 		return 0;
 	}
 
@@ -199,7 +199,7 @@ static int __command_break(struct debugger_state *state, void *data, int argc, c
 	breakpoint->address = address;
 	breakpoint->asic = state->asic;
 	breakpoint->count = count;
-	breakpoint->hook = hook_execution_emplace(&state->debugger->hook.before_execution, data, break_callback);
+	breakpoint->hook = hook_execution_emplace(&state->hook.before_execution, data, break_callback);
 	return 0;
 }
 
@@ -212,7 +212,7 @@ const struct debugger_command BreakCommand = {
 
 //MARK: - Step Command
 
-static int __command_step(debugger_state_t state, void *data, int argc, char **argv) {
+static int __command_step(debugger_t state, void *data, int argc, char **argv) {
 	return command_execute(&RunCommand, state, "run", "1");
 }
 
@@ -226,7 +226,7 @@ const struct debugger_command StepCommand = {
 
 typedef struct {
 	ti_mmu_t mmu;
-	debugger_state_t state;
+	debugger_t state;
 } command_step_over_dism_extra_t;
 
 static uint8_t __stepover_read(struct disassemble_memory *dmem, uint16_t mem) {
@@ -236,10 +236,10 @@ static uint8_t __stepover_read(struct disassemble_memory *dmem, uint16_t mem) {
 
 static int __stepover_write(struct disassemble_memory *mem, const char *thing, ...) {
 	command_step_over_dism_extra_t *extra = mem->extra_data;
-	if (extra->state->debugger->flags.echo) {
+	if (extra->state->flags.echo) {
 		va_list list;
 		va_start(list, thing);
-		return extra->state->vprint(extra->state, thing, list);
+		return debugger_vprint(extra->state, thing, list);
 	}
 	return 0;
 }
@@ -254,20 +254,20 @@ static void __stepover_callback(void *data, uint16_t address) {
 	hook_cancel(breakpoint->hook);
 }
 
-static int __command_stepover(struct debugger_state *state, void *data, int argc, char **argv) {
+static int __command_stepover(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 1) {
-		state->print(state, "%s - set a breakpoint for the instruction after the current one\n", argv[0]);
+		debugger_print(state, "%s - set a breakpoint for the instruction after the current one\n", argv[0]);
 		return 0;
 	}
 	command_step_over_dism_extra_t extra = { &state->asic->mmu, state };
 	struct disassemble_memory mem = { __stepover_read, state->asic->cpu.registers.PC, &extra };
 
-	if (state->debugger->flags.echo)
-		state->print(state, "0x%04X: ", state->asic->cpu.registers.PC);
+	if (state->flags.echo)
+		debugger_print(state, "0x%04X: ", state->asic->cpu.registers.PC);
 
-	uint16_t size = parse_instruction(&mem, __stepover_write, state->debugger->flags.knightos);
-	if (state->debugger->flags.echo)
-		state->print(state, "\n");
+	uint16_t size = parse_instruction(&mem, __stepover_write, state->flags.knightos);
+	if (state->flags.echo)
+		debugger_print(state, "\n");
 
 	// Note: 0x18, 0xFE is JR $, i.e. an infinite loop, which we step over as a special case
 	const uint8_t jumps[] = { 0x18, 0x28, 0x38, 0x30, 0x20 };
@@ -279,20 +279,20 @@ static int __command_stepover(struct debugger_state *state, void *data, int argc
 			return 0;
 		}
 
-	if (state->debugger->flags.knightos)
+	if (state->flags.knightos)
 		if (cpu_read_byte(&state->asic->cpu, state->asic->cpu.registers.PC) == 0xE7)
 			size += 2;
 
 	struct break_data *breakpoint = malloc(sizeof(struct break_data));
 	breakpoint->address = state->asic->cpu.registers.PC + size;
 	breakpoint->asic = state->asic;
-	breakpoint->hook = hook_execution_emplace(&state->debugger->hook.before_execution, data, __stepover_callback);
+	breakpoint->hook = hook_execution_emplace(&state->hook.before_execution, data, __stepover_callback);
 
-	int orig_echo = state->debugger->flags.echo;
-	state->debugger->flags.echo = false;
+	int orig_echo = state->flags.echo;
+	state->flags.echo = false;
 
 	int val = command_execute(&RunCommand, state, 1, "run");
-	state->debugger->flags.echo = orig_echo;
+	state->flags.echo = orig_echo;
 	return val;
 }
 
@@ -305,7 +305,7 @@ const struct debugger_command StepOverCommand = {
 
 //MARK: - Stop Command
 
-static int __command_stop(struct debugger_state *state, void *data, int argc, char **argv) {
+static int __command_stop(debugger_t state, void *data, int argc, char **argv) {
 	state->asic->stopped = true;
 	return 0;
 }

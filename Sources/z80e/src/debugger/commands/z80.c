@@ -6,9 +6,9 @@
 
 //MARK: - Load Register Command
 
-static int __command_load(debugger_state_t state, void *data, int argc, char **argv) {
+static int __command_load(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 3) {
-		state->print(state, "%s - Load a register with a specified value. Supports hex (i.e. 0x0000) and base-10 (i.e. 12)\n", argv[0]);
+		debugger_print(state, "%s - Load a register with a specified value. Supports hex (i.e. 0x0000) and base-10 (i.e. 12)\n", argv[0]);
 		return 0;
 	}
 
@@ -57,9 +57,9 @@ const struct debugger_command LoadCommand = {
 
 //MARK: - Dump Registers Command
 
-static int __command_dump_registers(struct debugger_state *state, void *data, int argc, char **argv) {
+static int __command_dump_registers(debugger_t state, void *data, int argc, char **argv) {
 	if (argc != 1) {
-		state->print(state, "print_registers - Print the contents of the emulator's registers\n"
+		debugger_print(state, "print_registers - Print the contents of the emulator's registers\n"
 				"This command will print the contents of the registers of the emulator\n"
 				" at the time of running.\n");
 		return 0;
@@ -68,20 +68,20 @@ static int __command_dump_registers(struct debugger_state *state, void *data, in
 	z80_cpu_t cpu = &state->asic->cpu;
 
 	z80_registers_t r = cpu->registers;
-	state->print(state, "   AF: 0x%04X   BC: 0x%04X   DE: 0x%04X  HL: 0x%04X\n", r.AF, r.BC, r.DE, r.HL);
-	state->print(state, "  'AF: 0x%04X  'BC: 0x%04X  'DE: 0x%04X 'HL: 0x%04X\n", r._AF, r._BC, r._DE, r._HL);
-	state->print(state, "   PC: 0x%04X   SP: 0x%04X   IX: 0x%04X  IY: 0x%04X\n", r.PC, r.SP, r.IX, r.IY);
-	state->print(state, "   IFF1: %d      IFF2: %d      IM %d\n", cpu->IFF1, cpu->IFF2, cpu->int_mode);
-	state->print(state, "Flags: ");
-	if (r.flags.S) state->print(state, "S ");
-	if (r.flags.Z) state->print(state, "Z ");
-	if (r.flags.H) state->print(state, "H ");
-	if (r.flags.PV) state->print(state, "P/V ");
-	if (r.flags.N) state->print(state, "N ");
-	if (r.flags.C) state->print(state, "C ");
-	if (r.F == 0) state->print(state, "None set");
-	state->print(state, "\n");
-	if (cpu->halted) state->print(state, "CPU halted\n");
+	debugger_print(state, "   AF: 0x%04X   BC: 0x%04X   DE: 0x%04X  HL: 0x%04X\n", r.AF, r.BC, r.DE, r.HL);
+	debugger_print(state, "  'AF: 0x%04X  'BC: 0x%04X  'DE: 0x%04X 'HL: 0x%04X\n", r._AF, r._BC, r._DE, r._HL);
+	debugger_print(state, "   PC: 0x%04X   SP: 0x%04X   IX: 0x%04X  IY: 0x%04X\n", r.PC, r.SP, r.IX, r.IY);
+	debugger_print(state, "   IFF1: %d      IFF2: %d      IM %d\n", cpu->IFF1, cpu->IFF2, cpu->int_mode);
+	debugger_print(state, "Flags: ");
+	if (r.flags.S) debugger_print(state, "S ");
+	if (r.flags.Z) debugger_print(state, "Z ");
+	if (r.flags.H) debugger_print(state, "H ");
+	if (r.flags.PV) debugger_print(state, "P/V ");
+	if (r.flags.N) debugger_print(state, "N ");
+	if (r.flags.C) debugger_print(state, "C ");
+	if (r.F == 0) debugger_print(state, "None set");
+	debugger_print(state, "\n");
+	if (cpu->halted) debugger_print(state, "CPU halted\n");
 
 	return 0;
 }
@@ -94,9 +94,9 @@ const struct debugger_command DumpRegistersCommand = {
 
 //MARK: - Dump Stack Command
 
-static int __command_dump_stack(struct debugger_state *state, void *data, int argc, char **argv) {
+static int __command_dump_stack(debugger_t state, void *data, int argc, char **argv) {
 	if (argc > 1) {
-		state->print(state, "%s [count] - print first `count` (or 10) items on the stack\n", argv[0]);
+		debugger_print(state, "%s [count] - print first `count` (or 10) items on the stack\n", argv[0]);
 		return 0;
 	}
 
@@ -105,7 +105,7 @@ static int __command_dump_stack(struct debugger_state *state, void *data, int ar
 
 	uint16_t i;
 	for (i = sp; i != (uint16_t)(sp + 20); i += 2) {
-		state->print(state, "0x%04X: 0x%04X\n", i, cpu_read_word(cpu, i));
+		debugger_print(state, "0x%04X: 0x%04X\n", i, cpu_read_word(cpu, i));
 	}
 
 	return 0;

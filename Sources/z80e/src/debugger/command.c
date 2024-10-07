@@ -11,11 +11,11 @@
 
 //MARK: - Command Execution
 
-int command_executev(debugger_command_t command, debugger_state_t debugger, int argc, char **argv) {
+int command_executev(debugger_command_t command, debugger_t debugger, int argc, char **argv) {
 	return command->callback(debugger, command->data, argc, argv);
 }
 
-int command_execute(debugger_command_t command, debugger_state_t debugger, int argc, ...) {
+int command_execute(debugger_command_t command, debugger_t debugger, int argc, ...) {
 	va_list argp;
 	va_start(argp, format);
 	char *argv[argc];

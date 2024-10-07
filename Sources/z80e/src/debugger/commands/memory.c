@@ -8,10 +8,10 @@
 
 //MARK: - Dump Mappings Command
 
-int __command_dump_mappings(struct debugger_state *state, void *data, int argc, char **argv) {
+int __command_dump_mappings(debugger_t state, void *data, int argc, char **argv) {
 	if (argc > 2 || (argc == 2 && strcmp(argv[1], "-v") != 0)) {
-		state->print(state, "%s [-v] - Print the MMU page mappings.\n The -v flag adds verbosity to the output.\n", argv[0]);
-		state->print(state, " The terse output is formatted like this: \"Bank 0: F:00\".\n"
+		debugger_print(state, "%s [-v] - Print the MMU page mappings.\n The -v flag adds verbosity to the output.\n", argv[0]);
+		debugger_print(state, " The terse output is formatted like this: \"Bank 0: F:00\".\n"
 				" 'F' says the mapped page is a flash page, 'R' says the mapped page is a ram page.\n");
 		return 0;
 	}
@@ -22,11 +22,11 @@ int __command_dump_mappings(struct debugger_state *state, void *data, int argc, 
 	for (i = 0; i < 4; i++) {
 		mmu_bank_t mapping = mmu_bank(&state->asic->mmu, i);
 		if (verbose)
-			state->print(state, "Page %d (0x%04X - 0x%04X): mapped to %s page %d (0x%04X - 0x%04X).\n",
+			debugger_print(state, "Page %d (0x%04X - 0x%04X): mapped to %s page %d (0x%04X - 0x%04X).\n",
 				i, i * 0x4000, (i + 1) * 0x4000 - 1, mapping.flash ? "ROM" : "RAM", mapping.page,
 				mapping.page * 0x4000, (mapping.page + 1) * 0x4000 - 1);
 		else
-			state->print(state, "Bank %d: %c:%02X\n", i, mapping.flash ? 'F' : 'R', mapping.page);
+			debugger_print(state, "Bank %d: %c:%02X\n", i, mapping.flash ? 'F' : 'R', mapping.page);
 	}
 
 	return 0;
@@ -46,9 +46,9 @@ const struct debugger_command DumpMappingsCommand = {
 
 //MARK: - Hexdump Command
 
-static int __command_hexdump(struct debugger_state *state, void *data, int argc, char **argv) {
+static int __command_hexdump(debugger_t state, void *data, int argc, char **argv) {
 	if (argc > 3) {
-		state->print(state, "%s [start] [length] - print an amount of bytes from the memory\n"
+		debugger_print(state, "%s [start] [length] - print an amount of bytes from the memory\n"
 				" Prints the bytes starting from `start` (or PC), `length` (default: 64) bytes in total.\n", argv[0]);
 		return 0;
 	}
@@ -68,34 +68,34 @@ static int __command_hexdump(struct debugger_state *state, void *data, int argc,
 	uint16_t i, total = 0;
 
 	while (length > 0) {
-		state->print(state, "0x%04X ", start);
+		debugger_print(state, "0x%04X ", start);
 
 		for (i = 0; i < 8 && length - i > 0; i++) {
-			state->print(state, "%02X ", cpu->read_byte(cpu->memory, start + i));
+			debugger_print(state, "%02X ", cpu->read_byte(cpu->memory, start + i));
 		}
 		start += i;
 		length -= i;
 		total += i;
 
-		state->print(state, " ");
+		debugger_print(state, " ");
 
 		for (i = 0; i < 8 && length - i > 0; i++) {
-			state->print(state, "%02X ", cpu->read_byte(cpu->memory, start + i));
+			debugger_print(state, "%02X ", cpu->read_byte(cpu->memory, start + i));
 		}
 		start += i;
 		length -= i;
 		total += i;
 
-		state->print(state, "%*s|", (16 - total) * 3 + (i < 8 ? 1 : 0), " ");
+		debugger_print(state, "%*s|", (16 - total) * 3 + (i < 8 ? 1 : 0), " ");
 		for (i = 0; i < total; i++) {
 			char c = cpu->read_byte(cpu->memory, start - 16 + i);
 			if (isprint(c) && c != '\t') {
-				state->print(state, "%c", c);
+				debugger_print(state, "%c", c);
 			} else {
-				state->print(state, ".");
+				debugger_print(state, ".");
 			}
 		}
-		state->print(state, "|\n");
+		debugger_print(state, "|\n");
 		total = 0;
 	}
 
@@ -116,9 +116,9 @@ const struct debugger_command HexdumpCommand = {
 
 //MARK: - Backwards Dump Command
 
-static int __command_backwards_hexdump(struct debugger_state *state, int argc, char **argv) {
+static int __command_backwards_hexdump(debugger_t state, int argc, char **argv) {
 	if (argc > 3) {
-		state->print(state, "%s [start] [length] - print an amount of bytes from the memory\n"
+		debugger_print(state, "%s [start] [length] - print an amount of bytes from the memory\n"
 				" Prints the bytes starting from `start` (or PC), `length` (default: 64) bytes in total.\n", argv[0]);
 		return 0;
 	}
@@ -138,34 +138,34 @@ static int __command_backwards_hexdump(struct debugger_state *state, int argc, c
 	uint16_t i, total = 0;
 
 	while (length > 0) {
-		state->print(state, "0x%04X ", start);
+		debugger_print(state, "0x%04X ", start);
 
 		for (i = 0; i < 8 && length - i > 0; i++) {
-			state->print(state, "%02X ", cpu->read_byte(cpu->memory, start - i));
+			debugger_print(state, "%02X ", cpu->read_byte(cpu->memory, start - i));
 		}
 		start -= i;
 		length -= i;
 		total += i;
 
-		state->print(state, " ");
+		debugger_print(state, " ");
 
 		for (i = 0; i < 8 && length - i > 0; i++) {
-			state->print(state, "%02X ", cpu->read_byte(cpu->memory, start + i));
+			debugger_print(state, "%02X ", cpu->read_byte(cpu->memory, start + i));
 		}
 		start -= i;
 		length -= i;
 		total += i;
 
-		state->print(state, "%*s|", (16 - total) * 3 + (i < 8 ? 1 : 0), " ");
+		debugger_print(state, "%*s|", (16 - total) * 3 + (i < 8 ? 1 : 0), " ");
 		for (i = 0; i < total; i++) {
 			char c = cpu->read_byte(cpu->memory, start - 16 + i);
 			if (isprint(c) && c != '\t') {
-				state->print(state, "%c", c);
+				debugger_print(state, "%c", c);
 			} else {
-				state->print(state, ".");
+				debugger_print(state, ".");
 			}
 		}
-		state->print(state, "|\n");
+		debugger_print(state, "|\n");
 		total = 0;
 	}
 

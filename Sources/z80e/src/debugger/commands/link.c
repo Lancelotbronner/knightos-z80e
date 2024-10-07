@@ -19,7 +19,7 @@ static hook_t hook;
 
 //MARK: - Send Command
 
-static void send_byte_from_input(struct debugger_state *state) {
+static void send_byte_from_input(debugger_t state) {
 	if (!link_input)
 		return;
 	int c = getc(link_input);
@@ -29,19 +29,19 @@ static void send_byte_from_input(struct debugger_state *state) {
 		return;
 	}
 	if (!link_recv_byte(state->asic, (uint8_t)c)) {
-		state->print(state, "Warning: link not ready\n");
+		debugger_print(state, "Warning: link not ready\n");
 		ungetc(c, link_input);
 	}
 }
 
 static uint8_t on_link_rx_buffer_read(void *state, uint8_t port, uint8_t value) {
-	struct debugger_state *s = state;
-	s->print(s, "Link rx buffer read from\n");
+	debugger_t s = state;
+	debugger_print(s, "Link rx buffer read from\n");
 	send_byte_from_input(state);
 	return value;
 }
 
-static int command_send(struct debugger_state *state, void *data, int argc, char **argv) {
+static int command_send(debugger_t state, void *data, int argc, char **argv) {
 	char *path = strdup(argv[2]);
 #ifndef NOLINK
 	wordexp_t p;
@@ -53,7 +53,7 @@ static int command_send(struct debugger_state *state, void *data, int argc, char
 
 	link_input = fopen(path, "r");
 	if (link_input) {
-		state->print(state, "Sending file: %s\n", path);
+		debugger_print(state, "Sending file: %s\n", path);
 		hook = hook_port_emplace(&state->asic->cpu.hook.port_in, 0x0A, 0x0A, state, on_link_rx_buffer_read);
 		send_byte_from_input(state);
 		free(path);
@@ -79,9 +79,9 @@ static int command_send(struct debugger_state *state, void *data, int argc, char
 	free(tmp);
 
 	if (!link_recv_byte(state->asic, expr))
-		state->print(state, "Calculator is not ready to receive another byte.\n");
+		debugger_print(state, "Calculator is not ready to receive another byte.\n");
 	else
-		state->print(state, "Sent %02X to calculator's link assist.\n", expr);
+		debugger_print(state, "Sent %02X to calculator's link assist.\n", expr);
 	return 0;
 }
 
@@ -94,7 +94,7 @@ const struct debugger_command SendCommand = {
 
 //MARK: - Receive Command
 
-static int command_receive(struct debugger_state *state, void *data, int argc, char **argv) {
+static int command_receive(debugger_t state, void *data, int argc, char **argv) {
 	return 0;
 }
 
@@ -108,9 +108,9 @@ const struct debugger_command ReceiveCommand = {
 
 //MARK: - Connect Command
 
-static int command_connect(struct debugger_state *state, void *data, int argc, char **argv) {
+static int command_connect(debugger_t state, void *data, int argc, char **argv) {
 #ifdef NOLINK
-	state->print(state, "Sockets are not supported\n");
+	debugger_print(state, "Sockets are not supported\n");
 #else
 	state->asic->socket.listenfd.fd =
 		socket(AF_UNIX, SOCK_STREAM, 0);
@@ -118,13 +118,13 @@ static int command_connect(struct debugger_state *state, void *data, int argc, c
 	fcntl(state->asic->socket.listenfd.fd, F_SETFD, FD_CLOEXEC);
 	state->asic->socket.listenfd.events = POLLIN;
 	if (state->asic->socket.listenfd.fd == -1) {
-		state->print(state, "Unable to create socket\n");
+		debugger_print(state, "Unable to create socket\n");
 		return 1;
 	}
 
 	struct sockaddr_un *link_sockaddr = malloc(sizeof(struct sockaddr_un));
 	if (link_sockaddr == NULL) {
-		state->print(state, "Can't allocate socket address\n");
+		debugger_print(state, "Can't allocate socket address\n");
 		return 1;
 	}
 
@@ -136,16 +136,16 @@ static int command_connect(struct debugger_state *state, void *data, int argc, c
 	if (bind(state->asic->socket.listenfd.fd,
 				(struct sockaddr *)link_sockaddr,
 				sizeof(*link_sockaddr)) == -1) {
-		state->print(state, "Unable to bind socket\n");
+		debugger_print(state, "Unable to bind socket\n");
 		return 1;
 	}
 
 	if (listen(state->asic->socket.listenfd.fd, 3) == -1) {
-		state->print(state, "Unable to listen on socket\n");
+		debugger_print(state, "Unable to listen on socket\n");
 		return 1;
 	}
 
-	state->print(state, "Bound to socket at %s\n", argv[2]);
+	debugger_print(state, "Bound to socket at %s\n", argv[2]);
 #endif
 	return 0;
 }
@@ -159,11 +159,11 @@ const struct debugger_command ConnectCommand = {
 
 //MARK: - Dump Link Command
 
-static int command_link(struct debugger_state *state, void *data, int argc, char **argv) {
+static int command_link(debugger_t state, void *data, int argc, char **argv) {
 	link_device_t lstate = &state->asic->link;
-	state->print(state, "Ready: %d\n", !lstate->assist.status.rx_ready);
-	state->print(state, "Tip: %d\n", lstate->us.tip);
-	state->print(state, "Ring: %d\n", lstate->us.ring);
+	debugger_print(state, "Ready: %d\n", !lstate->assist.status.rx_ready);
+	debugger_print(state, "Tip: %d\n", lstate->us.tip);
+	debugger_print(state, "Ring: %d\n", lstate->us.ring);
 	return 0;
 }
 

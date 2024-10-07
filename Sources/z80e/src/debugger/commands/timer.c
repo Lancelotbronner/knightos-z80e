@@ -8,9 +8,9 @@
 
 //TODO: Understand and document the timer command
 
-static int command_timer(struct debugger_state *state, void *data, int argc, char **argv) {
+static int command_timer(debugger_t state, void *data, int argc, char **argv) {
 	if (argc < 2) {
-		state->print(state, "%s [port] [value]\n", argv[0]);
+		debugger_print(state, "%s [port] [value]\n", argv[0]);
 		return 0;
 	}
 

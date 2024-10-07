@@ -11,7 +11,7 @@
 struct mmu_disassemble_memory {
 	struct disassemble_memory mem;
 	z80_cpu_t cpu;
-	struct debugger_state *state;
+	debugger_t state;
 };
 
 int disassemble_print(struct disassemble_memory *s, const char *format, ...) {
@@ -24,7 +24,7 @@ int disassemble_print(struct disassemble_memory *s, const char *format, ...) {
 
 	vsnprintf(buffer, 50, format, list);
 
-	return m->state->print(m->state, "%s", buffer);
+	return debugger_print(m->state, "%s", buffer);
 }
 
 uint8_t disassemble_read(struct disassemble_memory *s, uint16_t pointer) {
@@ -32,9 +32,9 @@ uint8_t disassemble_read(struct disassemble_memory *s, uint16_t pointer) {
 	return m->cpu->read_byte(m->cpu->memory, pointer);
 }
 
-static int __command_disassemble(struct debugger_state *state, void *data, int argc, char **argv) {
+static int __command_disassemble(debugger_t state, void *data, int argc, char **argv) {
 	if (argc > 3) {
-		state->print(state, "%s `start` `count` - Print the disassembled commands\n"
+		debugger_print(state, "%s `start` `count` - Print the disassembled commands\n"
 				" Prints `count` disassembled commands starting in memory from `start`.\n", argv[0]);
 		return 0;
 	}
@@ -56,9 +56,9 @@ static int __command_disassemble(struct debugger_state *state, void *data, int a
 	struct mmu_disassemble_memory str = { { disassemble_read, start }, cpu, state };
 
 	for (i = 0; i < count; i++) {
-		state->print(state, "0x%04X: ", str.mem.current);
-		parse_instruction(&(str.mem), disassemble_print, state->debugger->flags.knightos);
-		state->print(state, "\n");
+		debugger_print(state, "0x%04X: ", str.mem.current);
+		parse_instruction(&(str.mem), disassemble_print, state->flags.knightos);
+		debugger_print(state, "\n");
 	}
 
 	return 0;

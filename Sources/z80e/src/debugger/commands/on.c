@@ -68,29 +68,29 @@ static int register_from_string(char *string) {
 
 typedef struct {
 	int look_for;
-	debugger_state_t deb_sta;
+	debugger_t deb_sta;
 	char *exec_string;
 } on_state_t;
 
 static uint16_t command_on_register_hook(void *state, enum z80_registers reg, uint16_t value) {
 	on_state_t *data = state;
-	debugger_exec(data->deb_sta, data->exec_string);
+	debugger_execute(data->deb_sta, data->exec_string);
 	return value;
 }
 
 static uint8_t command_on_memory_hook(void *state, uint16_t location, uint8_t value) {
 	on_state_t *data = state;
-	debugger_exec(data->deb_sta, data->exec_string);
+	debugger_execute(data->deb_sta, data->exec_string);
 	return value;
 }
 
 static uint8_t command_on_port_hook(void *state, uint8_t port, uint8_t value) {
 	on_state_t *data = state;
-	debugger_exec(data->deb_sta, data->exec_string);
+	debugger_execute(data->deb_sta, data->exec_string);
 	return value;
 }
 
-static int command_on(struct debugger_state *state, void *data, int argc, char **argv) {
+static int command_on(debugger_t state, void *data, int argc, char **argv) {
 	if (argc < 5) {
 		printf("%s `type` `read|write` `value` `command`\n"
 			" Run a command on a specific case\n"
@@ -111,19 +111,19 @@ static int command_on(struct debugger_state *state, void *data, int argc, char *
 		thing = READ | WRITE;
 
 	if (thing == 0) {
-		state->print(state, "ERROR: First argument must be read, write, or rw\n");
+		debugger_print(state, "ERROR: First argument must be read, write, or rw\n");
 		return 1;
 	}
 
 	on_state_t *sta = malloc(sizeof(on_state_t));
-	sta->deb_sta = state->create_new_state(state, argv[4]);
+	sta->deb_sta = state;
 	sta->exec_string = malloc(strlen(argv[4]) + 1);
 	strcpy(sta->exec_string, argv[4]);
 
 	if (strncasecmp(argv[1], "register", 8) == 0) {
 		sta->look_for = register_from_string(argv[3]);
 		if (sta->look_for == -1) {
-			state->print(state, "ERROR: Invalid register!\n");
+			debugger_print(state, "ERROR: Invalid register!\n");
 			free(sta);
 			return 1;
 		}
@@ -145,7 +145,7 @@ static int command_on(struct debugger_state *state, void *data, int argc, char *
 			hook_port_emplace(&state->asic->cpu.hook.port_out, sta->look_for, sta->look_for, sta, command_on_port_hook);
 	} else {
 		free(sta);
-		state->print(state, "ERROR: Second argument must be memory, register or port!\n");
+		debugger_print(state, "ERROR: Second argument must be memory, register or port!\n");
 		return 1;
 	}
 
