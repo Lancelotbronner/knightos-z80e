@@ -141,9 +141,7 @@ int debugger_source(debugger_t debugger, const char *rc_name) {
 		return 0;
 	}
 
-	char *argv[] = { "source", realloced };
-
-	int ret = SourceCommand.callback(debugger, nullptr, 2, argv);
+	int ret = command_execute(&SourceCommand, debugger, 2, "source", realloced);
 
 	//TODO: Avoid this temporary allocation.
 	free(realloced);

@@ -27,7 +27,7 @@ struct debugger {
 	debugger_vprint_t vprint;
 	debugger_open_t open;
 	debugger_callback_t close;
-	//TODO: open/close could be replaced by an active command list or something
+	//TODO: is open/close even needed?
 
 	asic_t asic;
 	void *data;
