@@ -1,33 +1,62 @@
 #pragma once
 
-#include <z80e/debugging/debugger.h>
+#include <z80e/debugging/command.h>
 
-#include <stdint.h>
+// CLI Commands
+const struct debugger_command ListCommand;
+const struct debugger_command HelpCommand, HelpCommand1;
 
-int command_hexdump(debugger_state_t *state, int argc, char **argv);
-int command_backwards_hexdump(debugger_state_t *state, int argc, char **argv);
-int command_disassemble(debugger_state_t *state, int argc, char **argv);
-int command_print_registers(debugger_state_t *state, int argc, char **argv);
-int command_print_expression(debugger_state_t *state, int argc, char **argv);
-int command_stack(debugger_state_t *state, int argc, char **argv);
-int command_print_mappings(debugger_state_t *state, int argc, char **argv);
-int command_unhalt(debugger_state_t *state, int argc, char **argv);
-int command_run(debugger_state_t *state, int argc, char **argv);
-int command_step(debugger_state_t *state, int argc, char **argv);
-int command_stop(debugger_state_t *state, int argc, char **argv);
-int command_on(debugger_state_t *state, int argc, char **argv);
-int command_in(debugger_state_t *state, int argc, char **argv);
-int command_out(debugger_state_t *state, int argc, char **argv);
-int command_break(debugger_state_t *state, int argc, char **argv);
-int command_step_over(debugger_state_t *state, int argc, char **argv);
-int command_link(debugger_state_t *state, int argc, char **argv);
-int command_dump_lcd(debugger_state_t *state, int argc, char **argv);
-int command_turn_on(debugger_state_t *state, int argc, char **argv);
-int command_press_key(debugger_state_t *state, int argc, char **argv);
-int command_release_key(debugger_state_t *state, int argc, char **argv);
-int command_load_register(debugger_state_t *state, int argc, char **argv);
-int command_tap_key(debugger_state_t *state, int argc, char **argv);
-int command_timer(debugger_state_t *state, int argc, char **argv);
-uint16_t parse_expression_z80e(debugger_state_t *, const char *);
+// Debugging Commands
+const struct debugger_command BreakCommand;
+const struct debugger_command RunCommand;
+const struct debugger_command StepCommand;
+const struct debugger_command StepOverCommand;
+const struct debugger_command StopCommand;
 
-void init_link(struct debugger_state *state);
+// Print Commands
+const struct debugger_command PrintCommand;
+
+// Disassembly Commands
+const struct debugger_command DisassembleCommand;
+
+// Debugger Commands
+const struct debugger_command SourceCommand;
+const struct debugger_command SetCommand;
+const struct debugger_command UnsetCommand;
+const struct debugger_command OnCommand;
+
+// z80 Commands
+const struct debugger_command LoadCommand;
+const struct debugger_command DumpRegisterCommand;
+const struct debugger_command DumpStackCommand;
+
+// Interrupt Commands
+const struct debugger_command UnhaltCommand;
+const struct debugger_command PowerCommand;
+const struct debugger_command TickCommand;
+
+// Memory Commands
+const struct debugger_command DumpMappingsCommand;
+const struct debugger_command HexdumpCommand;
+const struct debugger_command HexdumpBackwardsCommand;
+
+// Port Commands
+const struct debugger_command InCommand;
+const struct debugger_command OutCommand;
+
+// Keyboard Commands
+const struct debugger_command PressCommand;
+const struct debugger_command ReleaseCommand;
+const struct debugger_command TapCommand;
+
+// Screen Commands
+const struct debugger_command DumpScreenCommand;
+
+// Link Commands
+const struct debugger_command SendCommand;
+const struct debugger_command ReceiveCommand;
+const struct debugger_command ConnectCommand;
+const struct debugger_command DumpLinkCommand;
+
+// Timer Commands
+const struct debugger_command TimerCommand;

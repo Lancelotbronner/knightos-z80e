@@ -9,12 +9,12 @@ import XCTz80e
 //	int debugger_alwaysokc = 0;
 //	int debugger_alwaysfailc = 0;
 //
-//	int debugger_alwaysok(debugger_state_t *state, int argc, char **argv) {
+//	int debugger_alwaysok(debugger_state_t state, int argc, char **argv) {
 //		debugger_alwaysokc++;
 //		return 0;
 //	}
 //
-//	int debugger_alwaysfail(debugger_state_t *state, int argc, char **argv) {
+//	int debugger_alwaysfail(debugger_state_t state, int argc, char **argv) {
 //		debugger_alwaysfailc++;
 //		return 0;
 //	}
@@ -47,7 +47,7 @@ import XCTz80e
 //		register_command(debugger, "alwaysok", debugger_alwaysok, NULL, 0);
 //		register_command(debugger, "alwaysfail", debugger_alwaysfail, NULL, 0);
 //
-//		debugger_command_t *command;
+//		debugger_command_t command;
 //		int result = find_best_command(debugger, "always", &command);
 //XCTAssertEqual(result, -)
 //			return 1;

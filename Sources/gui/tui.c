@@ -26,8 +26,8 @@ void tui_close_window(struct debugger_state *state) {
 	free(state);
 }
 
-debugger_state_t *tui_new_state(struct debugger_state *state, const char *title) {
-	debugger_state_t *stat = calloc(sizeof(debugger_state_t), 1);
+debugger_state_t tui_new_state(struct debugger_state *state, const char *title) {
+	debugger_state_t stat = calloc(sizeof(debugger_state_t), 1);
 	stat->print = print_tui;
 	stat->vprint = vprint_tui;
 	stat->state = 0;
@@ -45,7 +45,7 @@ tui_state_t *current_state;
 #define dprint(...) printf(__VA_ARGS__)
 void tui_init(tui_state_t *state) {
 	debugger_state_t dstate = { print_tui, vprint_tui, 0, state, state->debugger->asic, state->debugger, tui_new_state, tui_close_window };
-	debugger_state_t *used_state = tui_new_state(&dstate, "Sourcing z80erc...");
+	debugger_state_t used_state = tui_new_state(&dstate, "Sourcing z80erc...");
 	z80e_debug("TUI", "Running commands in z80erc...");
 	debugger_source_rc(used_state, "z80erc");
 	tui_close_window(used_state);
@@ -107,7 +107,7 @@ void tui_tick(tui_state_t *state) {
 			add_history(result);
 
 			debugger_state_t dstate = { print_tui, vprint_tui, 0, state, asic, state->debugger, tui_new_state, tui_close_window };
-			debugger_state_t *used_state = tui_new_state(&dstate, result);
+			debugger_state_t used_state = tui_new_state(&dstate, result);
 
 			int retval = debugger_exec(used_state, result);
 			if (retval > 0) {

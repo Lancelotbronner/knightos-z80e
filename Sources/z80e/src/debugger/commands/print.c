@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-int command_print_expression(struct debugger_state *state, int argc, char **argv) {
+//MARK: - Print Command
+
+static int __command_print(struct debugger_state *state, void *data, int argc, char **argv) {
 	if (argc == 1) {
 		state->print(state, "%s `expression` - Print an expression\n Don't forget to quote your expression!\n", argv[0]);
 		return 0;
@@ -16,8 +18,8 @@ int command_print_expression(struct debugger_state *state, int argc, char **argv
 		strl += strlen(argv[i + 1]) + 1;
 	}
 
-	char *data = malloc(strl);
-	char *dpointer = data;
+	char *tmp = malloc(strl);
+	char *dpointer = tmp;
 	for (i = 0; i < argc - 1; i++) {
 		strcpy(dpointer, argv[i + 1]);
 		dpointer += strlen(argv[i + 1]);
@@ -25,10 +27,17 @@ int command_print_expression(struct debugger_state *state, int argc, char **argv
 	}
 	*(dpointer - 1) = 0;
 
-	uint16_t expr = parse_expression_z80e(state, data);
+	uint16_t expr = debugger_evaluate(state, tmp);
 
-	state->print(state, "%s = 0x%04X (%u)\n", data, expr, expr);
+	state->print(state, "%s = 0x%04X (%u)\n", tmp, expr, expr);
 
-	free(data);
+	free(tmp);
 	return 0;
 }
+
+const struct debugger_command PrintCommand = {
+	.name = "print",
+	.usage = "<expression>",
+	.summary = "Evaluates an expression",
+	.callback = __command_print,
+};

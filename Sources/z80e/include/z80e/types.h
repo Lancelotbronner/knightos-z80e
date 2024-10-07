@@ -20,7 +20,7 @@ typedef struct z80_cpu *z80_cpu_t;
 
 typedef struct ti_mmu *ti_mmu_t;
 
-typedef struct z80_regstate z80_registers_t;
+typedef struct z80_state z80_registers_t;
 
 typedef struct ti_interrupts *ti_interrupts_t;
 
@@ -52,6 +52,10 @@ typedef struct mapping_device *mapping_device_t;
 
 typedef struct link_device *link_device_t;
 
-//MARK: - Debugging Management
+//MARK: - Debugger
 
 typedef struct debugger *debugger_t;
+
+typedef struct debugger_state *debugger_state_t;
+
+typedef struct debugger_command const *debugger_command_t;

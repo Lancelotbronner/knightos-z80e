@@ -8,6 +8,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//MARK: - On Command
+
+//TODO: Formal breakpoints
+// Formalize breakpoints in the debugger and allow the following:
+// - Have the concept of an current breakpoint
+// - Create breakpoint with optional label (becomes current)
+// - List breakpoints (note current one)
+// - (stretch) Add conditions to current breakpoint?
+// - Enable/Disable current breakpoint
+// - Set number of times to ignore current breakpoint before triggering
+// - Set number of times to break on current breakpoint before being automatically deactivated
+// - Add actions to current breakpoint
+// - Toggle whether or not the current breakpoint should continue after evaluating actions
+
 enum {
 	REGISTER,
 	MEMORY,
@@ -19,7 +33,8 @@ enum {
 	READ = (1 << 0),
 	WRITE = (1 << 1)
 };
-int register_from_string(char *string) {
+
+static int register_from_string(char *string) {
 	#define REGISTER(num, len, print) if (strncasecmp(string, print, len) == 0) return num;
 	REGISTER(A, 1, "A");
 	REGISTER(B, 1, "B");
@@ -53,29 +68,29 @@ int register_from_string(char *string) {
 
 typedef struct {
 	int look_for;
-	debugger_state_t *deb_sta;
+	debugger_state_t deb_sta;
 	char *exec_string;
 } on_state_t;
 
-uint16_t command_on_register_hook(void *state, enum z80_registers reg, uint16_t value) {
+static uint16_t command_on_register_hook(void *state, enum z80_registers reg, uint16_t value) {
 	on_state_t *data = state;
 	debugger_exec(data->deb_sta, data->exec_string);
 	return value;
 }
 
-uint8_t command_on_memory_hook(void *state, uint16_t location, uint8_t value) {
+static uint8_t command_on_memory_hook(void *state, uint16_t location, uint8_t value) {
 	on_state_t *data = state;
 	debugger_exec(data->deb_sta, data->exec_string);
 	return value;
 }
 
-uint8_t command_on_port_hook(void *state, uint8_t port, uint8_t value) {
+static uint8_t command_on_port_hook(void *state, uint8_t port, uint8_t value) {
 	on_state_t *data = state;
 	debugger_exec(data->deb_sta, data->exec_string);
 	return value;
 }
 
-int command_on(struct debugger_state *state, int argc, char **argv) {
+static int command_on(struct debugger_state *state, void *data, int argc, char **argv) {
 	if (argc < 5) {
 		printf("%s `type` `read|write` `value` `command`\n"
 			" Run a command on a specific case\n"
@@ -117,129 +132,29 @@ int command_on(struct debugger_state *state, int argc, char **argv) {
 		if (thing & WRITE)
 			hook_register_emplace(&state->asic->cpu.hook.register_write, sta->look_for, sta, command_on_register_hook);
 	} else if (strncasecmp(argv[1], "memory", 6) == 0) {
-		sta->look_for = parse_expression_z80e(state, argv[3]);
+		sta->look_for = debugger_evaluate(state, argv[3]);
 		if (thing & READ)
 			hook_memory_emplace(&state->asic->mmu.hook.memory_read, sta->look_for, sta->look_for, sta, command_on_memory_hook);
 		if (thing & WRITE)
 			hook_memory_emplace(&state->asic->mmu.hook.memory_write, sta->look_for, sta->look_for, sta, command_on_memory_hook);
 	} else if (strncasecmp(argv[1], "port", 4) == 0) {
-		sta->look_for = parse_expression_z80e(state, argv[3]);
+		sta->look_for = debugger_evaluate(state, argv[3]);
 		if (thing & READ)
 			hook_port_emplace(&state->asic->cpu.hook.port_in, sta->look_for, sta->look_for, sta, command_on_port_hook);
 		if (thing & WRITE)
 			hook_port_emplace(&state->asic->cpu.hook.port_out, sta->look_for, sta->look_for, sta, command_on_port_hook);
 	} else {
 		free(sta);
-		state->print(state, "ERROR: Second argument must be memory or register!\n");
+		state->print(state, "ERROR: Second argument must be memory, register or port!\n");
 		return 1;
 	}
 
 	return 0;
 }
 
-struct break_data {
-	uint16_t address;
-	asic_t asic;
-	hook_t hook_id;
-	int count;
-	int log;
+const struct debugger_command OnCommand = {
+	.name = "on",
+	.usage = "on (register|memory|port) (r|w|rw) <value|expression> <command...>",
+	.summary = "Hooks a command to a breakpoint.",
+	.callback = command_on,
 };
-
-void break_callback(struct break_data *data, uint16_t address) {
-	if(data->address != address)
-		return;
-
-	if (data->log)
-		z80e_debug("break", "Breakpoint hit at 0x%04X", address);
-
-	data->asic->stopped = true;
-
-	if (data->count != -1 && !(--data->count))
-		hook_cancel(data->hook_id);
-}
-
-int command_break(struct debugger_state *state, int argc, char **argv) {
-	if (argc != 2 && argc != 3) {
-		state->print(state, "%s `address` [count] - break at address\n", argv[0]);
-		return 0;
-	}
-
-	uint16_t address = parse_expression_z80e(state, argv[1]);
-
-	int count = -1;
-	if (argc == 3)
-		count = parse_expression_z80e(state, argv[2]);
-
-	struct break_data *data = malloc(sizeof(struct break_data));
-	data->address = address;
-	data->asic = state->asic;
-	data->count = count;
-	data->log = 1;
-	data->hook_id = hook_execution_emplace(&state->debugger->hook.before_execution, data, (hook_execution_callback_t)break_callback);
-	return 0;
-}
-
-typedef struct {
-	ti_mmu_t mmu;
-	debugger_state_t *state;
-} command_step_over_dism_extra_t;
-
-uint8_t step_over_read_byte(struct disassemble_memory *dmem, uint16_t mem) {
-	command_step_over_dism_extra_t *extra = dmem->extra_data;
-	return ti_read_byte(extra->mmu, mem);
-}
-
-int step_over_disasm_write(struct disassemble_memory *mem, const char *thing, ...) {
-	command_step_over_dism_extra_t *extra = mem->extra_data;
-	if (extra->state->debugger->flags.echo) {
-		va_list list;
-		va_start(list, thing);
-		return extra->state->vprint(extra->state, thing, list);
-	}
-	return 0;
-}
-
-int command_step_over(struct debugger_state *state, int argc, char **argv) {
-	if (argc != 1) {
-		state->print(state, "%s - set a breakpoint for the instruction after the current one\n", argv[0]);
-		return 0;
-	}
-	command_step_over_dism_extra_t extra = { &state->asic->mmu, state };
-	struct disassemble_memory mem = { step_over_read_byte, state->asic->cpu.registers.PC, &extra };
-
-	if (state->debugger->flags.echo)
-		state->print(state, "0x%04X: ", state->asic->cpu.registers.PC);
-
-	uint16_t size = parse_instruction(&mem, step_over_disasm_write, state->debugger->flags.knightos);
-	if (state->debugger->flags.echo)
-		state->print(state, "\n");
-
-	// Note: 0x18, 0xFE is JR $, i.e. an infinite loop, which we step over as a special case
-	const uint8_t jumps[] = { 0x18, 0x28, 0x38, 0x30, 0x20 };
-	int i;
-	for (i = 0; i < sizeof(jumps) / sizeof(uint8_t); ++i)
-		if (cpu_read_byte(&state->asic->cpu, state->asic->cpu.registers.PC) == jumps[i] &&
-			cpu_read_byte(&state->asic->cpu, state->asic->cpu.registers.PC + 1) == 0xFE) {
-			state->asic->cpu.registers.PC += 2;
-			return 0;
-		}
-
-	if (state->debugger->flags.knightos)
-		if (cpu_read_byte(&state->asic->cpu, state->asic->cpu.registers.PC) == 0xE7)
-			size += 2;
-
-	struct break_data *data = malloc(sizeof(struct break_data));
-	data->address = state->asic->cpu.registers.PC + size;
-	data->asic = state->asic;
-	data->count = 1;
-	data->log = 0;
-	data->hook_id = hook_execution_emplace(&state->debugger->hook.before_execution, data, (hook_execution_callback_t) break_callback);
-
-	char *_argv[] = { "run" };
-	int orig_echo = state->debugger->flags.echo;
-	state->debugger->flags.echo = 0;
-
-	int val = command_run(state, 1, _argv);
-	state->debugger->flags.echo = orig_echo;
-	return val;
-}

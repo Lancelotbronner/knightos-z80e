@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 
+//MARK: - Disassemble Command
+
 struct mmu_disassemble_memory {
 	struct disassemble_memory mem;
 	z80_cpu_t cpu;
@@ -30,7 +32,7 @@ uint8_t disassemble_read(struct disassemble_memory *s, uint16_t pointer) {
 	return m->cpu->read_byte(m->cpu->memory, pointer);
 }
 
-int command_disassemble(struct debugger_state *state, int argc, char **argv) {
+static int __command_disassemble(struct debugger_state *state, void *data, int argc, char **argv) {
 	if (argc > 3) {
 		state->print(state, "%s `start` `count` - Print the disassembled commands\n"
 				" Prints `count` disassembled commands starting in memory from `start`.\n", argv[0]);
@@ -43,10 +45,10 @@ int command_disassemble(struct debugger_state *state, int argc, char **argv) {
 	uint16_t count = 10;
 
 	if (argc > 1) {
-		start = parse_expression_z80e(state, argv[1]);
+		start = debugger_evaluate(state, argv[1]);
 	}
 	if (argc > 2) {
-		count = parse_expression_z80e(state, argv[2]);
+		count = debugger_evaluate(state, argv[2]);
 	}
 
 	uint16_t i = 0;
@@ -61,3 +63,11 @@ int command_disassemble(struct debugger_state *state, int argc, char **argv) {
 
 	return 0;
 }
+
+const struct debugger_command DisassembleCommand = {
+	.name = "disassemble",
+	.usage = "<start> <count>",
+	.summary = "Print the disassembled commands",
+	.description = "Prints `count` disassembled commands starting in memory from `start`.",
+	.callback = __command_disassemble,
+};

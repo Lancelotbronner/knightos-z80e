@@ -16,7 +16,7 @@
 
 struct z80_cpu {
 	struct device devices[0x100];
-	struct z80_regstate registers;
+	struct z80_state registers;
 	struct {
 		uint8_t IFF1 : 1;
 		uint8_t IFF2 : 1;

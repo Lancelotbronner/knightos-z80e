@@ -1,10 +1,21 @@
-#include <z80e/disassembler/disassemble.h>
+//
+//  expression.c
+//  z80e
+//
+//  Created by Christophe Bronner on 2024-10-07.
+//
+
+#include <z80e/debugging/debugger.h>
+
 #include <z80e/ti/asic.h>
+#include <z80e/disassembler/disassemble.h>
 
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+//MARK: - Expression Management
 
 struct mmu_disassemble_memory {
 	struct disassemble_memory mem;
@@ -12,12 +23,12 @@ struct mmu_disassemble_memory {
 	struct debugger_state *state;
 };
 
-uint8_t parse_expression_dasm_read(struct disassemble_memory *s, uint16_t pointer) {
+static uint8_t parse_expression_dasm_read(struct disassemble_memory *s, uint16_t pointer) {
 	struct mmu_disassemble_memory *m = (struct mmu_disassemble_memory *)s;
 	return m->cpu->read_byte(m->cpu->memory, pointer);
 }
 
-uint16_t parse_operand(debugger_state_t *state, const char *start, const char **end,
+static uint16_t parse_operand(debugger_state_t state, const char *start, const char **end,
 		struct mmu_disassemble_memory *mmudasm) {
 	if (*start >= '0' && *start <= '9') {
 		return strtol(start, (char **)end, 0);
@@ -62,15 +73,14 @@ if (strncasecmp(start, print, len) == 0) {\
 		REGISTER(R, 1, "R");
 
 		state->print(state, "ERROR: Unknown register/number!\n");
-		while(!strchr("+-*/(){} 	\n", *start)) {
+		while(!strchr("+-*/(){} \t\n", *start))
 			start++;
-		}
 		*end = 0;
 		return 0;
 	}
 }
 
-int precedence(char op) {
+static int precedence(char op) {
 	switch (op) {
 	case '+':
 	case '-':
@@ -92,7 +102,7 @@ int precedence(char op) {
 	}
 }
 
-void print_stack(uint16_t *a, int b, char *c, int d) {
+static void print_stack(uint16_t *a, int b, char *c, int d) {
 	printf("Stack: ");
 	while (b != 0) {
 		b--;
@@ -108,7 +118,7 @@ void print_stack(uint16_t *a, int b, char *c, int d) {
 	printf("\n");
 }
 
-uint16_t run_operator(char operator, uint16_t arg2, uint16_t arg1) {
+static uint16_t run_operator(char operator, uint16_t arg2, uint16_t arg1) {
 	switch(operator) {
 	case '+':
 		return arg1 + arg2;
@@ -125,7 +135,8 @@ uint16_t run_operator(char operator, uint16_t arg2, uint16_t arg1) {
 	}
 }
 
-uint16_t parse_expression_z80e(debugger_state_t *state, const char *string) {
+//TODO: Simplify and optimize debugger_evaluate
+uint16_t debugger_evaluate(debugger_state_t state, const char *string) {
 	uint16_t value_stack[20];
 	int value_stack_pos = 0;
 
@@ -136,9 +147,8 @@ uint16_t parse_expression_z80e(debugger_state_t *state, const char *string) {
 	uint16_t start = state->asic->cpu.registers.PC;
 	struct mmu_disassemble_memory mmudasm = { { parse_expression_dasm_read, start }, cpu, state };
 
-	while (isspace(*string)) {
+	while (isspace(*string))
 		string++;
-	}
 
 	while (*string != 0) {
 		if (strchr("+-*/%(){}", *string)) {

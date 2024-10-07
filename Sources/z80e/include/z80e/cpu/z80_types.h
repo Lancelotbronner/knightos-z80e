@@ -53,7 +53,7 @@ enum z80_registers : uint32_t {
 	IY = 0x02000000,
 };
 
-struct z80_regstate {
+struct z80_state {
 	union {
 		uint16_t AF;
 		struct {

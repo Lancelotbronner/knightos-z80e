@@ -1,4 +1,6 @@
+#include <z80e/debugging/command.h>
 #include <z80e/debugging/commands.h>
+#include <z80e/debugging/debugger.h>
 
 #include <errno.h>
 #include <limits.h>
@@ -7,94 +9,110 @@
 #include <string.h>
 #include <sys/stat.h>
 
-int debugger_list_commands(debugger_state_t *state, int argc, char **argv) {
-	if (argc != 1) {
-		state->print(state,
-			"list_commands - List all registered commands\nThis command takes no arguments.\n");
-		return 0;
+//MARK: - Command Management
+
+//TODO: Be able to group commands?
+//TODO: Split the concepts of commands, names (aliases) and usages?
+
+bool debugger_register(debugger_t debugger, const debugger_command_t command, void *data) {
+	if (!command || !command->callback)
+		return;
+
+	if (debugger->commands.count >= debugger->commands.capacity) {
+		debugger->commands.capacity += 8;
+		void *storage = malloc(debugger->commands.capacity * sizeof(debugger_command_t));
+		memcpy(storage, debugger->commands.storage, debugger->commands.count * sizeof(debugger_command_t));
+		debugger->commands.storage = storage;
 	}
 
-	int i = 0;
-	for (i = 0; i < state->debugger->commands.count; i++) {
-		state->print(state, "%d. %s\n", i, state->debugger->commands.commands[i]->name);
-	}
-	return 0;
+	debugger->commands.storage[debugger->commands.count++] = command;
 }
 
-int command_set(debugger_state_t *state, int argc, char **argv) {
-	if (argc != 2) {
-		state->print(state, "%s Set a setting. Available settings: \n 1. echo \n 2. echo_reg \n 3. auto_on \n 4. knightos \n 5. nointonstep \n", argv[0]);
-		return 0;
-	}
+//MARK: - Debugger Initialization
 
-	if (strcmp(argv[1], "echo") == 0) {
-		state->debugger->flags.echo = !state->debugger->flags.echo;
-	} else if (strcmp(argv[1], "echo_reg") == 0) {
-		state->debugger->flags.echo_reg = !state->debugger->flags.echo_reg;
-	} else if (strcmp(argv[1], "auto_on") == 0) {
-		state->debugger->flags.auto_on = !state->debugger->flags.auto_on;
-	} else if (strcmp(argv[1], "knightos") == 0) {
-		state->debugger->flags.knightos = !state->debugger->flags.knightos;
-	} else if (strcmp(argv[1], "nointonstep") == 0) {
-		state->debugger->flags.nointonstep = !state->debugger->flags.nointonstep;
-	} else {
-		state->print(state, "Unknown variable '%s'!\n", argv[1]);
-		return 1;
-	}
+static const debugger_command_t DebuggerCommands[] = {
+	// CLI Commands
+	&ListCommand,
+	&HelpCommand, &HelpCommand1,
 
-	return 0;
+	// Source Commands
+	&SourceCommand,
+
+	// Port Commands
+	&InCommand,
+	&OutCommand,
+
+	// Debugging Commands
+	&BreakCommand,
+	&RunCommand,
+	&StepCommand,
+	&StepOverCommand,
+	//TODO: Step over has alternate `so` alias.
+	&StopCommand,
+
+	// Print Commands
+	&PrintCommand,
+
+	// Screen Commands
+	&DumpScreenCommand,
+
+	// Memory Commands
+	&DumpMappingsCommand,
+	&HexdumpCommand,
+	&HexdumpBackwardsCommand,
+
+	// Disassembly Commands
+	&DisassembleCommand,
+
+	// Debugger Commands
+	&SetCommand,
+	&UnsetCommand,
+	&OnCommand,
+
+	// Interrupt Commands
+	&UnhaltCommand,
+	&PowerCommand,
+	&TickCommand,
+
+	// Link Commands
+	&SendCommand,
+	&ReceiveCommand,
+	&ConnectCommand,
+	&DumpLinkCommand,
+
+	// Keyboard Commands
+	&PressCommand,
+	&ReleaseCommand,
+	&TapCommand,
+
+	// z80 Commands
+	&LoadCommand,
+	&DumpRegisterCommand,
+	//TODO: print register has registers and regs as aliases
+	&DumpStackCommand,
+
+	// Timer Commands
+	&TimerCommand,
+};
+
+void debugger_init(debugger_t debugger, asic_t asic) {
+	int length = sizeof DebuggerCommands / sizeof *DebuggerCommands;
+	*debugger = (struct debugger) {
+		.asic = asic,
+		.commands.count = length,
+		.commands.capacity = length,
+	};
+
+	debugger->commands.storage = malloc(length * sizeof(debugger_command_t));
+	for (int i = 0; i < length; i++)
+		debugger->commands.storage[i] = DebuggerCommands[i];
 }
 
-int command_unset(debugger_state_t *state, int argc, char **argv) {
-	if (argc != 2) {
-		state->print(state, "%s `val` - unset a setting\n", argv[0]);
-		return 0;
-	}
-
-	if (strcmp(argv[1], "echo") == 0) {
-		state->debugger->flags.echo = 0;
-	} else if (strcmp(argv[1], "echo_reg") == 0) {
-		state->debugger->flags.echo_reg = 0;
-	} else if (strcmp(argv[1], "auto_on") == 0) {
-		state->debugger->flags.auto_on = 0;
-	} else if (strcmp(argv[1], "knightos") == 0) {
-		state->debugger->flags.knightos = 0;
-	} else if (strcmp(argv[1], "nointonstep") == 0) {
-		state->debugger->flags.nointonstep = 0;
-	} else {
-		state->print(state, "Unknown variable '%s'!\n", argv[1]);
-		return 1;
-	}
-
-	return 0;
+void debugger_deinit(debugger_t debugger) {
+	free(debugger->commands.storage);
 }
 
-int command_source(debugger_state_t *state, int argc, char **argv) {
-	if (argc != 2) {
-		state->print(state, "%s `file` - read a file and run its commands\n", argv[0]);
-		return 0;
-	}
-
-	FILE *rc = fopen(argv[1], "r");
-	if (rc == 0) {
-		state->print(state, "File couldn't be read: '%s'\n", strerror(errno));
-		return 1;
-	}
-	char filebuffer[256];
-	while(fgets(filebuffer, 256, rc)) {
-		filebuffer[strlen(filebuffer) - 1] = 0; // drop the \n at the end
-		if (filebuffer[0] == '#' || filebuffer[0] == 0) {
-			continue;
-		}
-
-		if (debugger_exec(state, filebuffer) < 0) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int debugger_source_rc(debugger_state_t *state, const char *rc_name) {
+int debugger_source_rc(debugger_state_t state, const char *rc_name) {
 	char *env = getenv("XDG_CONFIG_HOME");
 	char *realloced;
 	size_t strsize = 0;
@@ -125,146 +143,65 @@ int debugger_source_rc(debugger_state_t *state, const char *rc_name) {
 
 	char *argv[] = { "source", realloced };
 
-	int ret = command_source(state, 2, argv);
+	int ret = SourceCommand.callback(state, nullptr, 2, argv);
 
 	//TODO: Avoid this temporary allocation.
 	free(realloced);
 	return ret;
 }
 
-static debugger_command_t default_commands[] = {
-	{ "list_commands", debugger_list_commands, 0 },
-	{ "?", debugger_list_commands, 0 },
-	{ "source", command_source, 0 },
-	{ "in", command_in, 0 },
-	{ "out", command_out, 0 },
-	{ "break", command_break, 1 },
-	{ "run", command_run, 1 },
-	{ "step", command_step, 2 },
-	{ "stop", command_stop, 0 },
-	{ "dump", command_hexdump, 0 },
-	{ "bdump", command_backwards_hexdump, 0 },
-	{ "disassemble", command_disassemble, 1 },
-	{ "registers", command_print_registers, 0 },
-	{ "regs", command_print_registers, 0 },
-	{ "expression", command_print_expression, 0 },
-	{ "stack", command_stack, 1 },
-	{ "mappings", command_print_mappings, 0 },
-	{ "unhalt", command_unhalt, 0 },
-	{ "step_over", command_step_over, 0 },
-	{ "so", command_step_over, 1 },
-	{ "on", command_on, 0 },
-	{ "set", command_set, 0 },
-	{ "unset", command_unset, 0 },
-	{ "lcd", command_dump_lcd, 0 },
-	{ "link", command_link, 0 },
-	{ "turn_on", command_turn_on, 0 },
-	{ "press_key", command_press_key, 0 },
-	{ "release_key", command_release_key, 0 },
-	{ "tap_key", command_tap_key, 0 },
-	{ "ld", command_load_register, 0 },
-	{ "timer", command_timer, 0 },
-};
-
-static int default_command_count = sizeof(default_commands) / sizeof(debugger_command_t);
-
-void debugger_init(debugger_t debugger, asic_t asic) {
-	*debugger = (struct debugger) {
-		.asic = asic,
-		.commands.count = default_commands,
-		.commands.capacity = default_command_count,
-		.commands.commands = calloc(sizeof(debugger_command_t *), debugger->commands.capacity),
-	};
-
-	for (int i = 0; i < default_command_count; i++)
-		debugger->commands.commands[i] = &default_commands[i];
-}
-
-void debugger_deinit(debugger_t debugger) {
-	free(debugger->commands.commands);
-}
-
 static int compare_strings(const char *a, const char *b) {
 	int i = 0;
-	while (*a != 0 && *b != 0 && *(a++) == *(b++)) {
+	while (*a != 0 && *b != 0 && *(a++) == *(b++))
 		i++;
-	}
 	return i;
 }
 
-int debugger_find(debugger_t debugger, const char *f_command, debugger_command_t ** pointer) {
-	int i;
+//MARK: - Debugger Invocation
+
+int debugger_find(debugger_t debugger, const char *f_command, debugger_command_t * pointer) {
 	int max_match = 0;
-	int match_numbers = 0;
 	size_t command_length = strlen(f_command);
 	int highest_priority = INT_MIN;
 	int highest_priority_max = 0;
 
-	debugger_command_t *best_command = 0;
+	debugger_command_t best_command = 0;
 
-	for (i = 0; i < debugger->commands.count; i++) {
-		debugger_command_t *cmd = debugger->commands.commands[i];
+	for (int i = 0; i < debugger->commands.count; i++) {
+		debugger_command_t cmd = debugger->commands.storage[i];
 		int match = compare_strings(f_command, cmd->name);
 
-		if (command_length > strlen(cmd->name)) {
-			continue; // ignore
-		} else if (strlen(f_command) != match && match < command_length) {
+		if (command_length > strlen(cmd->name))
 			continue;
-		} else if (match < max_match) {
+
+		if (strlen(f_command) != match && match < command_length)
 			continue;
-		} else if (match > max_match) {
+
+		if (match < max_match)
+			continue;
+
+		if (match > max_match) {
 			max_match = match;
-			match_numbers = 0;
-			highest_priority = cmd->priority;
-			highest_priority_max = 0;
 			best_command = cmd;
-		} else if (match == max_match) {
-			match_numbers++;
-			if (cmd->priority > highest_priority) {
-				highest_priority = cmd->priority;
-				highest_priority_max = 0;
-				best_command = cmd;
-			} else if (cmd->priority == highest_priority) {
-				highest_priority_max++;
-			}
 		}
+
+		// we found a duplicate
+		return -1;
 	}
 
 	*pointer = best_command;
-	if ((max_match && match_numbers == 0) || (max_match && highest_priority_max < 1)) {
+	if (max_match || (max_match && highest_priority_max < 1))
 		return 1;
-	}
 
-	if (max_match == 0) {
+	if (max_match == 0)
 		return 0;
-	}
-
-	if (match_numbers > 1 || highest_priority_max > 0) {
-		return -1;
-	}
 
 	return 0;
 }
 
-//TODO: This debugger doesn't need to support custom commands right?
-void __debugger_register(debugger_t debugger, const char *name, debugger_function_t function, void *state, int priority) {
-	debugger_list_t *list = &debugger->commands;
-	debugger_command_t *command = malloc(sizeof(debugger_command_t));
-	command->name = name;
-	command->function = function;
-	command->state = state;
-	command->priority = priority;
-
-	if (list->count >= list->capacity) {
-		list->commands = realloc(list->commands, sizeof(debugger_command_t *) * (list->capacity + 10));
-		list->capacity += 10;
-	}
-
-	list->count++;
-	list->commands[list->count - 1] = command;
-}
-
 char **debugger_parse(const char *cmdline, int *argc) {
+	//TODO: Simplify and optimize debugger_parse
+	// Note: Write n values to provided array so I can reuse it
 	char *buffer[10];
 	int buffer_pos = 0;
 	while (*cmdline != 0 && *cmdline != '\n') {
@@ -333,29 +270,28 @@ char **debugger_parse(const char *cmdline, int *argc) {
 	return result;
 }
 
-int debugger_exec(debugger_state_t *state, const char *command_str) {
-	debugger_command_t *command;
+int debugger_exec(debugger_state_t state, const char *command_str) {
+	debugger_command_t command;
 	int argc;
-	char **cmdline = debugger_parse(command_str, &argc);
+	char **argv = debugger_parse(command_str, &argc);
 	int return_value = 0;
 
-	int status = debugger_find(state->debugger, cmdline[0], &command);
+	int status = debugger_find(state->debugger, argv[0], &command);
 	if (status == -1) {
-		state->print(state, "Error: Ambiguous command %s\n", cmdline[0]);
+		state->print(state, "Error: Ambiguous command %s\n", argv[0]);
 		return_value = -1;
 	} else if (status == 0) {
-		state->print(state, "Error: Unknown command %s\n", cmdline[0]);
+		state->print(state, "Error: Unknown command %s\n", argv[0]);
 		return_value = -2;
 	} else {
-		state->state = command->state;
-		return_value = command->function(state, argc, cmdline);
+		state->state = command->data;
+		return_value = command_executev(command, state, argc, argv);
 	}
 
-	char **tmp = cmdline;
-	while (*tmp) {
+	char **tmp = argv;
+	while (*tmp)
 		free(*(tmp++));
-	}
-	free(cmdline);
+	free(argv);
 
 	return return_value;
 }

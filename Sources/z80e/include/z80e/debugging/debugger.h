@@ -5,31 +5,21 @@
 
 #include <stdarg.h>
 
-typedef struct debugger_state debugger_state_t;
-typedef int (*debugger_function_t)(debugger_state_t *, int, char **);
-
-typedef struct {
-	const char *name;
-	debugger_function_t function;
-	int priority;
-	void *state;
-} debugger_command_t;
-
-typedef struct {
+struct debugger_commands {
 	int count;
 	int capacity;
-	debugger_command_t **commands;
-} debugger_list_t;
+	debugger_command_t *storage;
+};
 
 struct debugger_state {
-	int (*print)(debugger_state_t *, const char *, ...);
-	int (*vprint)(debugger_state_t *, const char *, va_list);
+	int (*print)(debugger_state_t , const char *, ...);
+	int (*vprint)(debugger_state_t , const char *, va_list);
 	void *state;
 	void *interface_state;
 	asic_t asic;
 	debugger_t debugger;
-	debugger_state_t *(*create_new_state)(debugger_state_t *, const char *command_name);
-	void (*close_window)(debugger_state_t *);
+	debugger_state_t (*create_new_state)(debugger_state_t , const char *command_name);
+	void (*close_window)(debugger_state_t );
 };
 
 typedef enum {
@@ -40,9 +30,10 @@ typedef enum {
 } debugger_operation_state;
 
 struct debugger {
-	debugger_list_t commands;
-	asic_t asic;
 	debugger_operation_state state;
+	asic_t asic;
+
+	struct debugger_commands commands;
 
 	struct {
 		struct hooks_execution before_execution;
@@ -58,13 +49,15 @@ struct debugger {
 	} flags;
 };
 
-int debugger_source_rc(debugger_state_t *, const char *rc_name);
+int debugger_source_rc(debugger_state_t , const char *rc_name);
 
 void debugger_init(debugger_t debugger, asic_t asic);
-void debugger_deinit(debugger_t );
+void debugger_deinit(debugger_t debugger);
 
-int debugger_find(debugger_t , const char *, debugger_command_t **);
-void __debugger_register(debugger_t , const char *, debugger_function_t, void *, int);
+int debugger_find(debugger_t debugger, const char *, debugger_command_t *);
+bool debugger_register(debugger_t debugger, const debugger_command_t command, void *data);
 
 char **debugger_parse(const char *, int *);
-int debugger_exec(debugger_state_t *, const char *);
+int debugger_exec(debugger_state_t , const char *);
+
+uint16_t debugger_evaluate(debugger_state_t , const char *);

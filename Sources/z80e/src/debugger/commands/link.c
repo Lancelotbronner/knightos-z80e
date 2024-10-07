@@ -13,14 +13,15 @@
 #include <string.h>
 #include <unistd.h>
 
-FILE *link_output = NULL;
-FILE *link_input = NULL;
-hook_t hook;
+static FILE *link_output = NULL;
+static FILE *link_input = NULL;
+static hook_t hook;
 
-void send_byte_from_input(struct debugger_state *state) {
-	if (!link_input) {
+//MARK: - Send Command
+
+static void send_byte_from_input(struct debugger_state *state) {
+	if (!link_input)
 		return;
-	}
 	int c = getc(link_input);
 	if (c == EOF) {
 		fclose(link_input);
@@ -33,14 +34,14 @@ void send_byte_from_input(struct debugger_state *state) {
 	}
 }
 
-uint8_t on_link_rx_buffer_read(void *state, uint8_t port, uint8_t value) {
+static uint8_t on_link_rx_buffer_read(void *state, uint8_t port, uint8_t value) {
 	struct debugger_state *s = state;
 	s->print(s, "Link rx buffer read from\n");
 	send_byte_from_input(state);
 	return value;
 }
 
-int handle_send(struct debugger_state *state, int argc, char **argv) {
+static int command_send(struct debugger_state *state, void *data, int argc, char **argv) {
 	char *path = strdup(argv[2]);
 #ifndef NOLINK
 	wordexp_t p;
@@ -61,37 +62,53 @@ int handle_send(struct debugger_state *state, int argc, char **argv) {
 	free(path);
 
 	int strl = 0;
-	int i;
-	for (i = 1; i < argc - 1; i++) {
+	for (int i = 1; i < argc - 1; i++)
 		strl += strlen(argv[i + 1]) + 1;
-	}
 
-	char *data = malloc(strl);
-	char *dpointer = data;
-	for (i = 1; i < argc - 1; i++) {
+	char *tmp = malloc(strl);
+	char *dpointer = tmp;
+	for (int i = 1; i < argc - 1; i++) {
 		strcpy(dpointer, argv[i + 1]);
 		dpointer += strlen(argv[i + 1]);
 		*(dpointer++) = ' ';
 	}
 	*(dpointer - 1) = 0;
 
-	uint8_t expr = parse_expression_z80e(state, data);
+	uint8_t expr = debugger_evaluate(state, tmp);
 
-	free(data);
+	free(tmp);
 
-	if (!link_recv_byte(state->asic, expr)) {
+	if (!link_recv_byte(state->asic, expr))
 		state->print(state, "Calculator is not ready to receive another byte.\n");
-	} else {
+	else
 		state->print(state, "Sent %02X to calculator's link assist.\n", expr);
-	}
 	return 0;
 }
 
-int handle_recv(struct debugger_state *state, int argc, char **argv) {
+const struct debugger_command SendCommand = {
+	.name = "send",
+	.usage = "<value|path>",
+	.summary = "Sends a value or file to the link port",
+	.callback = command_send,
+};
+
+//MARK: - Receive Command
+
+static int command_receive(struct debugger_state *state, void *data, int argc, char **argv) {
 	return 0;
 }
 
-int handle_socket(struct debugger_state *state, int argc, char **argv) {
+const struct debugger_command ReceiveCommand = {
+	.name = "recv",
+	.usage = "(print|path)",
+	.summary = "Configures link receiving behaviour",
+	.description = "When receiving link data, either print or write values to a file.",
+	.callback = command_receive,
+};
+
+//MARK: - Connect Command
+
+static int command_connect(struct debugger_state *state, void *data, int argc, char **argv) {
 #ifdef NOLINK
 	state->print(state, "Sockets are not supported\n");
 #else
@@ -133,36 +150,26 @@ int handle_socket(struct debugger_state *state, int argc, char **argv) {
 	return 0;
 }
 
-int handle_status(struct debugger_state *state) {
-	link_device_t lstate = state->asic->cpu.devices[0x00].data;
+const struct debugger_command ConnectCommand = {
+	.name = "connect",
+	.usage = "<socket>",
+	.summary = "Connects the link port to a unix socket",
+	.callback = command_connect,
+};
+
+//MARK: - Dump Link Command
+
+static int command_link(struct debugger_state *state, void *data, int argc, char **argv) {
+	link_device_t lstate = &state->asic->link;
 	state->print(state, "Ready: %d\n", !lstate->assist.status.rx_ready);
 	state->print(state, "Tip: %d\n", lstate->us.tip);
 	state->print(state, "Ring: %d\n", lstate->us.ring);
 	return 0;
 }
 
-int command_link(struct debugger_state *state, int argc, char **argv) {
-	if (argc >= 2) {
-		if ((strcasecmp(argv[1], "send") == 0) && (argc == 3)) {
-			return handle_send(state, argc, argv);
-		} else if ((strcasecmp(argv[1], "recv") == 0) && (argc == 3)) {
-			return handle_recv(state, argc, argv);
-		} else if ((strcasecmp(argv[1], "socket") == 0) && (argc == 3)) {
-			return handle_socket(state, argc, argv);
-		} else if (strcasecmp(argv[1], "status") == 0) {
-			return handle_status(state);
-		} else {
-			state->print(state, "Invalid operation %s\n", argv[1]);
-		}
-	}
-
-	// Nothing handled the command? help text
-	state->print(state, "%s [send|recv|socket|status] [value|behavior|path]\n"
-			"send a value will send a value to the link port. If you pass a file, it will be sent instead.\n"
-			"recv [behavior] defines z80e's behavior when receiving link port data.\n"
-			"Use 'print' to print each value, or a file name to write values to that file.\n", argv[0]);
-	return 0;
-}
-
-void init_link(struct debugger_state *state) {
-}
+const struct debugger_command DumpLinkCommand = {
+	.name = "link",
+	.usage = "",
+	.summary = "Dumps the status of the link port",
+	.callback = command_link,
+};

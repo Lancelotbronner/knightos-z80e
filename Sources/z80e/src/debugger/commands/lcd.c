@@ -1,9 +1,12 @@
+#include <z80e/debugging/command.h>
 #include <z80e/debugging/debugger.h>
 
 #include <z80e/hardware/t6a04.h>
 #include <z80e/ti/asic.h>
 
-void dump_lcd_unicode_to_utf8(char *b, uint32_t c) {
+//MARK: - Print Screen Command
+
+static void dump_lcd_unicode_to_utf8(char *b, uint32_t c) {
 	if (c<0x80) *b++=c;
 	else if (c<0x800) *b++=192+c/64, *b++=128+c%64;
 	else if (c-0xd800u<0x800) return;
@@ -11,8 +14,8 @@ void dump_lcd_unicode_to_utf8(char *b, uint32_t c) {
 	else if (c<0x110000) *b++=240+c/262144, *b++=128+c/4096%64, *b++=128+c/64%64, *b++=128+c%64;
 }
 
-int command_dump_lcd(debugger_state_t *state, int argc, char **argv) {
-	lcd_t6a04_t lcd = state->asic->cpu.devices[0x10].data;
+static int command_lcd(debugger_state_t state, void *data, int argc, char **argv) {
+	lcd_t6a04_t lcd = &state->asic->lcd;
 	int cY;
 	int cX;
 
@@ -57,3 +60,9 @@ int command_dump_lcd(debugger_state_t *state, int argc, char **argv) {
 		lcd->word_length ? '8' : '6', lcd->display_on ? 'O' : ' ', lcd->op_amp1, lcd->op_amp2);
 	return 0;
 }
+
+const struct debugger_command DumpScreenCommand = {
+	.name = "lcd",
+	.summary = "Dumps the LCD and its registers",
+	.callback = command_lcd,
+};
