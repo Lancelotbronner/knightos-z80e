@@ -50,6 +50,7 @@ static int __command_run(debugger_t debugger, void *data, int argc, char **argv)
 	}
 
 	if(argc == 2) {
+		debugger->open(debugger, argv[0]);
 		instructions = debugger_evaluate(debugger, argv[1]);
 		debugger->state = DEBUGGER_LONG_OPERATION;
 
@@ -98,9 +99,11 @@ static int __command_run(debugger_t debugger, void *data, int argc, char **argv)
 			}
 		}
 		debugger->state = DEBUGGER_ENABLED;
+		debugger->close(debugger);
 		return 0;
 	}
 
+	debugger->open(debugger, argv[0]);
 	debugger->state = DEBUGGER_LONG_OPERATION_INTERRUPTABLE;
 	while (1) {
 		hook_execution_trigger(&debugger->hook.before_execution, debugger->asic->cpu.registers.PC);
@@ -147,6 +150,7 @@ static int __command_run(debugger_t debugger, void *data, int argc, char **argv)
 		}
 	}
 	debugger->state = DEBUGGER_ENABLED;
+	debugger->close(debugger);
 	return 0;
 }
 

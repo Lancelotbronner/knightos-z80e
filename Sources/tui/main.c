@@ -296,9 +296,8 @@ int main(int argc, char **argv) {
 	asic_add_timer(device, 0, 60, lcd_timer_tick, device->cpu.devices[0x10].data);
 
 	if (debugger.state == DEBUGGER_ENABLED) {
-		tui_state_t state = { &debugger };
-		tui_init(&state);
-		tui_tick(&state);
+		tui_init(&debugger);
+		tui_tick(&debugger);
 	} else if (context.cycles == -1) { // Run indefinitely
 		while (true) {
 			asic_tick(device);

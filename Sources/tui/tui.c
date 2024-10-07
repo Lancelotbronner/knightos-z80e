@@ -14,41 +14,29 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-int vprint_tui(debugger_t a, const char *b, va_list list) {
-	return vprintf(b, list);
+static int tui_vprint(debugger_t debugger, const char *format, va_list args) {
+	return vprintf(format, args);
 }
 
-void tui_close_window(debugger_t debugger) {
-	free(state);
+static void tui_open(debugger_t debugger, const char *command) {
+
 }
 
-debugger_t tui_new_state(debugger_t debugger, const char *title) {
-	debugger_t stat = calloc(sizeof(debugger_t), 1);
-	stat->vprint = vprint_tui;
-	stat->data = state->data;
-	stat->asic = state->asic;
-	stat->debugger = state->debugger;
-	stat->create_new_state = tui_new_state;
-	stat->deinit = tui_close_window;
-	return stat;
+static void tui_close(debugger_t debugger) {
+
 }
 
-tui_state_t *current_state;
+static void tui_deinit(debugger_t debugger) {
 
-#define dprint(...) printf(__VA_ARGS__)
-void tui_init(tui_state_t *state) {
-	struct debugger_state dstate = (struct debugger_state){
-		.vprint = vprint_tui,
-		.data = state,
-		.asic = state->debugger->asic,
-		.debugger = state->debugger,
-		.create_new_state = tui_new_state,
-		.deinit = tui_close_window
-	};
-	debugger_t used_state = tui_new_state(&dstate, "Sourcing z80erc...");
-	z80e_debug("TUI", "Running commands in z80erc...");
-	debugger_source_rc(used_state, "z80erc");
-	tui_close_window(used_state);
+}
+
+void tui_init(debugger_t debugger) {
+	debugger->vprint = tui_vprint;
+	debugger->open = tui_open;
+	debugger->close = tui_close;
+	debugger->deinit = tui_deinit;
+	z80e_debug("TUI", "Sourcing z80erc...");
+	debugger_source(debugger, "z80erc");
 }
 
 struct tui_disasm {
@@ -70,11 +58,11 @@ int tui_disassemble_write(struct disassemble_memory *state, const char *format, 
 	return count;
 }
 
-void tui_tick(tui_state_t *state) {
-	current_state = state;
-	asic_t asic = state->debugger->asic;
+void tui_tick(debugger_t debugger) {
+	asic_t asic = debugger->asic;
 	struct tui_disasm disasm_custom = { &asic->mmu, 0 };
 	struct disassemble_memory disasm = { tui_disassemble_read, 0, &disasm_custom };
+
 	while (1) {
 		char prompt_buffer[80];
 		char *current_pointer = prompt_buffer;
@@ -83,51 +71,41 @@ void tui_tick(tui_state_t *state) {
 
 		disasm_custom.string_pointer = current_pointer;
 		disasm.current = asic->cpu.registers.PC;
-		parse_instruction(&disasm, tui_disassemble_write, state->debugger->flags.knightos);
+		parse_instruction(&disasm, tui_disassemble_write, debugger->flags.knightos);
 		current_pointer = disasm_custom.string_pointer;
 
 		sprintf(current_pointer, "] %s> ", asic->cpu.halted ? "HALT " : "");
 		char *result = readline(prompt_buffer);
-		if (result) {
-			int from_history = 0;
 
-			if (*result == 0) {
-				HIST_ENTRY *hist = history_get(where_history());
-				if (hist == 0) {
-					free(result);
-					continue;
-				}
-				result = (char *)hist->line;
-				from_history = 1;
-			}
-			if (strcmp(result, "exit") == 0) {
-				break;
-			}
-
-			add_history(result);
-
-			struct debugger_state dstate = (struct debugger_state){
-				.vprint = vprint_tui,
-				.data = state,
-				.asic = state->debugger->asic,
-				.debugger = state->debugger,
-				.create_new_state = tui_new_state,
-				.deinit = tui_close_window
-			};
-			debugger_t used_state = tui_new_state(&dstate, result);
-
-			int retval = debugger_execute(used_state, result);
-			if (retval > 0) {
-				dprint("The command returned %d\n", retval);
-			}
-
-			tui_close_window(used_state);
-
-			if (!from_history) {
-				free(result);
-			}
-		} else if (result == NULL) {
+		if (!result)
 			break;
+
+		int from_history = 0;
+		
+		if (*result == 0) {
+			HIST_ENTRY *hist = history_get(where_history());
+			if (hist == 0) {
+				free(result);
+				continue;
+			}
+			result = (char *)hist->line;
+			from_history = 1;
 		}
+		if (strcmp(result, "exit") == 0)
+			break;
+
+		add_history(result);
+
+		debugger->open(debugger, result);
+
+		int retval = debugger_execute(debugger, result);
+		if (retval > 0) {
+			printf("The command returned %d\n", retval);
+		}
+
+		debugger->close(debugger);
+
+		if (!from_history)
+			free(result);
 	}
 }

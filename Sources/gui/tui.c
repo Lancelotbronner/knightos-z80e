@@ -45,7 +45,7 @@ void tui_init(tui_state_t *state) {
 	debugger_t dstate = { print_tui, vprint_tui, 0, state, state->debugger->asic, state->debugger, tui_new_state, tui_close_window };
 	debugger_t used_state = tui_new_state(&dstate, "Sourcing z80erc...");
 	z80e_debug("TUI", "Running commands in z80erc...");
-	debugger_source_rc(used_state, "z80erc");
+	debugger_source(used_state, "z80erc");
 	tui_close_window(used_state);
 }
 

@@ -112,7 +112,7 @@ void debugger_deinit(debugger_t debugger) {
 	free(debugger->commands.storage);
 }
 
-int debugger_source_rc(debugger_t debugger, const char *rc_name) {
+int debugger_source(debugger_t debugger, const char *rc_name) {
 	char *env = getenv("XDG_CONFIG_HOME");
 	char *realloced;
 	size_t strsize = 0;

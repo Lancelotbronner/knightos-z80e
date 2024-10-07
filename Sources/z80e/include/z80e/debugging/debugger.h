@@ -6,6 +6,7 @@
 #include <stdarg.h>
 
 typedef int (*debugger_vprint_t)(debugger_t debugger, const char *format, va_list args);
+typedef void (*debugger_open_t)(debugger_t debugger, const char *command);
 typedef void (*debugger_callback_t)(debugger_t debugger);
 
 struct debugger_commands {
@@ -24,6 +25,9 @@ enum debugger_op_state {
 struct debugger {
 	debugger_callback_t deinit;
 	debugger_vprint_t vprint;
+	debugger_open_t open;
+	debugger_callback_t close;
+	//TODO: open/close could be replaced by an active command list or something
 
 	asic_t asic;
 	void *data;
@@ -46,7 +50,7 @@ struct debugger {
 	enum debugger_op_state state : 2;
 };
 
-int debugger_source_rc(debugger_t , const char *rc_name);
+int debugger_source(debugger_t , const char *rc_name);
 
 void debugger_init(debugger_t debugger, asic_t asic);
 void debugger_deinit(debugger_t debugger);
