@@ -6,9 +6,9 @@
 
 //MARK: - Press Command
 
-static int command_press(debugger_t state, void *data, int argc, char **argv) {
+static int command_press(debugger_t debugger, void *data, int argc, char **argv) {
 	if (argc != 2) {
-		debugger_print(state, "%s - Depress the specified key code, in hex or by name.\n", argv[0]);
+		debugger_print(debugger, "%s - Depress the specified key code, in hex or by name.\n", argv[0]);
 		return 0;
 	}
 	uint8_t key;
@@ -22,10 +22,10 @@ static int command_press(debugger_t state, void *data, int argc, char **argv) {
 		}
 	}
 	if (!found) {
-		key = debugger_evaluate(state, argv[1]);
+		key = debugger_evaluate(debugger, argv[1]);
 	}
 
-	keyboard_press(state->asic->cpu.devices[0x01].data, key);
+	keyboard_press(&debugger->asic->keyboard, key);
 	return 0;
 }
 
@@ -39,26 +39,24 @@ const struct debugger_command PressCommand = {
 
 //MARK: - Release Command
 
-static int command_release(debugger_t state, void *data, int argc, char **argv) {
+static int command_release(debugger_t debugger, void *data, int argc, char **argv) {
 	if (argc != 2) {
-		debugger_print(state, "%s - Release the specified key code, in hex or by name.\n", argv[0]);
+		debugger_print(debugger, "%s - Release the specified key code, in hex or by name.\n", argv[0]);
 		return 0;
 	}
 	uint8_t key;
 
-	int i, found = 0;
-	for (i = 0; i < sizeof(key_strings) / sizeof(key_string_t); ++i) {
+	int found = 0;
+	for (int i = 0; i < sizeof(key_strings) / sizeof(key_string_t); ++i)
 		if (strcasecmp(key_strings[i].key, argv[1]) == 0) {
 			key = key_strings[i].value;
 			found = 1;
 			break;
 		}
-	}
-	if (!found) {
-		key = debugger_evaluate(state, argv[1]);
-	}
+	if (!found)
+		key = debugger_evaluate(debugger, argv[1]);
 
-	keyboard_release(state->asic->cpu.devices[0x01].data, key);
+	keyboard_release(&debugger->asic->keyboard, key);
 	return 0;
 }
 
@@ -72,9 +70,9 @@ const struct debugger_command ReleaseCommand = {
 
 //MARK: - Tap Command
 
-static int command_tap_key(debugger_t state, int argc, char **argv) {
+static int command_tap_key(debugger_t debugger, int argc, char **argv) {
 	if (argc != 2) {
-		debugger_print(state, "%s - Depress the specified key code, in hex or by name.\n", argv[0]);
+		debugger_print(debugger, "%s - Depress the specified key code, in hex or by name.\n", argv[0]);
 		return 0;
 	}
 	uint8_t key;
@@ -88,13 +86,13 @@ static int command_tap_key(debugger_t state, int argc, char **argv) {
 		}
 	}
 	if (!found)
-		key = debugger_evaluate(state, argv[1]);
+		key = debugger_evaluate(debugger, argv[1]);
 
-	keyboard_device_t keyboard = &state->asic->keyboard;
+	keyboard_device_t keyboard = &debugger->asic->keyboard;
 	keyboard_press(keyboard, key);
-	command_execute(&RunCommand, state, 2, "run", "1000");
+	command_execute(&RunCommand, debugger, 2, "run", "1000");
 	keyboard_release(keyboard, key);
-	return command_execute(&RunCommand, state, 2, "run");
+	return command_execute(&RunCommand, debugger, 2, "run");
 }
 
 const struct debugger_command TapCommand = {

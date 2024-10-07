@@ -9,7 +9,7 @@
 
 #include <z80e/types.h>
 
-typedef int (*command_callback_t)(debugger_t state, void *data, int argc, char **argv);
+typedef int (*command_callback_t)(debugger_t debugger, void *data, int argc, char **argv);
 
 struct debugger_command {
 	const char *name;

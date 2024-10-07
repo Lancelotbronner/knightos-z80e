@@ -6,13 +6,13 @@
 
 //MARK: - Unhalt Command
 
-static int command_unhalt(debugger_t state, void *data, int argc, char **argv) {
+static int command_unhalt(debugger_t debugger, void *data, int argc, char **argv) {
 	if (argc != 1) {
-		debugger_print(state, "unhalt - Unhalts the running CPU.\n");
+		debugger_print(debugger, "unhalt - Unhalts the running CPU.\n");
 		return 0;
 	}
 
-	z80_cpu_t cpu = &state->asic->cpu;
+	z80_cpu_t cpu = &debugger->asic->cpu;
 	cpu->halted = 0;
 	return 0;
 }
@@ -25,16 +25,16 @@ const struct debugger_command UnhaltCommand = {
 
 //MARK: - Power Command
 
-static int __command_turn_on(debugger_t state, void *data, int argc, char **argv) {
+static int __command_turn_on(debugger_t debugger, void *data, int argc, char **argv) {
 	if (argc != 1) {
-		debugger_print(state, "%s - Interrupt the CPU and raise the 'on button' interrupt\n", argv[0]);
+		debugger_print(debugger, "%s - Interrupt the CPU and raise the 'on button' interrupt\n", argv[0]);
 		return 0;
 	}
 
-	asic_power_press(state->asic);
-	command_execute(&RunCommand, state, 2, "run", "50000");
-	asic_power_release(state->asic);
-	return command_execute(&RunCommand, state, 1, "run");
+	asic_power_press(debugger->asic);
+	command_execute(&RunCommand, debugger, 2, "run", "50000");
+	asic_power_release(debugger->asic);
+	return command_execute(&RunCommand, debugger, 1, "run");
 }
 
 const struct debugger_command PowerCommand = {
@@ -46,9 +46,9 @@ const struct debugger_command PowerCommand = {
 
 //MARK: - Tick Command
 
-static int __command_tick(debugger_t state, void *data, int argc, char **argv) {
-	state->asic->interrupts.interrupted.first_crystal = true;
-	state->asic->cpu.interrupt = !state->asic->cpu.interrupt;
+static int __command_tick(debugger_t debugger, void *data, int argc, char **argv) {
+	debugger->asic->interrupts.interrupted.first_crystal = true;
+	debugger->asic->cpu.interrupt = !debugger->asic->cpu.interrupt;
 	return 0;
 }
 

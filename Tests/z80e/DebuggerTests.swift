@@ -9,12 +9,12 @@ import XCTz80e
 //	int debugger_alwaysokc = 0;
 //	int debugger_alwaysfailc = 0;
 //
-//	int debugger_alwaysok(debugger_t state, int argc, char **argv) {
+//	int debugger_alwaysok(debugger_t debugger, int argc, char **argv) {
 //		debugger_alwaysokc++;
 //		return 0;
 //	}
 //
-//	int debugger_alwaysfail(debugger_t state, int argc, char **argv) {
+//	int debugger_alwaysfail(debugger_t debugger, int argc, char **argv) {
 //		debugger_alwaysfailc++;
 //		return 0;
 //	}

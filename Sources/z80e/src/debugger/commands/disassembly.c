@@ -11,7 +11,7 @@
 struct mmu_disassemble_memory {
 	struct disassemble_memory mem;
 	z80_cpu_t cpu;
-	debugger_t state;
+	debugger_t debugger;
 };
 
 int disassemble_print(struct disassemble_memory *s, const char *format, ...) {
@@ -24,7 +24,7 @@ int disassemble_print(struct disassemble_memory *s, const char *format, ...) {
 
 	vsnprintf(buffer, 50, format, list);
 
-	return debugger_print(m->state, "%s", buffer);
+	return debugger_print(m->debugger, "%s", buffer);
 }
 
 uint8_t disassemble_read(struct disassemble_memory *s, uint16_t pointer) {
@@ -32,33 +32,31 @@ uint8_t disassemble_read(struct disassemble_memory *s, uint16_t pointer) {
 	return m->cpu->read_byte(m->cpu->memory, pointer);
 }
 
-static int __command_disassemble(debugger_t state, void *data, int argc, char **argv) {
+static int __command_disassemble(debugger_t debugger, void *data, int argc, char **argv) {
 	if (argc > 3) {
-		debugger_print(state, "%s `start` `count` - Print the disassembled commands\n"
+		debugger_print(debugger, "%s `start` `count` - Print the disassembled commands\n"
 				" Prints `count` disassembled commands starting in memory from `start`.\n", argv[0]);
 		return 0;
 	}
 
-	z80_cpu_t cpu = &state->asic->cpu;
+	z80_cpu_t cpu = &debugger->asic->cpu;
 
-	uint16_t start = state->asic->cpu.registers.PC;
+	uint16_t start = debugger->asic->cpu.registers.PC;
 	uint16_t count = 10;
 
-	if (argc > 1) {
-		start = debugger_evaluate(state, argv[1]);
-	}
-	if (argc > 2) {
-		count = debugger_evaluate(state, argv[2]);
-	}
+	if (argc > 1)
+		start = debugger_evaluate(debugger, argv[1]);
+	if (argc > 2)
+		count = debugger_evaluate(debugger, argv[2]);
 
 	uint16_t i = 0;
 
-	struct mmu_disassemble_memory str = { { disassemble_read, start }, cpu, state };
+	struct mmu_disassemble_memory str = { { disassemble_read, start }, cpu, debugger };
 
 	for (i = 0; i < count; i++) {
-		debugger_print(state, "0x%04X: ", str.mem.current);
-		parse_instruction(&(str.mem), disassemble_print, state->flags.knightos);
-		debugger_print(state, "\n");
+		debugger_print(debugger, "0x%04X: ", str.mem.current);
+		parse_instruction(&(str.mem), disassemble_print, debugger->flags.knightos);
+		debugger_print(debugger, "\n");
 	}
 
 	return 0;

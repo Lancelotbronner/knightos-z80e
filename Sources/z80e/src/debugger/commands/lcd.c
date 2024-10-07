@@ -14,8 +14,8 @@ static void dump_lcd_unicode_to_utf8(char *b, uint32_t c) {
 	else if (c<0x110000) *b++=240+c/262144, *b++=128+c/4096%64, *b++=128+c/64%64, *b++=128+c%64;
 }
 
-static int command_lcd(debugger_t state, void *data, int argc, char **argv) {
-	lcd_t6a04_t lcd = &state->asic->lcd;
+static int command_lcd(debugger_t debugger, void *data, int argc, char **argv) {
+	lcd_t6a04_t lcd = &debugger->asic->lcd;
 	int cY;
 	int cX;
 
@@ -50,13 +50,13 @@ static int command_lcd(debugger_t state, void *data, int argc, char **argv) {
 					(h << 7));
 				char buff[5] = {0};
 				dump_lcd_unicode_to_utf8(buff, byte_value);
-				debugger_print(state, "%s", buff);
+				debugger_print(debugger, "%s", buff);
 			}
-			debugger_print(state, "\n");
+			debugger_print(debugger, "\n");
 		}
 	#endif
-	debugger_print(state, "C: 0x%02X X: 0x%02X Y: 0x%02X Z: 0x%02X\n", lcd->contrast, lcd->X, lcd->Y, lcd->Z);
-	debugger_print(state, "   %c%c%c%c  O1: 0x%01X 02: 0x%01X\n", lcd->up ? 'V' : '^', lcd->counter ? '-' : '|',
+	debugger_print(debugger, "C: 0x%02X X: 0x%02X Y: 0x%02X Z: 0x%02X\n", lcd->contrast, lcd->X, lcd->Y, lcd->Z);
+	debugger_print(debugger, "   %c%c%c%c  O1: 0x%01X 02: 0x%01X\n", lcd->up ? 'V' : '^', lcd->counter ? '-' : '|',
 		lcd->word_length ? '8' : '6', lcd->display_on ? 'O' : ' ', lcd->op_amp1, lcd->op_amp2);
 	return 0;
 }

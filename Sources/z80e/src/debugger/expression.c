@@ -20,7 +20,7 @@
 struct mmu_disassemble_memory {
 	struct disassemble_memory mem;
 	z80_cpu_t cpu;
-	debugger_t state;
+	debugger_t debugger;
 };
 
 static uint8_t parse_expression_dasm_read(struct disassemble_memory *s, uint16_t pointer) {
@@ -28,7 +28,7 @@ static uint8_t parse_expression_dasm_read(struct disassemble_memory *s, uint16_t
 	return m->cpu->read_byte(m->cpu->memory, pointer);
 }
 
-static uint16_t parse_operand(debugger_t state, const char *start, const char **end,
+static uint16_t parse_operand(debugger_t debugger, const char *start, const char **end,
 		struct mmu_disassemble_memory *mmudasm) {
 	if (*start >= '0' && *start <= '9') {
 		return strtol(start, (char **)end, 0);
@@ -43,7 +43,7 @@ static uint16_t parse_operand(debugger_t state, const char *start, const char **
 #define REGISTER(num, len, print) \
 if (strncasecmp(start, print, len) == 0) {\
 	*end += len; \
-	return state->asic->cpu.registers. num; \
+	return debugger->asic->cpu.registers. num; \
 }
 		REGISTER(IXH, 3, "IXH");
 		REGISTER(IXL, 3, "IXL");
@@ -72,7 +72,7 @@ if (strncasecmp(start, print, len) == 0) {\
 		REGISTER(I, 1, "I");
 		REGISTER(R, 1, "R");
 
-		debugger_print(state, "ERROR: Unknown register/number!\n");
+		debugger_print(debugger, "ERROR: Unknown register/number!\n");
 		while(!strchr("+-*/(){} \t\n", *start))
 			start++;
 		*end = 0;
@@ -136,16 +136,16 @@ static uint16_t run_operator(char operator, uint16_t arg2, uint16_t arg1) {
 }
 
 //TODO: Simplify and optimize debugger_evaluate
-uint16_t debugger_evaluate(debugger_t state, const char *string) {
+uint16_t debugger_evaluate(debugger_t debugger, const char *string) {
 	uint16_t value_stack[20];
 	int value_stack_pos = 0;
 
 	char operator_stack[20];
 	int operator_stack_pos = 0;
 
-	z80_cpu_t cpu = &state->asic->cpu;
-	uint16_t start = state->asic->cpu.registers.PC;
-	struct mmu_disassemble_memory mmudasm = { { parse_expression_dasm_read, start }, cpu, state };
+	z80_cpu_t cpu = &debugger->asic->cpu;
+	uint16_t start = debugger->asic->cpu.registers.PC;
+	struct mmu_disassemble_memory mmudasm = { { parse_expression_dasm_read, start }, cpu, debugger };
 
 	while (isspace(*string))
 		string++;
@@ -161,7 +161,7 @@ uint16_t debugger_evaluate(debugger_t state, const char *string) {
 					char ch = operator_stack[operator_stack_pos - 1];
 					int prec = precedence(ch);
 					if (prec != -2 && value_stack_pos < 2) {
-						debugger_print(state, "ERROR: Missing values!\n");
+						debugger_print(debugger, "ERROR: Missing values!\n");
 					} else if (prec != -2 && value_stack_pos > 1) {
 						uint16_t first = value_stack[value_stack_pos - 1];
 						uint16_t second = value_stack[value_stack_pos - 2];
@@ -178,7 +178,7 @@ uint16_t debugger_evaluate(debugger_t state, const char *string) {
 					char ch = operator_stack[operator_stack_pos - 1];
 					int prec = precedence(ch);
 					if (prec != -4 && value_stack_pos < 2) {
-						debugger_print(state, "ERROR: Missing values!\n");
+						debugger_print(debugger, "ERROR: Missing values!\n");
 					} else if (prec != -2 && value_stack_pos > 1) {
 						uint16_t first = value_stack[value_stack_pos - 1];
 						uint16_t second = value_stack[value_stack_pos - 2];
@@ -192,17 +192,17 @@ uint16_t debugger_evaluate(debugger_t state, const char *string) {
 				}
 
 				if (value_stack_pos < 1) {
-					debugger_print(state, "ERROR: Dereferencing failed!\n");
+					debugger_print(debugger, "ERROR: Dereferencing failed!\n");
 				} else {
 					uint16_t memory = value_stack[value_stack_pos - 1];
-					value_stack[value_stack_pos - 1] = state->asic->cpu.read_byte(state->asic->cpu.memory, memory);
+					value_stack[value_stack_pos - 1] = debugger->asic->cpu.read_byte(debugger->asic->cpu.memory, memory);
 				}
 			} else {
 				while (operator_stack_pos > 0) {
 					char ch = operator_stack[operator_stack_pos - 1];
 					int prec = precedence(ch);
 					if (prec > op && value_stack_pos < 2) {
-						debugger_print(state, "ERROR: Missing values!\n");
+						debugger_print(debugger, "ERROR: Missing values!\n");
 					} else if (prec > op) {
 						uint16_t first = value_stack[value_stack_pos - 1];
 						uint16_t second = value_stack[value_stack_pos - 2];
@@ -217,7 +217,7 @@ uint16_t debugger_evaluate(debugger_t state, const char *string) {
 			}
 			string++;
 		} else {
-			value_stack[value_stack_pos++] = parse_operand(state, string, &string, &mmudasm);
+			value_stack[value_stack_pos++] = parse_operand(debugger, string, &string, &mmudasm);
 			if (string == 0) {
 				return 0;
 			}
@@ -235,13 +235,13 @@ uint16_t debugger_evaluate(debugger_t state, const char *string) {
 		int prec = precedence(ch);
 
 		if(prec == -2) {
-			debugger_print(state, "ERROR: Mismatched parentheses!\n");
+			debugger_print(debugger, "ERROR: Mismatched parentheses!\n");
 			return 0;
 		} else if(prec == -4) {
-			debugger_print(state, "ERROR: Mismatched dereference!\n");
+			debugger_print(debugger, "ERROR: Mismatched dereference!\n");
 			return 0;
 		} else if(value_stack_pos < 2) {
-			debugger_print(state, "ERROR: Missing values!\n");
+			debugger_print(debugger, "ERROR: Missing values!\n");
 			return 0;
 		} else {
 			uint16_t first = value_stack[value_stack_pos - 1];

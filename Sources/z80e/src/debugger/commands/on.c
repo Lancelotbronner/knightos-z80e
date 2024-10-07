@@ -90,7 +90,7 @@ static uint8_t command_on_port_hook(void *state, uint8_t port, uint8_t value) {
 	return value;
 }
 
-static int command_on(debugger_t state, void *data, int argc, char **argv) {
+static int command_on(debugger_t debugger, void *data, int argc, char **argv) {
 	if (argc < 5) {
 		printf("%s `type` `read|write` `value` `command`\n"
 			" Run a command on a specific case\n"
@@ -111,41 +111,41 @@ static int command_on(debugger_t state, void *data, int argc, char **argv) {
 		thing = READ | WRITE;
 
 	if (thing == 0) {
-		debugger_print(state, "ERROR: First argument must be read, write, or rw\n");
+		debugger_print(debugger, "ERROR: First argument must be read, write, or rw\n");
 		return 1;
 	}
 
 	on_state_t *sta = malloc(sizeof(on_state_t));
-	sta->deb_sta = state;
+	sta->deb_sta = debugger;
 	sta->exec_string = malloc(strlen(argv[4]) + 1);
 	strcpy(sta->exec_string, argv[4]);
 
 	if (strncasecmp(argv[1], "register", 8) == 0) {
 		sta->look_for = register_from_string(argv[3]);
 		if (sta->look_for == -1) {
-			debugger_print(state, "ERROR: Invalid register!\n");
+			debugger_print(debugger, "ERROR: Invalid register!\n");
 			free(sta);
 			return 1;
 		}
 		if (thing & READ)
-			hook_register_emplace(&state->asic->cpu.hook.register_read, sta->look_for, sta, command_on_register_hook);
+			hook_register_emplace(&debugger->asic->cpu.hook.register_read, sta->look_for, sta, command_on_register_hook);
 		if (thing & WRITE)
-			hook_register_emplace(&state->asic->cpu.hook.register_write, sta->look_for, sta, command_on_register_hook);
+			hook_register_emplace(&debugger->asic->cpu.hook.register_write, sta->look_for, sta, command_on_register_hook);
 	} else if (strncasecmp(argv[1], "memory", 6) == 0) {
-		sta->look_for = debugger_evaluate(state, argv[3]);
+		sta->look_for = debugger_evaluate(debugger, argv[3]);
 		if (thing & READ)
-			hook_memory_emplace(&state->asic->mmu.hook.memory_read, sta->look_for, sta->look_for, sta, command_on_memory_hook);
+			hook_memory_emplace(&debugger->asic->mmu.hook.memory_read, sta->look_for, sta->look_for, sta, command_on_memory_hook);
 		if (thing & WRITE)
-			hook_memory_emplace(&state->asic->mmu.hook.memory_write, sta->look_for, sta->look_for, sta, command_on_memory_hook);
+			hook_memory_emplace(&debugger->asic->mmu.hook.memory_write, sta->look_for, sta->look_for, sta, command_on_memory_hook);
 	} else if (strncasecmp(argv[1], "port", 4) == 0) {
-		sta->look_for = debugger_evaluate(state, argv[3]);
+		sta->look_for = debugger_evaluate(debugger, argv[3]);
 		if (thing & READ)
-			hook_port_emplace(&state->asic->cpu.hook.port_in, sta->look_for, sta->look_for, sta, command_on_port_hook);
+			hook_port_emplace(&debugger->asic->cpu.hook.port_in, sta->look_for, sta->look_for, sta, command_on_port_hook);
 		if (thing & WRITE)
-			hook_port_emplace(&state->asic->cpu.hook.port_out, sta->look_for, sta->look_for, sta, command_on_port_hook);
+			hook_port_emplace(&debugger->asic->cpu.hook.port_out, sta->look_for, sta->look_for, sta, command_on_port_hook);
 	} else {
 		free(sta);
-		debugger_print(state, "ERROR: Second argument must be memory, register or port!\n");
+		debugger_print(debugger, "ERROR: Second argument must be memory, register or port!\n");
 		return 1;
 	}
 

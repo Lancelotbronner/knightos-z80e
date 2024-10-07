@@ -22,11 +22,11 @@ int vprint_tui(debugger_t a, const char *b, va_list list) {
 	return vprintf(b, list);
 }
 
-void tui_close_window(debugger_t state) {
+void tui_close_window(debugger_t debugger) {
 	free(state);
 }
 
-debugger_t tui_new_state(debugger_t state, const char *title) {
+debugger_t tui_new_state(debugger_t debugger, const char *title) {
 	debugger_t stat = calloc(sizeof(debugger_t), 1);
 	stat->vprint = vprint_tui;
 	stat->data = state->data;

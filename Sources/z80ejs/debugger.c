@@ -17,14 +17,14 @@ typedef struct {
 
 char openti_print_buffer[256];
 
-int openti_state_vprint(debugger_t state, const char *format, va_list list) {
+int openti_state_vprint(debugger_t debugger, const char *format, va_list list) {
 	openti_interface_state *istate = state->data;
 	int count = vsnprintf(openti_print_buffer, 256, format, list);
 	istate->print_string(istate->js_reference, openti_print_buffer);
 	return count;
 }
 
-void openti_close_window(debugger_t state) {
+void openti_close_window(debugger_t debugger) {
 	openti_interface_state *istate = state->data;
 	istate->window_closed(istate->js_reference);
 	free(state->data);
@@ -32,7 +32,7 @@ void openti_close_window(debugger_t state) {
 }
 
 debugger_t openti_new_state(debugger_t debugger, int ref) {
-	debugger_t state = calloc(sizeof(debugger_t), 1);
+	debugger_t debugger = calloc(sizeof(debugger_t), 1);
 	state->vprint = openti_state_vprint;
 	state->debugger = debugger;
 	state->asic = debugger->asic;

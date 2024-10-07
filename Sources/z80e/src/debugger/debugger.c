@@ -112,7 +112,7 @@ void debugger_deinit(debugger_t debugger) {
 	free(debugger->commands.storage);
 }
 
-int debugger_source_rc(debugger_t state, const char *rc_name) {
+int debugger_source_rc(debugger_t debugger, const char *rc_name) {
 	char *env = getenv("XDG_CONFIG_HOME");
 	char *realloced;
 	size_t strsize = 0;
@@ -136,14 +136,14 @@ int debugger_source_rc(debugger_t state, const char *rc_name) {
 	struct stat stat_buf;
 	if (stat(realloced, &stat_buf) == -1) {
 		if (errno != ENOENT)
-			debugger_print(state, "Couldn't read %s: '%s'\n", rc_name, strerror(errno));
+			debugger_print(debugger, "Couldn't read %s: '%s'\n", rc_name, strerror(errno));
 		free(realloced);
 		return 0;
 	}
 
 	char *argv[] = { "source", realloced };
 
-	int ret = SourceCommand.callback(state, nullptr, 2, argv);
+	int ret = SourceCommand.callback(debugger, nullptr, 2, argv);
 
 	//TODO: Avoid this temporary allocation.
 	free(realloced);
@@ -270,21 +270,21 @@ static char **debugger_parse(const char *cmdline, int *argc) {
 	return result;
 }
 
-int debugger_execute(debugger_t state, const char *command_str) {
+int debugger_execute(debugger_t debugger, const char *command_str) {
 	debugger_command_t command;
 	int argc;
 	char **argv = debugger_parse(command_str, &argc);
 	int return_value = 0;
 
-	int status = debugger_find(state, argv[0], &command);
+	int status = debugger_find(debugger, argv[0], &command);
 	if (status == -1) {
-		debugger_print(state, "Error: Ambiguous command %s\n", argv[0]);
+		debugger_print(debugger, "Error: Ambiguous command %s\n", argv[0]);
 		return_value = -1;
 	} else if (status == 0) {
-		debugger_print(state, "Error: Unknown command %s\n", argv[0]);
+		debugger_print(debugger, "Error: Unknown command %s\n", argv[0]);
 		return_value = -2;
 	} else {
-		return_value = command_executev(command, state, argc, argv);
+		return_value = command_executev(command, debugger, argc, argv);
 	}
 
 	char **tmp = argv;

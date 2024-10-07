@@ -8,16 +8,16 @@
 
 //TODO: Understand and document the timer command
 
-static int command_timer(debugger_t state, void *data, int argc, char **argv) {
+static int command_timer(debugger_t debugger, void *data, int argc, char **argv) {
 	if (argc < 2) {
-		debugger_print(state, "%s [port] [value]\n", argv[0]);
+		debugger_print(debugger, "%s [port] [value]\n", argv[0]);
 		return 0;
 	}
 
-	uint8_t port = debugger_evaluate(state, argv[2]);
-	uint8_t val = debugger_evaluate(state, argv[3]);
+	uint8_t port = debugger_evaluate(debugger, argv[2]);
+	uint8_t val = debugger_evaluate(debugger, argv[3]);
 
-	uint8_t *timer = asic_device(state->asic, port)->data;
+	uint8_t *timer = asic_device(debugger->asic, port)->data;
 	timer[(port - 0x30) % 3] = val;
 
 	return 0;
