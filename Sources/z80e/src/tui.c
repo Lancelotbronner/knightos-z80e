@@ -28,7 +28,7 @@ void tui_init(debugger_t debugger) {
 	debugger->open = tui_open;
 	debugger->close = tui_close;
 	debugger->deinit = tui_deinit;
-	z80e_debug("TUI", "Sourcing z80erc...");
+	fprintf(stderr, "Sourcing z80erc...\n");
 	debugger_source(debugger, "z80erc");
 }
 

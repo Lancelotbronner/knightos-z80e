@@ -11,7 +11,7 @@ let package = Package(
 		.library(name: "XCTz80e", targets: ["XCTz80e"]),
 	],
 	dependencies: [
-		.package(name: "scas", path: "../scas"),
+		.package(url: "https://github.com/Lancelotbronner/scas", revision: "f333a1d3a6c16bb7d5c40d920edba31399294874"),
 	],
 	targets: [
 		.target(
