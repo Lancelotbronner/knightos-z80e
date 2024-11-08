@@ -65,14 +65,13 @@ static int command_source(debugger_t debugger, void *data, int argc, char **argv
 	}
 	char filebuffer[256];
 	while(fgets(filebuffer, 256, rc)) {
-		filebuffer[strlen(filebuffer) - 1] = 0; // drop the \n at the end
-		if (filebuffer[0] == '#' || filebuffer[0] == 0) {
+		// drop the \n at the end
+		filebuffer[strlen(filebuffer) - 1] = 0;
+		if (filebuffer[0] == '#' || filebuffer[0] == 0)
 			continue;
-		}
 
-		if (debugger_execute(debugger, filebuffer) < 0) {
+		if (debugger_execute(debugger, filebuffer) < 0)
 			return 1;
-		}
 	}
 	return 0;
 }

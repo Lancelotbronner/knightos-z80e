@@ -6,8 +6,8 @@ import PackageDescription
 let package = Package(
 	name: "z80e",
 	products: [
-		.library(name: "z80e", targets: ["z80e"]),
-		.library(name: "z80ejs", targets: ["z80ejs"]),
+		.library(name: "libz80e", targets: ["libz80e"]),
+		.library(name: "libz80ejs", targets: ["libz80ejs"]),
 		.library(name: "XCTz80e", targets: ["XCTz80e"]),
 	],
 	dependencies: [
@@ -15,24 +15,40 @@ let package = Package(
 	],
 	targets: [
 		.target(
-			name: "z80e",
+			name: "libz80e",
 			dependencies: [
 				.product(name: "ScasKit", package: "scas")
 			]),
 
 		.target(
-			name: "z80ejs",
-			dependencies: ["z80e"]),
+			 name: "libz80ejs",
+			 dependencies: ["libz80e"]),
+
+		// Applications
+
+		.target(
+			name: "z80e",
+			dependencies: ["libz80e"]),
 
 		.executableTarget(
-			name: "z80e-cli",
-			dependencies: ["z80e"],
-			path: "Sources/tui"),
+			name: "z80e-tui",
+			dependencies: ["z80e"]),
+
+		.systemLibrary(
+			name: "libsdl2",
+			pkgConfig: "sdl2",
+			providers: [
+				.brew(["sdl2"]),
+			]),
 
 		.executableTarget(
 			name: "z80e-gui",
-			dependencies: ["z80e"],
-			path: "Sources/gui"),
+			dependencies: ["z80e", "libsdl2"],
+			cSettings: [
+				.unsafeFlags([
+					"-I/opt/homebrew/include",
+				]),
+			]),
 
 		// Testing
 

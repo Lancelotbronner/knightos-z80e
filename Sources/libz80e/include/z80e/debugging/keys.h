@@ -2,9 +2,70 @@
 
 #include <stdint.h>
 
+enum key : unsigned char {
+	K_DOWN = 0x00,
+	K_LEFT = 0x01,
+	K_RIGHT = 0x02,
+	K_UP = 0x03,
+	K_ENTER = 0x10,
+	K_PLUS = 0x11,
+	K_SUBTRACT = 0x12,
+	K_MULTIPLY = 0x13,
+	K_DIVIDE = 0x14,
+	K_POW = 0x15,
+	K_CLEAR = 0x16,
+	K_NEGATE = 0x20,
+	K_3 = 0x21,
+	K_6 = 0x22,
+	K_9 = 0x23,
+	K_RPAREN = 0x24,
+	K_TAN = 0x25,
+	K_VARS = 0x26,
+	K_DOT = 0x30,
+	K_2 = 0x31,
+	K_5 = 0x32,
+	K_8 = 0x33,
+	K_LPAREN = 0x34,
+	K_COS = 0x35,
+	K_PRGM = 0x36,
+	K_STAT = 0x37,
+	K_0 = 0x40,
+	K_1 = 0x41,
+	K_4 = 0x42,
+	K_7 = 0x43,
+	K_COMMA = 0x44,
+	K_SIN = 0x45,
+	K_APPS = 0x46,
+	K_XTON = 0x47,
+	K_STORE = 0x51,
+	K_LN = 0x52,
+	K_LOG = 0x53,
+	K_SQUARE = 0x54,
+	K_INVERT = 0x55,
+	K_MATH = 0x56,
+	K_ALPHA = 0x57,
+	K_GRAPH = 0x60,
+	K_TRACE = 0x61,
+	K_ZOOM = 0x62,
+	K_WINDOW = 0x63,
+	K_FUNCTIONS = 0x64,
+	K_2nd = 0x65,
+	K_MODE = 0x66,
+	K_DEL = 0x67,
+};
+
+enum ti_modifier {
+	TI_NORMAL,
+	TI_SECONDARY,
+	TI_ALPHA,
+};
+
+enum ti_key keyboard_parse(char *key);
+const char *keyboard_describe(enum ti_key key, enum ti_modifier modifier);
+
 typedef struct {
-    char *key;
-    uint8_t value;
+	char *key;
+	uint8_t value;
 } key_string_t;
 
 // TODO: Add aliases

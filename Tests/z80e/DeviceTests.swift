@@ -2,6 +2,8 @@ import XCTest
 import XCTz80e
 import z80e
 
+//TODO: Switch to Swift Testing
+
 final class DeviceTests: XCTestCaseTI83p {
 
 	//MARK: - Keyboard
@@ -86,50 +88,29 @@ final class DeviceTests: XCTestCaseTI83p {
 
 	//MARK: - Memory Mapping (83p)
 
-//	func test_memorymapping_83p() {
-//		asic_t *asic = asic_init(TI83p, NULL);
-//		memory_mapping_state_t *state = asic->cpu->devices[0x04].device;
-//
-//		state->bank_a_page = 0;
-//		state->bank_a_flash = 0;
-//
-//		reload_mapping(state);
-//		ti_write_byte(asic->mmu, 0x4000, 0x12);
-//
-//		if (asic->mmu->ram[0] != 0x12) {
-//			asic_free(asic);
-//			return 1;
-//		}
-//
-//		if (ti_read_byte(asic->mmu, 0xC000) != 0x12) {
-//			asic_free(asic);
-//			return 2;
-//		}
-//
-//		state->map_mode = 1;
-//		state->bank_a_page = 1;
-//		state->bank_a_flash = 0;
-//		state->bank_b_page = 0;
-//		state->bank_b_flash = 0;
-//		reload_mapping(state);
-//
-//		if (ti_read_byte(asic->mmu, 0x4000) != 0x12) {
-//			asic_free(asic);
-//			return 3;
-//		}
-//
-//		asic->mmu->ram[0x4000] = 0x34;
-//		if (ti_read_byte(asic->mmu, 0x8000) != 0x34) {
-//			asic_free(asic);
-//			return 4;
-//		}
-//
-//		if (ti_read_byte(asic->mmu, 0xC000) != 0x12) {
-//			asic_free(asic);
-//			return 5;
-//		}
-//		return 0;
-//	}
+	func test_memorymapping_83p() {
+		asic.mapping.a = 0;
+		asic.mapping.flashA = false;
+
+		mapping_reload(&asic.mapping)
+		write_byte(0x400, 0x12)
+
+		XCTAssertEqual(asic.mmu.ram[0], 0x12)
+		XCTAssertEqual(read_byte(0xC000), 0x12)
+
+		asic.mapping.mode = true;
+		asic.mapping.a = 1;
+		asic.mapping.flashA = false;
+		asic.mapping.b = 0;
+		asic.mapping.flashB = false;
+		mapping_reload(&asic.mapping);
+
+		XCTAssertEqual(read_byte(0x4000), 0x12)
+
+		asic.mmu.ram[0x4000] = 0x34;
+		XCTAssertEqual(read_byte(0x8000), 0x34)
+		XCTAssertEqual(read_byte(0xC000), 0x12)
+	}
 
 	//MARK: - Status
 

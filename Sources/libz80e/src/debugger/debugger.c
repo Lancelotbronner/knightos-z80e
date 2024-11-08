@@ -101,6 +101,7 @@ void debugger_init(debugger_t debugger, asic_t asic) {
 		.asic = asic,
 		.commands.count = length,
 		.commands.capacity = length,
+		.state = DEBUGGER_DISABLED,
 	};
 
 	debugger->commands.storage = malloc(length * sizeof(debugger_command_t));

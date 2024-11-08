@@ -54,3 +54,6 @@ void port_keyboard(device_t device, const keyboard_device_t keyboard) {
 	device->read = __keyboard_read;
 	device->write = __keyboard_write;
 }
+
+//MARK: - Keys
+

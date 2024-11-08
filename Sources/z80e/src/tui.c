@@ -1,14 +1,7 @@
-#include "tui.h"
-
-#include <z80e/debugging/debugger.h>
-#include <z80e/debugging/commands.h>
-#include <z80e/disassembler/disassemble.h>
-#include <z80e/hardware/mmu.h>
-#include <z80e/log.h>
+#include <z80e/tui.h>
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
 
 #include <readline/readline.h>
@@ -63,7 +56,7 @@ void tui_tick(debugger_t debugger) {
 	struct tui_disasm disasm_custom = { &asic->mmu, 0 };
 	struct disassemble_memory disasm = { tui_disassemble_read, 0, &disasm_custom };
 
-	while (1) {
+	while (true) {
 		char prompt_buffer[80];
 		char *current_pointer = prompt_buffer;
 		mmu_bank_t bank = mmu_bank(&asic->mmu, asic->cpu.registers.PC / 0x4000);

@@ -37,8 +37,7 @@ struct asic {
 
 	// TODO: Merge runloop, clock_rate and timers into new scheduler?
 	// TODO: Merge socket into link?
-	// TODO: Merge on_before_execution and on_after_execution into debugger?
-	// TODO: Merge battery_remove_check into new power?
+	// TODO: Merge battery & battery_remove_check into new power?
 
 	struct z80_cpu cpu;
 	struct z80_runloop runloop;

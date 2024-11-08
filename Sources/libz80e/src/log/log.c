@@ -7,16 +7,11 @@
 
 const char *loglevel_to_string(loglevel_t level) {
 	switch (level) {
-	case L_DEBUG:
-		return "DEBUG";
-	case L_INFO:
-		return "INFO";
-	case L_WARN:
-		return "WARN";
-	case L_ERROR:
-		return "ERROR";
-	default:
-		return "UNKNOWN";
+	case L_DEBUG: return "DEBUG";
+	case L_INFO: return "INFO";
+	case L_WARN: return "WARN";
+	case L_ERROR: return "ERROR";
+	default: return "UNKNOWN";
 	}
 }
 
@@ -25,7 +20,7 @@ const char *loglevel_to_string(loglevel_t level) {
 #define LOG_CAPACITY 1024
 static log_callback_t Callback;
 static void *Data;
-static loglevel_t Level;
+static loglevel_t Level = L_WARN;
 static char Message[LOG_CAPACITY];
 
 void z80e_log_callback(log_callback_t callback, void *data) {
