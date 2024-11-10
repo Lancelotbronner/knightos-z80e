@@ -14,6 +14,9 @@
 
 #include <stdint.h>
 
+typedef unsigned char (*memory16_read8_t)(void * _Null_unspecified data, uint16_t address);
+typedef void (*memory16_write8_t)(void * _Null_unspecified data, uint16_t address, unsigned char value);
+
 struct z80_cpu {
 	struct device devices[0x100];
 	struct z80_state registers;
@@ -24,13 +27,14 @@ struct z80_cpu {
 		// Internal use:
 		uint8_t IFF_wait : 1;
 		uint8_t halted : 1;
+		uint8_t interrupt : 1;
 	};
 	uint8_t bus;
 	uint16_t prefix;
+	//TODO: Abstract into a `struct mmu16` which manages a list of `struct memory16`?
 	void * _Nullable memory;
-	uint8_t (* _Nullable read_byte)(void * _Null_unspecified, uint16_t);
-	void (* _Nullable write_byte)(void * _Null_unspecified, uint16_t, uint8_t);
-	bool interrupt;
+	_Nullable memory16_read8_t memory_read;
+	_Nullable memory16_write8_t memory_write;
 
 	struct {
 		struct hooks_register register_read;

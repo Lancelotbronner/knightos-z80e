@@ -212,20 +212,20 @@ uint8_t cpu_write_register_byte(z80_cpu_t cpu, enum z80_registers reg_to_read, u
 }
 
 uint8_t cpu_read_byte(z80_cpu_t cpu, uint16_t address) {
-	return cpu->read_byte(cpu->memory, address);
+	return cpu->memory_read(cpu->memory, address);
 }
 
 void cpu_write_byte(z80_cpu_t cpu, uint16_t address, uint8_t value) {
-	cpu->write_byte(cpu->memory, address, value);
+	cpu->memory_write(cpu->memory, address, value);
 }
 
 uint16_t cpu_read_word(z80_cpu_t cpu, uint16_t address) {
-	return cpu->read_byte(cpu->memory, address) | (cpu->read_byte(cpu->memory, address + 1) << 8);
+	return cpu->memory_read(cpu->memory, address) | (cpu->memory_read(cpu->memory, address + 1) << 8);
 }
 
 void cpu_write_word(z80_cpu_t cpu, uint16_t address, uint16_t value) {
-	cpu->write_byte(cpu->memory, address, value & 0xFF);
-	cpu->write_byte(cpu->memory, address + 1, value >> 8);
+	cpu->memory_write(cpu->memory, address, value & 0xFF);
+	cpu->memory_write(cpu->memory, address + 1, value >> 8);
 }
 
 uint8_t cpu_port_in(z80_cpu_t cpu, uint8_t port) {

@@ -69,7 +69,7 @@ static int __command_hexdump(debugger_t debugger, void *data, int argc, char **a
 		debugger_print(debugger, "0x%04X ", start);
 
 		for (i = 0; i < 8 && length - i > 0; i++) {
-			debugger_print(debugger, "%02X ", cpu->read_byte(cpu->memory, start + i));
+			debugger_print(debugger, "%02X ", cpu->memory_read(cpu->memory, start + i));
 		}
 		start += i;
 		length -= i;
@@ -78,7 +78,7 @@ static int __command_hexdump(debugger_t debugger, void *data, int argc, char **a
 		debugger_print(debugger, " ");
 
 		for (i = 0; i < 8 && length - i > 0; i++) {
-			debugger_print(debugger, "%02X ", cpu->read_byte(cpu->memory, start + i));
+			debugger_print(debugger, "%02X ", cpu->memory_read(cpu->memory, start + i));
 		}
 		start += i;
 		length -= i;
@@ -86,7 +86,7 @@ static int __command_hexdump(debugger_t debugger, void *data, int argc, char **a
 
 		debugger_print(debugger, "%*s|", (16 - total) * 3 + (i < 8 ? 1 : 0), " ");
 		for (i = 0; i < total; i++) {
-			char c = cpu->read_byte(cpu->memory, start - 16 + i);
+			char c = cpu->memory_read(cpu->memory, start - 16 + i);
 			if (isprint(c) && c != '\t') {
 				debugger_print(debugger, "%c", c);
 			} else {
@@ -137,7 +137,7 @@ static int __command_backwards_hexdump(debugger_t debugger, int argc, char **arg
 		debugger_print(debugger, "0x%04X ", start);
 
 		for (i = 0; i < 8 && length - i > 0; i++) {
-			debugger_print(debugger, "%02X ", cpu->read_byte(cpu->memory, start - i));
+			debugger_print(debugger, "%02X ", cpu->memory_read(cpu->memory, start - i));
 		}
 		start -= i;
 		length -= i;
@@ -146,14 +146,14 @@ static int __command_backwards_hexdump(debugger_t debugger, int argc, char **arg
 		debugger_print(debugger, " ");
 
 		for (i = 0; i < 8 && length - i > 0; i++)
-			debugger_print(debugger, "%02X ", cpu->read_byte(cpu->memory, start + i));
+			debugger_print(debugger, "%02X ", cpu->memory_read(cpu->memory, start + i));
 		start -= i;
 		length -= i;
 		total += i;
 
 		debugger_print(debugger, "%*s|", (16 - total) * 3 + (i < 8 ? 1 : 0), " ");
 		for (i = 0; i < total; i++) {
-			char c = cpu->read_byte(cpu->memory, start - 16 + i);
+			char c = cpu->memory_read(cpu->memory, start - 16 + i);
 			if (isprint(c) && c != '\t')
 				debugger_print(debugger, "%c", c);
 			else

@@ -29,7 +29,7 @@ int disassemble_print(struct disassemble_memory *s, const char *format, ...) {
 
 uint8_t disassemble_read(struct disassemble_memory *s, uint16_t pointer) {
 	struct mmu_disassemble_memory *m = (struct mmu_disassemble_memory *)s;
-	return m->cpu->read_byte(m->cpu->memory, pointer);
+	return m->cpu->memory_read(m->cpu->memory, pointer);
 }
 
 static int __command_disassemble(debugger_t debugger, void *data, int argc, char **argv) {

@@ -39,7 +39,7 @@ struct tui_disasm {
 
 uint8_t tui_disassemble_read(struct disassemble_memory *state, uint16_t mem) {
 	struct tui_disasm *disasm = state->extra_data;
-	return ti_read_byte(disasm->mmu, mem);
+	return mmu_read(disasm->mmu, mem);
 }
 
 int tui_disassemble_write(struct disassemble_memory *state, const char *format, ...) {

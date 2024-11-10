@@ -14,7 +14,18 @@ Here are some non-goal:
 
 ## Tasks
 
+- Split the asic into components that communicate via hooks
+	- [] scheduler (+runloop, +clock_rate, +timers)
+		- find way to hook cpu and devices (link)
+	- [] mmu (+mapping)
+		- modularization
+	- [] cpu (+interrupts)
+		- find way to hook mmu
+	- [x] lcd
+	- [x] keyboard
+	- [] link (+socket)
+	- [x] battery (+battery_state, +battery_remove_check)
+- Refactor `mmu` and `mapping` into spans that forward a `read`/`write` interface?
+- Refactor `ti_device_type` into functions that assemble and configure the components
 - Debugger proper breakpoints
-- Inline interrupt timers?
-- Proper crystal devices?
 - Debugger command aliases & help grouping

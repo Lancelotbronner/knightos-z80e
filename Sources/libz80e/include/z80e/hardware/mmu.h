@@ -58,6 +58,9 @@ struct ti_mmu {
 	bool flash_unlocked : 1;
 };
 
+void mmu_init(ti_mmu_t mmu, ti_device_type device_type);
+void mmu_deinit(ti_mmu_t mmu);
+
 mmu_bank_t mmu_bank(ti_mmu_t const mmu, unsigned int bank);
 
 void mmu_configure(ti_mmu_t mmu, unsigned int bank, uint8_t page, bool flash);
@@ -66,9 +69,6 @@ void mmu_flash(ti_mmu_t mmu, unsigned int bank, bool flash);
 
 bool mmu_validate(ti_mmu_t mmu, unsigned int bank, mmu_bank_t *info);
 
-uint8_t ti_read_byte(void *memory, uint16_t address);
-void ti_write_byte(void *memory, uint16_t address, uint8_t value);
-void mmu_force_write(void *memory, uint16_t address, uint8_t value);
-
-void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type);
-void ti_mmu_deinit(ti_mmu_t mmu);
+unsigned char mmu_read(ti_mmu_t mmu, uint16_t address);
+void mmu_write(ti_mmu_t mmu, uint16_t address, uint8_t value);
+void mmu_force_write(ti_mmu_t mmu, uint16_t address, uint8_t value);

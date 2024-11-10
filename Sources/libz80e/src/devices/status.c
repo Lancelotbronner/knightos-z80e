@@ -6,10 +6,10 @@ static uint8_t __status_read(device_t device) {
 	asic_t asic = device->data;
 	uint8_t value = 0x00;
 
-	if (asic->battery_remove_check) {
-		if (asic->battery != BATTERIES_REMOVED)
+	if (asic->battery.remove_check) {
+		if (asic->battery.state != BATTERIES_REMOVED)
 			value |= 0x01;
-	} else if (asic->battery == BATTERIES_GOOD)
+	} else if (asic->battery.state == BATTERIES_GOOD)
 		value |= 0x01;
 
 	value |= asic->device != TI73 ? 0x02 : 0x00;

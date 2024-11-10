@@ -25,7 +25,7 @@ struct mmu_disassemble_memory {
 
 static uint8_t parse_expression_dasm_read(struct disassemble_memory *s, uint16_t pointer) {
 	struct mmu_disassemble_memory *m = (struct mmu_disassemble_memory *)s;
-	return m->cpu->read_byte(m->cpu->memory, pointer);
+	return m->cpu->memory_read(m->cpu->memory, pointer);
 }
 
 static uint16_t parse_operand(debugger_t debugger, const char *start, const char **end,
@@ -195,7 +195,7 @@ uint16_t debugger_evaluate(debugger_t debugger, const char *string) {
 					debugger_print(debugger, "ERROR: Dereferencing failed!\n");
 				} else {
 					uint16_t memory = value_stack[value_stack_pos - 1];
-					value_stack[value_stack_pos - 1] = debugger->asic->cpu.read_byte(debugger->asic->cpu.memory, memory);
+					value_stack[value_stack_pos - 1] = debugger->asic->cpu.memory_read(debugger->asic->cpu.memory, memory);
 				}
 			} else {
 				while (operator_stack_pos > 0) {

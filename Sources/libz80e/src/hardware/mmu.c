@@ -88,7 +88,7 @@ bool mmu_validate(ti_mmu_t mmu, unsigned int bank, mmu_bank_t *info) {
 
 //MARK: - Memory Unit Management
 
-void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type) {
+void mmu_init(ti_mmu_t mmu, ti_device_type device_type) {
 	switch (device_type) {
 	case TI83p:
 	case TI73:
@@ -120,9 +120,11 @@ void ti_mmu_init(ti_mmu_t mmu, ti_device_type device_type) {
 	return mmu;
 }
 
-void ti_mmu_deinit(ti_mmu_t mmu) {
-	free(mmu->ram);
-	free(mmu->flash);
+void mmu_deinit(ti_mmu_t mmu) {
+	if (mmu->ram)
+		free(mmu->ram);
+	if (mmu->flash)
+		free(mmu->flash);
 }
 
 void chip_reset(ti_mmu_t mmu, uint32_t address, uint8_t value) {
@@ -161,9 +163,7 @@ void chip_erase(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 	z80e_warning("mmu", "Erased entire Flash chip - you probably didn't want to do that.");
 }
 
-uint8_t ti_read_byte(void *memory, uint16_t address) {
-	ti_mmu_t mmu = memory;
-
+unsigned char mmu_read(ti_mmu_t mmu, uint16_t address) {
 	mmu_bank_t bank = mmu_bank(mmu, address / 0x4000);
 	uint8_t mapped_address = __mmu_address(mmu, bank, address);
 	uint8_t *destination = bank.flash ? mmu->flash : mmu->ram;
@@ -223,9 +223,7 @@ static struct flash_pattern Patterns[] = {
 	// TODO: More patterns
 };
 
-void ti_write_byte(void *memory, uint16_t address, uint8_t value) {
-	ti_mmu_t mmu = memory;
-
+void mmu_write(ti_mmu_t mmu, uint16_t address, uint8_t value) {
 	value = hook_memory_trigger(&mmu->hook.memory_write, address, value);
 	mmu_bank_t bank = mmu_bank(mmu, address / 0x4000);
 	uint32_t mapped_address = __mmu_address(mmu, bank, address);
@@ -266,8 +264,7 @@ void ti_write_byte(void *memory, uint16_t address, uint8_t value) {
 		chip_reset(mmu, mapped_address, value);
 }
 
-void mmu_force_write(void *memory, uint16_t address, uint8_t value) {
-	ti_mmu_t mmu = memory;
+void mmu_force_write(ti_mmu_t mmu, uint16_t address, uint8_t value) {
 	value = hook_memory_trigger(&mmu->hook.memory_write, address, value);
 	__mmu_destination(mmu, address)[0] = value;
 }

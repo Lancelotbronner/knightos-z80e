@@ -24,15 +24,19 @@
 #include <poll.h>
 #endif
 
-typedef enum {
+enum battery_state {
 	BATTERIES_REMOVED,
 	BATTERIES_LOW,
 	BATTERIES_GOOD
-} battery_state;
+};
+
+struct battery {
+	enum battery_state state : 2;
+	bool remove_check : 1;
+};
 
 struct asic {
 	ti_device_type device;
-	battery_state battery;
 	int clock_rate;
 
 	// TODO: Merge runloop, clock_rate and timers into new scheduler?
@@ -61,27 +65,33 @@ struct asic {
 		z80_timer_t head;
 	} timers;
 
+	struct battery battery;
+
+	//TODO: move to debugger
 	bool stopped : 1;
-	bool battery_remove_check : 1;
 };
-
-int asic_set_clock_rate(asic_t , int);
-
-int asic_add_timer(asic_t , int, double, timer_callback_t, void *);
-void asic_remove_timer(asic_t , int);
 
 //MARK: - Lifecycle Management
 
 void asic_init(asic_t asic, ti_device_type);
 void asic_deinit(asic_t asic);
 
-//MARK: - Runloop Management
+//MARK: - Scheduler Management
+
+//TODO: Move these to scheduler
+
+int asic_set_clock_rate(asic_t , int);
+
+int asic_add_timer(asic_t , int, double, timer_callback_t, void *);
+void asic_remove_timer(asic_t , int);
 
 void asic_tick(asic_t asic);
 
 void asic_tick_cycles(asic_t asic, int cycles);
 
 //MARK: - Port Management
+
+//TODO: Move these to z80?
 
 /// Installs the provided device onto the chip at the specified port.
 /// - Parameters:
@@ -98,6 +108,8 @@ device_t asic_device(asic_t asic, unsigned char port);
 
 //MARK: - Interrupts Management
 
+//TODO: Move these to z80?
+
 void __asic_interrupt_update(asic_t asic);
 
 /// Trigger an interrupt on the chip.
@@ -111,6 +123,8 @@ void asic_allow(asic_t asic, enum ti_interrupt interrupt, bool enabled);
 void asic_acknowledge(asic_t asic, enum ti_interrupt interrupt);
 
 //MARK: - Control Management
+
+//TODO: Move these to interrupts
 
 void asic_power_press(asic_t asic);
 void asic_power_release(asic_t asic);

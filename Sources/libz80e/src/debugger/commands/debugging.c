@@ -19,7 +19,7 @@ struct run_disassemble_state {
 static uint8_t __run_read(struct disassemble_memory *state, uint16_t pointer) {
 	struct run_disassemble_state *dstate = (struct run_disassemble_state *)state;
 
-	return dstate->debugger->asic->cpu.read_byte(dstate->debugger->asic->cpu.memory, pointer);
+	return dstate->debugger->asic->cpu.memory_read(dstate->debugger->asic->cpu.memory, pointer);
 }
 
 static int __run_write(struct disassemble_memory *state, const char *format, ...) {
@@ -234,7 +234,7 @@ typedef struct {
 
 static uint8_t __stepover_read(struct disassemble_memory *dmem, uint16_t mem) {
 	command_step_over_dism_extra_t *extra = dmem->extra_data;
-	return ti_read_byte(extra->mmu, mem);
+	return mmu_read(extra->mmu, mem);
 }
 
 static int __stepover_write(struct disassemble_memory *mem, const char *thing, ...) {

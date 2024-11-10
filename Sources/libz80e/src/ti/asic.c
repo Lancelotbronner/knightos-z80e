@@ -29,15 +29,15 @@ void asic_init(asic_t asic, ti_device_type type) {
 
 	// Configure device
 	asic->device = type;
-	asic->battery = BATTERIES_GOOD;
+	asic->battery.state = BATTERIES_GOOD;
 
 	// Configure the Memory Management Unit
-	ti_mmu_init(&asic->mmu, type);
+	mmu_init(&asic->mmu, type);
 
 	// Configure the CPU
 	asic->cpu.memory = (void*)&asic->mmu;
-	asic->cpu.read_byte = ti_read_byte;
-	asic->cpu.write_byte = ti_write_byte;
+	asic->cpu.memory_read = (memory16_read8_t)mmu_read;
+	asic->cpu.memory_write = (memory16_write8_t)mmu_write;
 	asic->clock_rate = 6000000;
 
 	// Configure timers
@@ -61,7 +61,7 @@ void asic_init(asic_t asic, ti_device_type type) {
 }
 
 void asic_deinit(asic_t asic) {
-	ti_mmu_deinit(&asic->mmu);
+	mmu_deinit(&asic->mmu);
 }
 
 //MARK: - Port Management

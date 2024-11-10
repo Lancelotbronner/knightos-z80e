@@ -8,9 +8,6 @@
 #define LCD_T6A04_RAM 7680 // 64 * 120
 
 struct lcd_t6a04 {
-
-	asic_t asic;
-
 	/// [X * 64 + Y]
 	uint8_t ram[LCD_T6A04_RAM];
 
