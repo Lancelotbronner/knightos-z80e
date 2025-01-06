@@ -20,7 +20,7 @@ enum ti_interrupt : unsigned char {
 	INTERRUPT_THIRD_CRYSTAL = 0x80,
 };
 
-//TODO: Review these interrupt flags, different devices may be returning different orders?
+//TODO: Review these interrupt flags, different peripherals may be returning different orders?
 union ti_interrupt_flags {
 	enum ti_interrupt flags;
 	struct {

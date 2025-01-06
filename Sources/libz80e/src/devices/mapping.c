@@ -1,4 +1,4 @@
-#include <z80e/devices/mapping.h>
+#include <z80e/peripherals/mapping.h>
 #include <z80e/log.h>
 #include <z80e/ti/asic.h>
 
@@ -18,7 +18,7 @@ void mapping_reload(mapping_device_t mapping) {
 
 	if (mapping->mode) {
 		uint8_t page2 = mapping->a;
-		if (mapping->asic->device == TI83p)
+		if (mapping->asic->peripheral == TI83p)
 			page2 |= 1;
 
 		mmu_configure(mmu, 1, mapping->a & 0xFE, mapping->flashA);
@@ -26,7 +26,7 @@ void mapping_reload(mapping_device_t mapping) {
 		mmu_configure(mmu, 3, mapping->b, mapping->flashB);
 	} else {
 		uint8_t page3 = 0;
-		if (mapping->asic->device != TI83p)
+		if (mapping->asic->peripheral != TI83p)
 			page3 = mapping->page;
 
 		mmu_configure(mmu, 1, mapping->a, mapping->flashA);
@@ -45,13 +45,13 @@ void mapping_reload(mapping_device_t mapping) {
 
 //MARK: - Mapping Status
 
-static unsigned char __mapping_status_read(device_t device) {
-	mapping_device_t mapping = device->data;
+static unsigned char __mapping_status_read(peripheral_t peripheral) {
+	mapping_device_t mapping = peripheral->data;
 	return mapping->asic->interrupts.interrupted.flags;
 }
 
-static void __mapping_status_write(device_t device, unsigned char value) {
-	mapping_device_t mapping = device->data;
+static void __mapping_status_write(peripheral_t peripheral, unsigned char value) {
+	mapping_device_t mapping = peripheral->data;
 	mapping->mode = value;
 
 	z80e_debug("memorymapping", "set mapping mode to %d (at 0x%04X)", mapping->mode, mapping->asic->cpu.registers.PC);
@@ -67,54 +67,54 @@ static void __mapping_status_write(device_t device, unsigned char value) {
 	};
 
 	asic_t asic = mapping->asic;
-	bool isNotTi83p = asic->device != TI83p;
+	bool isNotTi83p = asic->peripheral != TI83p;
 	value >>= 1;
 	uint8_t speed = value & 3;
 	asic_timer1_frequency(asic, timer1[isNotTi83p][speed]);
 	asic_timer2_frequency(asic, timer2[isNotTi83p][speed]);
 }
 
-void port_mapping_status(device_t device, mapping_device_t mapping) {
-	device->data = mapping;
-	device->read = __mapping_status_read;
-	device->write = __mapping_status_write;
+void port_mapping_status(peripheral_t peripheral, mapping_device_t mapping) {
+	peripheral->data = mapping;
+	peripheral->read = __mapping_status_read;
+	peripheral->write = __mapping_status_write;
 }
 
 //MARK: - Mapping Paging
 
-static unsigned char __mapping_paging_read(device_t device) {
-	mapping_device_t mapping = device->data;
+static unsigned char __mapping_paging_read(peripheral_t peripheral) {
+	mapping_device_t mapping = peripheral->data;
 	return mapping->page;
 }
 
-static void __mapping_paging_write(device_t device, unsigned char value) {
-	mapping_device_t mapping = device->data;
+static void __mapping_paging_write(peripheral_t peripheral, unsigned char value) {
+	mapping_device_t mapping = peripheral->data;
 	mapping->page = value;
 	z80e_debug("memorymapping", "Set ram banking page to %d (at 0x%04X)", mapping->page, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 }
 
-void port_mapping_paging(device_t device, mapping_device_t mapping) {
-	device->data = mapping;
-	device->read = __mapping_paging_read;
-	device->write = __mapping_paging_write;
+void port_mapping_paging(peripheral_t peripheral, mapping_device_t mapping) {
+	peripheral->data = mapping;
+	peripheral->read = __mapping_paging_read;
+	peripheral->write = __mapping_paging_write;
 }
 
 //MARK: - Mapping Bank A
 
-static unsigned char __mapping_bankA_read(device_t device) {
-	mapping_device_t mapping = device->data;
+static unsigned char __mapping_bankA_read(peripheral_t peripheral) {
+	mapping_device_t mapping = peripheral->data;
 	unsigned char value = mapping->a;
 	if (!mapping->flashA)
-		value |= mapping->asic->device == TI83p ? 0x40 : 0x80;
+		value |= mapping->asic->peripheral == TI83p ? 0x40 : 0x80;
 	return value;
 }
 
-static void __mapping_bankA_write(device_t device, unsigned char value) {
-	mapping_device_t mapping = device->data;
-	bool is_flash = !(value & (mapping->asic->device == TI83p ? 0x40 : 0x80));
+static void __mapping_bankA_write(peripheral_t peripheral, unsigned char value) {
+	mapping_device_t mapping = peripheral->data;
+	bool is_flash = !(value & (mapping->asic->peripheral == TI83p ? 0x40 : 0x80));
 
-	if (mapping->asic->device == TI83p) {
+	if (mapping->asic->peripheral == TI83p) {
 		value &= 0x1F;
 	} else {
 		value &= 0x7F;
@@ -127,27 +127,27 @@ static void __mapping_bankA_write(device_t device, unsigned char value) {
 	mapping_reload(mapping);
 }
 
-void port_mapping_bankA(device_t device, mapping_device_t mapping) {
-	device->data = mapping;
-	device->read = __mapping_bankA_read;
-	device->write = __mapping_bankA_write;
+void port_mapping_bankA(peripheral_t peripheral, mapping_device_t mapping) {
+	peripheral->data = mapping;
+	peripheral->read = __mapping_bankA_read;
+	peripheral->write = __mapping_bankA_write;
 }
 
 //MARK: - Mapping Bank B
 
-static unsigned char __mapping_bankB_read(device_t device) {
-	mapping_device_t mapping = device->data;
+static unsigned char __mapping_bankB_read(peripheral_t peripheral) {
+	mapping_device_t mapping = peripheral->data;
 	unsigned char value = mapping->b;
 	if (!mapping->flashB)
-		value |= mapping->asic->device == TI83p ? 0x40 : 0x80;
+		value |= mapping->asic->peripheral == TI83p ? 0x40 : 0x80;
 	return value;
 }
 
-static void __mapping_bankB_write(device_t device, unsigned char value) {
-	mapping_device_t mapping = device->data;
-	bool is_flash = !(value & (mapping->asic->device == TI83p ? 0x40 : 0x80));
+static void __mapping_bankB_write(peripheral_t peripheral, unsigned char value) {
+	mapping_device_t mapping = peripheral->data;
+	bool is_flash = !(value & (mapping->asic->peripheral == TI83p ? 0x40 : 0x80));
 
-	if (mapping->asic->device == TI83p) {
+	if (mapping->asic->peripheral == TI83p) {
 		value &= 0x1F;
 	} else {
 		value &= 0x7F;
@@ -160,8 +160,8 @@ static void __mapping_bankB_write(device_t device, unsigned char value) {
 	mapping_reload(mapping);
 }
 
-void port_mapping_bankB(device_t device, mapping_device_t mapping) {
-	device->data = mapping;
-	device->read = __mapping_bankB_read;
-	device->write = __mapping_bankB_write;
+void port_mapping_bankB(peripheral_t peripheral, mapping_device_t mapping) {
+	peripheral->data = mapping;
+	peripheral->read = __mapping_bankB_read;
+	peripheral->write = __mapping_bankB_write;
 }

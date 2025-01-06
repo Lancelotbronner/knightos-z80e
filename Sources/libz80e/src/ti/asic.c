@@ -4,15 +4,15 @@
 #include <z80e/hardware/mmu.h>
 #include <z80e/hardware/t6a04.h>
 #include <z80e/hardware/timer.h>
-#include <z80e/devices/crystal.h>
-#include <z80e/devices/flash.h>
-#include <z80e/devices/interrupts.h>
-#include <z80e/devices/keyboard.h>
-#include <z80e/devices/link.h>
-#include <z80e/devices/mapping.h>
-#include <z80e/devices/speed.h>
-#include <z80e/devices/status.h>
-#include <z80e/devices/t6a04.h>
+#include <z80e/peripherals/crystal.h>
+#include <z80e/peripherals/flash.h>
+#include <z80e/peripherals/interrupts.h>
+#include <z80e/peripherals/keyboard.h>
+#include <z80e/peripherals/link.h>
+#include <z80e/peripherals/mapping.h>
+#include <z80e/peripherals/speed.h>
+#include <z80e/peripherals/status.h>
+#include <z80e/peripherals/t6a04.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -27,8 +27,8 @@ void asic_init(asic_t asic, ti_device_type type) {
 	// Ensure everything is always zero-initialized.
 	*asic = (struct asic){};
 
-	// Configure device
-	asic->device = type;
+	// Configure peripheral
+	asic->peripheral = type;
 	asic->battery.state = BATTERIES_GOOD;
 
 	// Configure the Memory Management Unit
@@ -55,7 +55,7 @@ void asic_init(asic_t asic, ti_device_type type) {
 	// Configure debugging
 	asic->stopped = false;
 
-	// Configure devices
+	// Configure peripherals
 	plug_devices(asic);
 	asic_mirror_ports(asic);
 }
@@ -66,12 +66,12 @@ void asic_deinit(asic_t asic) {
 
 //MARK: - Port Management
 
-void asic_install(asic_t asic, const device_t device, unsigned char port) {
-	asic->cpu.devices[port] = *device;
+void asic_install(asic_t asic, const peripheral_t peripheral, unsigned char port) {
+	asic->cpu.peripherals[port] = *peripheral;
 }
 
-device_t asic_device(asic_t asic, unsigned char port) {
-	return &asic->cpu.devices[port];
+peripheral_t asic_device(asic_t asic, unsigned char port) {
+	return &asic->cpu.peripherals[port];
 }
 
 typedef struct {
@@ -79,20 +79,20 @@ typedef struct {
 	uint8_t port;
 } unimplemented_port_t;
 
-static uint8_t __unimplemented_read(device_t device) {
-	unimplemented_port_t *d = device->data;
+static uint8_t __unimplemented_read(peripheral_t peripheral) {
+	unimplemented_port_t *d = peripheral->data;
 	z80e_info("asic", "Warning: attempted to read from unimplemented port 0x%02x from 0x%04X.", d->port, d->asic->cpu.registers.PC);
 	return 0x00;
 }
 
-static void __unimplemented_write(device_t device, uint8_t value) {
-	unimplemented_port_t *d = device->data;
+static void __unimplemented_write(peripheral_t peripheral, uint8_t value) {
+	unimplemented_port_t *d = peripheral->data;
 	z80e_info("asic", "Warning: attempted to write 0x%02x to unimplemented port 0x%02x from 0x%04X.", value, d->port, d->asic->cpu.registers.PC);
 }
 
 static void plug_devices(asic_t asic) {
 
-	if (asic->device != TI73 && asic->device != TI83p) {
+	if (asic->peripheral != TI73 && asic->peripheral != TI83p) {
 		port_speed(asic_device(asic, 0x20), asic);
 		
 		// Initialize 3 crystal timers
@@ -131,7 +131,7 @@ static void plug_devices(asic_t asic) {
 	// Initialize memory mapping ports
 	mapping_init(&asic->mapping, asic);
 	port_mapping_status(asic_device(asic, 0x04), &asic->mapping);
-	if (asic->device != TI83p)
+	if (asic->peripheral != TI83p)
 		port_mapping_paging(asic_device(asic, 0x05), &asic->mapping);
 	port_mapping_bankA(asic_device(asic, 0x06), &asic->mapping);
 	port_mapping_bankB(asic_device(asic, 0x07), &asic->mapping);
@@ -144,7 +144,7 @@ static void plug_devices(asic_t asic) {
 
 static void asic_mirror_ports(asic_t asic) {
 	int i;
-	switch (asic->device) {
+	switch (asic->peripheral) {
 	case TI83p:
 		for (i = 0x08; i < 0x10; i++) {
 			port_mirror(asic_device(asic, i), asic_device(asic, i & 0x07));

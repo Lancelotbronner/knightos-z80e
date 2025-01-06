@@ -1,5 +1,5 @@
 //
-//  devices/mapping.h
+//  peripherals/mapping.h
 //  z80e
 //
 //  Created by Christophe Bronner on 2024-04-10.
@@ -34,7 +34,7 @@ void mapping_reload(mapping_device_t mapping);
 
 //MARK: - Port Configuration
 
-void port_mapping_status(device_t device, mapping_device_t mapping);
-void port_mapping_paging(device_t device, mapping_device_t mapping);
-void port_mapping_bankA(device_t device, mapping_device_t mapping);
-void port_mapping_bankB(device_t device, mapping_device_t mapping);
+void port_mapping_status(peripheral_t peripheral, mapping_device_t mapping);
+void port_mapping_paging(peripheral_t peripheral, mapping_device_t mapping);
+void port_mapping_bankA(peripheral_t peripheral, mapping_device_t mapping);
+void port_mapping_bankB(peripheral_t peripheral, mapping_device_t mapping);

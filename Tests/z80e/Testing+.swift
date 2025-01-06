@@ -13,7 +13,7 @@ public extension Tag {
 	@Tag static var block: Self
 	@Tag static var control: Self
 	@Tag static var debugger: Self
-	@Tag static var device: Self
+	@Tag static var peripheral: Self
 	@Tag static var disassembler: Self
 	@Tag static var index: Self
 	@Tag static var interrupt: Self

@@ -11,9 +11,9 @@
 
 #include <z80e/cpu/z80.h>
 #include <z80e/debugging/debugger.h>
-#include <z80e/devices/keyboard.h>
-#include <z80e/devices/link.h>
-#include <z80e/devices/mapping.h>
+#include <z80e/peripherals/keyboard.h>
+#include <z80e/peripherals/link.h>
+#include <z80e/peripherals/mapping.h>
 #include <z80e/hardware/interrupts.h>
 #include <z80e/hardware/mmu.h>
 #include <z80e/hardware/t6a04.h>
@@ -36,7 +36,7 @@ struct battery {
 };
 
 struct asic {
-	ti_device_type device;
+	ti_device_type peripheral;
 	int clock_rate;
 
 	// TODO: Merge runloop, clock_rate and timers into new scheduler?
@@ -93,18 +93,18 @@ void asic_tick_cycles(asic_t asic, int cycles);
 
 //TODO: Move these to z80?
 
-/// Installs the provided device onto the chip at the specified port.
+/// Installs the provided peripheral onto the chip at the specified port.
 /// - Parameters:
 ///   - asic: The chip.
-///   - device: The device to install.
+///   - peripheral: The peripheral to install.
 ///   - port: The port on which to install.
-void asic_install(asic_t asic, const device_t device, unsigned char port);
+void asic_install(asic_t asic, const peripheral_t peripheral, unsigned char port);
 
-/// Retrieves the device installed on the specified port.
+/// Retrieves the peripheral installed on the specified port.
 /// - Parameters:
 ///   - asic: The chip.
-///   - port: The port at which to retrieve the device.
-device_t asic_device(asic_t asic, unsigned char port);
+///   - port: The port at which to retrieve the peripheral.
+peripheral_t asic_device(asic_t asic, unsigned char port);
 
 //MARK: - Interrupts Management
 

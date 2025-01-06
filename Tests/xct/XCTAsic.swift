@@ -42,7 +42,7 @@ open class XCTestCaseAsic: XCTestCase {
 		cpu_write_word(&asic.cpu, address, value)
 	}
 
-	public func get(device position: Int) -> device {
+	public func get(peripheral position: Int) -> peripheral {
 		cpu_device(&asic.cpu, UInt8(truncatingIfNeeded: position)).pointee
 	}
 
@@ -55,8 +55,8 @@ open class XCTestCaseAsic: XCTestCase {
 	override public func setUp() {
 		asic_init(_asic, _type)
 
-		// Configure the default test device
-		cpu_device(&asic.cpu, 0x12)[0] = device(
+		// Configure the default test peripheral
+		cpu_device(&asic.cpu, 0x12)[0] = peripheral(
 			data: Unmanaged<XCTestCaseAsic>
 				.passUnretained(self)
 				.toOpaque(),
@@ -70,16 +70,16 @@ open class XCTestCaseAsic: XCTestCase {
 
 }
 
-private func test_read(_ device: UnsafeMutablePointer<device>) -> UInt8 {
+private func test_read(_ peripheral: UnsafeMutablePointer<peripheral>) -> UInt8 {
 	let test = Unmanaged<XCTestCaseAsic>
-		.fromOpaque(device.pointee.data!)
+		.fromOpaque(peripheral.pointee.data!)
 		.takeUnretainedValue()
 	return test._value
 }
 
-private func test_write(_ device: UnsafeMutablePointer<device>, _ value: UInt8) {
+private func test_write(_ peripheral: UnsafeMutablePointer<peripheral>, _ value: UInt8) {
 	let test = Unmanaged<XCTestCaseAsic>
-		.fromOpaque(device.pointee.data!)
+		.fromOpaque(peripheral.pointee.data!)
 		.takeUnretainedValue()
 	test._value = value
 }

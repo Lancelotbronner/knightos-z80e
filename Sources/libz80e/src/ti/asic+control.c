@@ -20,11 +20,11 @@ void asic_power_release(asic_t asic) {
 
 //MARK: - Interrupt Timers
 
-static void __timer1_tick(asic_t asic, void *device) {
+static void __timer1_tick(asic_t asic, void *peripheral) {
 	asic_interrupt(asic, INTERRUPT_FIRST_TIMER);
 }
 
-static void __timer2_tick(asic_t asic, void *device) {
+static void __timer2_tick(asic_t asic, void *peripheral) {
 	asic_interrupt(asic, INTERRUPT_SECOND_TIMER);
 }
 

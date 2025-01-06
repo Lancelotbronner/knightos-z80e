@@ -1,6 +1,6 @@
-#include <z80e/devices/keyboard.h>
+#include <z80e/peripherals/keyboard.h>
 
-#include <z80e/device.h>
+#include <z80e/peripheral.h>
 
 //MARK: - Keyboard Management
 
@@ -27,8 +27,8 @@ void keyboard_release(keyboard_device_t keyboard, unsigned char keycode) {
 
 //MARK: - Keyboard Port
 
-static unsigned char __keyboard_read(const device_t device) {
-	keyboard_device_t keyboard = device->data;
+static unsigned char __keyboard_read(const peripheral_t peripheral) {
+	keyboard_device_t keyboard = peripheral->data;
 	unsigned char mask = keyboard->group_mask;
 
 	unsigned char value = 0;
@@ -40,8 +40,8 @@ static unsigned char __keyboard_read(const device_t device) {
 	return ~value;
 }
 
-static void __keyboard_write(const device_t device, unsigned char value) {
-	keyboard_device_t keyboard = device->data;
+static void __keyboard_write(const peripheral_t peripheral, unsigned char value) {
+	keyboard_device_t keyboard = peripheral->data;
 	if (value == 0xFF) {
 		keyboard->group_mask = 0;
 		return;
@@ -49,8 +49,8 @@ static void __keyboard_write(const device_t device, unsigned char value) {
 	keyboard->group_mask |= ~value;
 }
 
-void port_keyboard(device_t device, const keyboard_device_t keyboard) {
-	device->data = keyboard;
-	device->read = __keyboard_read;
-	device->write = __keyboard_write;
+void port_keyboard(peripheral_t peripheral, const keyboard_device_t keyboard) {
+	peripheral->data = keyboard;
+	peripheral->read = __keyboard_read;
+	peripheral->write = __keyboard_write;
 }

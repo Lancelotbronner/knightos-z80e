@@ -22,7 +22,7 @@ static struct asic Asic;
 static struct debugger Debugger;
 
 struct z80e {
-	ti_device_type device;
+	ti_device_type peripheral;
 	char *rom_file;
 	int cycles;
 
@@ -32,7 +32,7 @@ struct z80e {
 };
 
 static struct z80e z80e = {
-	.device = TI83p,
+	.peripheral = TI83p,
 	.rom_file = nullptr,
 	.cycles = -1,
 	.print_state = false,
@@ -51,7 +51,7 @@ debugger_t z80e_debugger() {
 bool z80e_init() {
 	signal(SIGINT, z80e_sigint);
 	disassembler_init();
-	asic_init(&Asic, z80e.device);
+	asic_init(&Asic, z80e.peripheral);
 
 	if (!z80e_load_rom())
 		goto failure;
@@ -129,8 +129,8 @@ void z80e_cycles(int cycles) {
 	z80e.cycles = cycles;
 }
 
-void z80e_device(ti_device_type device) {
-	z80e.device = device;
+void z80e_device(ti_device_type peripheral) {
+	z80e.peripheral = peripheral;
 }
 
 void z80e_debugging(bool enabled) {
@@ -151,7 +151,7 @@ void z80e_help(bool should_exit) {
 	printf("z80e - Emulate z80 calculators\n"
 		   "Usage: z80e [flags] [rom]\n\n"
 		   "Flags:\n"
-		   "\t-d <device>: Selects a device to emulate. Available devices:\n"
+		   "\t-d <peripheral>: Selects a peripheral to emulate. Available peripherals:\n"
 		   "\t\tTI73, TI83p, TI83pSE, TI84p, TI84pSE, TI84pCSE\n"
 		   "\t-c <cycles>: Emulate this number of cycles, then exit. If omitted, the machine will be emulated indefinitely.\n"
 		   "\t--print-state: Prints the state of the machine on exit.\n"
@@ -194,8 +194,8 @@ static bool z80e_parse_device(char *arg) {
 	else if (strcasecmp(arg, "84pCSE") == 0)
 		z80e_device(TI84pCSE);
 
-	fprintf(stderr, "'%s' is not a valid device.\n", arg);
-	fprintf(stderr, "Valid devices are: TI73, TI83p, TI83pSE, TI84p, TI84pSE, TI84pCSE.\n");
+	fprintf(stderr, "'%s' is not a valid peripheral.\n", arg);
+	fprintf(stderr, "Valid peripherals are: TI73, TI83p, TI83pSE, TI84p, TI84pSE, TI84pCSE.\n");
 	return false;
 }
 
@@ -217,7 +217,7 @@ static bool z80e_parse_log(char *arg) {
 }
 
 static bool z80e_parse_long(char *arg) {
-	if (strcasecmp(arg, "device") == 0)
+	if (strcasecmp(arg, "peripheral") == 0)
 		z80e_parse_device(argv[++argi]);
 	else if (strcasecmp(arg, "print-state") == 0)
 		z80e_print_state(true);

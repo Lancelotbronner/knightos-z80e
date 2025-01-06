@@ -41,8 +41,8 @@ union lcd_status {
 	};
 };
 
-uint8_t lcd_t6a04_status_read(device_t device) {
-	lcd_t6a04_t lcd = device->data;
+uint8_t lcd_t6a04_status_read(peripheral_t peripheral) {
+	lcd_t6a04_t lcd = peripheral->data;
 	union lcd_status status = {};
 	// always accepts commands
 	// always in operating state
@@ -53,8 +53,8 @@ uint8_t lcd_t6a04_status_read(device_t device) {
 	return status.value;
 }
 
-void lcd_t6a04_status_write(device_t device, uint8_t val) {
-	lcd_t6a04_t lcd = device->data;
+void lcd_t6a04_status_write(peripheral_t peripheral, uint8_t val) {
+	lcd_t6a04_t lcd = peripheral->data;
 
 	z80e_debug("lcd", "Wrote 0x%02X (0b%b) to status", val, val);
 	if ((val & 0xC0) == 0xC0) { // 0b11XXXXXX
@@ -71,7 +71,7 @@ void lcd_t6a04_status_write(device_t device, uint8_t val) {
 		z80e_debug("lcd", "\tSet Y (horizontal!) to 0x%02X", lcd->Y);
 	} else if ((val & 0x18) == 0x18) { // 0b00011***
 		// test mode - not emulating yet
-		z80e_warning("lcd", "\tTest mode is dangerous and will damage your device");
+		z80e_warning("lcd", "\tTest mode is dangerous and will damage your peripheral");
 	} else if (val & 0x10) { // 0b00010*XX
 		lcd->op_amp1 = val & 0x03;
 		z80e_debug("lcd", "\tSet Op-Amp 1 to 0x%02X", lcd->op_amp1);
@@ -231,8 +231,8 @@ void lcd_t6a04_clear(lcd_t6a04_t lcd) {
 
 //MARK: - Device Management (Status)
 
-static unsigned char __status_read(device_t device) {
-	lcd_t6a04_t lcd = device->data;
+static unsigned char __status_read(peripheral_t peripheral) {
+	lcd_t6a04_t lcd = peripheral->data;
 	union lcd_status status = {};
 	// always accepts commands
 	// always in operating state
@@ -243,8 +243,8 @@ static unsigned char __status_read(device_t device) {
 	return status.value;
 }
 
-static void __status_write(device_t device, unsigned char value) {
-	lcd_t6a04_t lcd = device->data;
+static void __status_write(peripheral_t peripheral, unsigned char value) {
+	lcd_t6a04_t lcd = peripheral->data;
 
 	z80e_debug("lcd", "Wrote 0x%02X (0b%b) to status", value, value);
 	if ((value & 0xC0) == 0xC0) { // 0b11XXXXXX
@@ -261,7 +261,7 @@ static void __status_write(device_t device, unsigned char value) {
 		z80e_debug("lcd", "\tSet Y (horizontal!) to 0x%02X", lcd->Y);
 	} else if ((value & 0x18) == 0x18) { // 0b00011***
 		// test mode - not emulating yet
-		z80e_warning("lcd", "\tTest mode is dangerous and will damage your device");
+		z80e_warning("lcd", "\tTest mode is dangerous and will damage your peripheral");
 	} else if (value & 0x10) { // 0b00010*XX
 		lcd->op_amp1 = value & 0x03;
 		z80e_debug("lcd", "\tSet Op-Amp 1 to 0x%02X", lcd->op_amp1);
@@ -283,24 +283,24 @@ static void __status_write(device_t device, unsigned char value) {
 	}
 }
 
-void port_t6a04_status(device_t device, lcd_t6a04_t lcd) {
-	device->data = lcd;
-	device->read = __status_read;
-	device->write = __status_write;
+void port_t6a04_status(peripheral_t peripheral, lcd_t6a04_t lcd) {
+	peripheral->data = lcd;
+	peripheral->read = __status_read;
+	peripheral->write = __status_write;
 }
 
 //MARK: - Device Management (Data)
 
-static unsigned char __data_read(device_t device) {
-	lcd_t6a04_t lcd = device->data;
+static unsigned char __data_read(peripheral_t peripheral) {
+	lcd_t6a04_t lcd = peripheral->data;
 	uint8_t result = lcd->read_reg;
 	lcd->read_reg = __lcd_screen_read(lcd);
 	__lcd_advance_position(lcd);
 	return result;
 }
 
-static void __data_write(device_t device, unsigned char value) {
-	lcd_t6a04_t lcd = device->data;
+static void __data_write(peripheral_t peripheral, unsigned char value) {
+	lcd_t6a04_t lcd = peripheral->data;
 	bool dirty = __lcd_screen_write(lcd, value);
 	__lcd_advance_position(lcd);
 	z80e_debug("lcd", "Wrote %02X (0b%b) to %d (Y), %d (X)", value, value, lcd->Y, lcd->X);
@@ -308,8 +308,8 @@ static void __data_write(device_t device, unsigned char value) {
 		hook_lcd_trigger(&lcd->hook.update, lcd);
 }
 
-void port_t6a04_data(device_t device, lcd_t6a04_t lcd) {
-	device->data = lcd;
-	device->read = __data_read;
-	device->write = __data_write;
+void port_t6a04_data(peripheral_t peripheral, lcd_t6a04_t lcd) {
+	peripheral->data = lcd;
+	peripheral->read = __data_read;
+	peripheral->write = __data_write;
 }

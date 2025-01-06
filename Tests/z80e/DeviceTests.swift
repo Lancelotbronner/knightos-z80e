@@ -12,28 +12,28 @@ final class DeviceTests: XCTestCaseTI83p {
 		var keyboard = keyboard_device()
 		keyboard_init(&keyboard)
 
-		var device = device()
-		port_keyboard(&device, &keyboard)
+		var peripheral = peripheral()
+		port_keyboard(&peripheral, &keyboard)
 
 		keyboard_press(&keyboard, 0)
-		device_write(&device, 0xFE)
-		var value = device_read(&device)
+		peripheral_write(&peripheral, 0xFE)
+		var value = peripheral_read(&peripheral)
 		XCTAssertEqual(value, 0xFE)
 
 		keyboard_press(&keyboard, 1);
-		value = device_read(&device)
+		value = peripheral_read(&peripheral)
 		XCTAssertEqual(value, 0xFC)
 
 		keyboard_press(&keyboard, 0x14);
-		value = device_read(&device)
+		value = peripheral_read(&peripheral)
 		XCTAssertEqual(value, 0xFC)
 
-		device_write(&device, 0xFC)
-		value = device_read(&device)
+		peripheral_write(&peripheral, 0xFC)
+		value = peripheral_read(&peripheral)
 		XCTAssertEqual(value, 0xEC)
 
 		keyboard_release(&keyboard, 0x14);
-		value = device_read(&device)
+		value = peripheral_read(&peripheral)
 		XCTAssertEqual(value, 0xFC)
 	}
 
@@ -41,7 +41,7 @@ final class DeviceTests: XCTestCaseTI83p {
 
 //	func test_memorymapping_others() {
 //		asic_t *asic = asic_init(TI84p, NULL);
-//		memory_mapping_state_t *state = asic->cpu->devices[0x04].device;
+//		memory_mapping_state_t *state = asic->cpu->peripherals[0x04].peripheral;
 //
 //
 //		state->ram_bank_page = 1;
@@ -115,38 +115,38 @@ final class DeviceTests: XCTestCaseTI83p {
 	//MARK: - Status
 
 	func test_battery() {
-		var device = device()
-		port_status(&device, _asic)
+		var peripheral = peripheral()
+		port_status(&peripheral, _asic)
 
 		asic.battery.state = BATTERIES_GOOD
 		asic.battery.remove_check = false
-		let value = device_read(&device) & 0x1
+		let value = peripheral_read(&peripheral) & 0x1
 		XCTAssertEqual(value, 0x1)
 	}
 
 	func test_flash() {
-		var device = device()
-		port_status(&device, _asic)
+		var peripheral = peripheral()
+		port_status(&peripheral, _asic)
 
 		asic.mmu.flash_unlocked = true
-		var value = device_read(&device) & 0x4
+		var value = peripheral_read(&peripheral) & 0x4
 		XCTAssertEqual(value, 0x4)
 
 		asic.mmu.flash_unlocked = false;
-		value = device_read(&device) & 0x4
+		value = peripheral_read(&peripheral) & 0x4
 		XCTAssertEqual(value, 0)
 	}
 
 	//MARK: - Link Port
 
 	func test_link_port() {
-		var device = get(device: 0x00)
+		var peripheral = get(peripheral: 0x00)
 
-		var value = device_read(&device);
+		var value = peripheral_read(&peripheral);
 		XCTAssertEqual(value, 0)
 
-		device_write(&device, 0x01)
-		value = device_read(&device)
+		peripheral_write(&peripheral, 0x01)
+		value = peripheral_read(&peripheral)
 		XCTAssertEqual(value, 0x11)
 	}
 
@@ -154,9 +154,9 @@ final class DeviceTests: XCTestCaseTI83p {
 
 //	func test_link_assist_rx() {
 //		asic_t *asic = asic_init(TI83pSE, NULL);
-//		struct device link_assist_rx_read = asic->cpu->devices[0x0A];
-//		struct device link_assist_status = asic->cpu->devices[0x09];
-//		link_device_t state = link_assist_rx_read.device;
+//		struct peripheral link_assist_rx_read = asic->cpu->peripherals[0x0A];
+//		struct peripheral link_assist_status = asic->cpu->peripherals[0x09];
+//		link_device_t state = link_assist_rx_read.peripheral;
 //
 //		if (!link_recv_byte(asic, 0xBE)) {
 //			asic_free(asic);
@@ -192,9 +192,9 @@ final class DeviceTests: XCTestCaseTI83p {
 
 //	func test_link_assist_tx() {
 //		asic_t *asic = asic_init(TI83pSE, NULL);
-//		struct device link_assist_tx_read = asic->cpu->devices[0x0D];
-//		struct device link_assist_status = asic->cpu->devices[0x09];
-//		link_device_t state = link_assist_tx_read.device;
+//		struct peripheral link_assist_tx_read = asic->cpu->peripherals[0x0D];
+//		struct peripheral link_assist_status = asic->cpu->peripherals[0x09];
+//		link_device_t state = link_assist_tx_read.peripheral;
 //
 //		if (link_read_tx_buffer(asic) != EOF) {
 //			asic_free(asic);

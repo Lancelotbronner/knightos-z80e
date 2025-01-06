@@ -24,7 +24,7 @@ void z80e_dirty_lcd();
 
 void z80e_check_rom(bool enabled);
 void z80e_cycles(int cycles);
-void z80e_device(ti_device_type device);
+void z80e_device(ti_device_type peripheral);
 void z80e_debugging(bool enabled);
 void z80e_print_state(bool enabled);
 void z80e_rom(char *filepath);

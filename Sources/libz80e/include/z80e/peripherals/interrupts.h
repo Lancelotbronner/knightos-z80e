@@ -1,5 +1,5 @@
 //
-//  devices/interrupts.h
+//  peripherals/interrupts.h
 //  z80e
 //
 //  Created by Christophe Bronner on 2024-09-12.
@@ -13,6 +13,6 @@
 
 /// Configures a port to control the interrupt mask.
 /// - Parameters:
-///   - device: The device to configure.
+///   - peripheral: The peripheral to configure.
 ///   - keyboard: The chip to control.
-void port_interrupt_mask(device_t device, asic_t asic);
+void port_interrupt_mask(peripheral_t peripheral, asic_t asic);

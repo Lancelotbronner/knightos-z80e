@@ -1,5 +1,5 @@
 //
-//  devices/speed.h
+//  peripherals/speed.h
 //  z80e
 //
 //  Created by Christophe Bronner on 2024-04-11.
@@ -13,6 +13,6 @@
 
 /// Configures a port to return the speed of the provided chip.
 /// - Parameters:
-///   - device: The device to configure.
+///   - peripheral: The peripheral to configure.
 ///   - asic: The chip to monitor.
-void port_speed(device_t device, asic_t asic);
+void port_speed(peripheral_t peripheral, asic_t asic);

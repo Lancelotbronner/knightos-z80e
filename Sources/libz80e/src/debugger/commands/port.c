@@ -12,7 +12,7 @@ static int command_in(debugger_t debugger, void *data, int argc, char **argv) {
 	}
 
 	uint8_t port = debugger_evaluate(debugger, argv[1]) & 0xFF;
-	uint8_t val = device_read(&debugger->asic->cpu.devices[port]);
+	uint8_t val = peripheral_read(&debugger->asic->cpu.peripherals[port]);
 	debugger_print(debugger, "port 0x%02X -> 0x%02X\n", port, val);
 	return 0;
 }
@@ -34,7 +34,7 @@ int command_out(debugger_t debugger, void *data, int argc, char **argv) {
 
 	uint8_t port = debugger_evaluate(debugger, argv[1]) & 0xFF;
 	uint8_t val = debugger_evaluate(debugger, argv[2]) & 0xFF;
-	device_write(&debugger->asic->cpu.devices[port], val);
+	peripheral_write(&debugger->asic->cpu.peripherals[port], val);
 	debugger_print(debugger, "port 0x%02X <- 0x%02X\n", port, val);
 	return 0;
 }

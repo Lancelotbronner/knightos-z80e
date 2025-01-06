@@ -2,35 +2,35 @@
  * Implements the 83+SE/84+((C)SE) crystal timers
  */
 
-#include <z80e/devices/crystal.h>
+#include <z80e/peripherals/crystal.h>
 
-#include <z80e/device.h>
+#include <z80e/peripheral.h>
 
 //MARK: - Crystal Frequency
 
-static unsigned char __crystal_read(device_t device) {
-	unsigned char frequency = device->data;
+static unsigned char __crystal_read(peripheral_t peripheral) {
+	unsigned char frequency = peripheral->data;
 	return frequency;
 }
 
-static void __crystal_write(device_t device, unsigned char value) {
-	device->data = value;
+static void __crystal_write(peripheral_t peripheral, unsigned char value) {
+	peripheral->data = value;
 }
 
-void port_crystal_frequency(device_t device) {
-	device->data = 0;
-	device->read = __crystal_read;
-	device->write = __crystal_write;
+void port_crystal_frequency(peripheral_t peripheral) {
+	peripheral->data = 0;
+	peripheral->read = __crystal_read;
+	peripheral->write = __crystal_write;
 }
 
-void port_crystal_loop(device_t device) {
-	device->data = 0;
-	device->read = __crystal_read;
-	device->write = __crystal_write;
+void port_crystal_loop(peripheral_t peripheral) {
+	peripheral->data = 0;
+	peripheral->read = __crystal_read;
+	peripheral->write = __crystal_write;
 }
 
-void port_crystal_count(device_t device) {
-	device->data = 0;
-	device->read = __crystal_read;
-	device->write = __crystal_write;
+void port_crystal_count(peripheral_t peripheral) {
+	peripheral->data = 0;
+	peripheral->read = __crystal_read;
+	peripheral->write = __crystal_write;
 }

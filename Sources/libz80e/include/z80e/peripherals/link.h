@@ -1,5 +1,5 @@
 //
-//  devices/link.h
+//  peripherals/link.h
 //  z80e
 //
 //  Created by Christophe Bronner on 2024-09-12.

@@ -2,13 +2,13 @@ import XCTest
 import XCTz80e
 import z80e
 
-func cpu_reset(_ device: UnsafeMutablePointer<device>, _ data: UInt8) {
+func cpu_reset(_ peripheral: UnsafeMutablePointer<peripheral>, _ data: UInt8) {
 	XCTFail("Jumped to 0x00!")
 	exit(0)
 }
 
-func write_text(_ device: UnsafeMutablePointer<device>) -> CUnsignedChar {
-	guard let _device = device.pointee.data?.assumingMemoryBound(to: asic.self) else {
+func write_text(_ peripheral: UnsafeMutablePointer<peripheral>) -> CUnsignedChar {
+	guard let _device = peripheral.pointee.data?.assumingMemoryBound(to: asic.self) else {
 		return 0
 	}
 
@@ -42,7 +42,7 @@ final class ZexTests: XCTestCaseAsic {
 
 		for i in 0..<0x100 {
 			let _iodevice = cpu_device(&asic.cpu, UInt8(i))
-			var iodevice: device {
+			var iodevice: peripheral {
 				_read { yield _iodevice.pointee }
 				_modify { yield &_iodevice.pointee }
 			}

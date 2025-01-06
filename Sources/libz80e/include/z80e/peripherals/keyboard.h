@@ -1,5 +1,5 @@
 //
-//  devices/keyboard.h
+//  peripherals/keyboard.h
 //  z80e
 //
 //  Created by Christophe Bronner on 2024-04-10.
@@ -27,6 +27,6 @@ void keyboard_press(keyboard_device_t keyboard, unsigned char keycode);
 
 /// Configures a port to be a Ti keyboard.
 /// - Parameters:
-///   - device: The device to configure.
+///   - peripheral: The peripheral to configure.
 ///   - keyboard: The keyboard to connect to this port.
-void port_keyboard(device_t device, const keyboard_device_t keyboard);
+void port_keyboard(peripheral_t peripheral, const keyboard_device_t keyboard);

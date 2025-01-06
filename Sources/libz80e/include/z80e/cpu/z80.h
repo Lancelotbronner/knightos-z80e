@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <z80e/device.h>
+#include <z80e/peripheral.h>
 #include <z80e/types.h>
 #include <z80e/cpu/z80_types.h>
 #include <z80e/debugging/hooks.h>
@@ -18,7 +18,7 @@ typedef unsigned char (*memory16_read8_t)(void * _Null_unspecified data, uint16_
 typedef void (*memory16_write8_t)(void * _Null_unspecified data, uint16_t address, unsigned char value);
 
 struct z80_cpu {
-	struct device devices[0x100];
+	struct peripheral peripherals[0x100];
 	struct z80_state registers;
 	union {
 		struct {
@@ -60,7 +60,7 @@ uint16_t cpu_read_register_word(const z80_cpu_t _Nonnull, enum z80_registers);
 uint8_t cpu_write_register_byte(const z80_cpu_t _Nonnull, enum z80_registers, uint8_t);
 uint16_t cpu_write_register_word(const z80_cpu_t _Nonnull, enum z80_registers, uint16_t);
 
-device_t _Nonnull cpu_device(const z80_cpu_t _Nonnull cpu, unsigned char i);
+peripheral_t _Nonnull cpu_device(const z80_cpu_t _Nonnull cpu, unsigned char i);
 uint8_t cpu_read_byte(const z80_cpu_t _Nonnull cpu, uint16_t address);
 void cpu_write_byte(const z80_cpu_t _Nonnull cpu, uint16_t address, uint8_t value);
 uint16_t cpu_read_word(const z80_cpu_t _Nonnull cpu, uint16_t address);

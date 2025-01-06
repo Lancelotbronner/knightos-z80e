@@ -73,18 +73,18 @@ public extension asic {
 		cpu_write_word(&cpu, address, value)
 	}
 
-	mutating func get(device position: Int) -> device {
+	mutating func get(peripheral position: Int) -> peripheral {
 		cpu_device(&cpu, UInt8(truncatingIfNeeded: position)).pointee
 	}
 
 }
 
-private func test_read(_ device: UnsafeMutablePointer<device>) -> UInt8 {
-	guard let data = device.pointee.data else { return 0 }
+private func test_read(_ peripheral: UnsafeMutablePointer<peripheral>) -> UInt8 {
+	guard let data = peripheral.pointee.data else { return 0 }
 	return data.assumingMemoryBound(to: UInt8.self).pointee
 }
 
-private func test_write(_ device: UnsafeMutablePointer<device>, _ value: UInt8) {
-	guard let data = device.pointee.data else { return }
+private func test_write(_ peripheral: UnsafeMutablePointer<peripheral>, _ value: UInt8) {
+	guard let data = peripheral.pointee.data else { return }
 	data.assumingMemoryBound(to: UInt8.self).pointee = value
 }

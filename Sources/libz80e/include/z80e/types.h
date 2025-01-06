@@ -32,17 +32,17 @@ typedef struct z80_hardware_timer *z80_timer_t;
 
 typedef struct z80_link_socket *z80_link_t;
 
-//MARK: - Port Management
+//MARK: - Peripheral Management
 
-typedef struct device *device_t;
+typedef struct peripheral *peripheral_t;
 
-//TODO: pass the asic in device functions?
+//TODO: pass the asic in peripheral functions?
 //typedef unsigned char (* _Nullable read_t)(asic_t _Nonnull , void * _Null_unspecified);
 //typedef void (* _Nullable write_t)(asic_t _Nonnull, void * _Null_unspecified, unsigned char);
 
-typedef unsigned char (* _Nullable read_t)(const device_t _Nonnull);
+typedef unsigned char (* _Nullable read_t)(const peripheral_t _Nonnull);
 
-typedef void (* _Nullable write_t)(const device_t _Nonnull, unsigned char);
+typedef void (* _Nullable write_t)(const peripheral_t _Nonnull, unsigned char);
 
 //MARK: - Devices
 

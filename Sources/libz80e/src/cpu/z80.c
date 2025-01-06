@@ -26,8 +26,8 @@ struct ExecutionContext {
 	int8_t (*d)(struct ExecutionContext *);
 };
 
-struct device *cpu_device(const z80_cpu_t cpu, unsigned char i) {
-	return &cpu->devices[i];
+struct peripheral *cpu_device(const z80_cpu_t cpu, unsigned char i) {
+	return &cpu->peripherals[i];
 }
 
 uint16_t cpu_read_register_word(z80_cpu_t cpu, enum z80_registers reg_to_read) {
@@ -229,20 +229,20 @@ void cpu_write_word(z80_cpu_t cpu, uint16_t address, uint16_t value) {
 }
 
 uint8_t cpu_port_in(z80_cpu_t cpu, uint8_t port) {
-	device_t device = &cpu->devices[port];
+	peripheral_t peripheral = &cpu->peripherals[port];
 	uint8_t val = 0;
-	if (device->read) {
-		val = device->read(device);
+	if (peripheral->read) {
+		val = peripheral->read(peripheral);
 		val = hook_port_trigger(&cpu->hook.port_in, port, val);
 	}
 	return val;
 }
 
 void cpu_port_out(z80_cpu_t cpu, uint8_t port, uint8_t val) {
-	device_t device = &cpu->devices[port];
-	if (device->write) {
+	peripheral_t peripheral = &cpu->peripherals[port];
+	if (peripheral->write) {
 		val = hook_port_trigger(&cpu->hook.port_out, port, val);
-		device->write(device, val);
+		peripheral->write(peripheral, val);
 	}
 }
 
@@ -889,7 +889,7 @@ void execute_im(int y, struct ExecutionContext *context) {
 
 void handle_interrupt(struct ExecutionContext *context) {
 	// Note: Should we consider doing a proper raise/acknowledge mechanism
-	// with interrupting devices? It's probably not entirely required but it
+	// with interrupting peripherals? It's probably not entirely required but it
 	// might be nice to follow the actual behavior more closely.
 	z80_cpu_t cpu = context->cpu;
 	z80_registers_t *r = &cpu->registers;
