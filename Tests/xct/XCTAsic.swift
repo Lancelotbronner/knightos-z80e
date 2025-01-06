@@ -14,11 +14,10 @@ open class XCTestCaseAsic: XCTestCase {
 
 	open var _type: ti_device_type { TI83p }
 
-	public internal(set) var _asic: asic_t!
+	public var asic = z80e.asic()
 
-	public var asic: asic {
-		_read { yield _asic.pointee }
-		_modify { yield &_asic.pointee }
+	public var _asic: asic_t {
+		withUnsafeMutablePointer(to: &asic) { $0 }
 	}
 
 	public func flash(_ data: [UInt8]) {

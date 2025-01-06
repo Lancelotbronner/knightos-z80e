@@ -14,7 +14,7 @@ Here are some non-goal:
 
 ## Tasks
 
-- Split the asic into components that communicate via hooks
+- Split the asic into parts that communicate via hooks
 	- [] scheduler (+runloop, +clock_rate, +timers)
 		- find way to hook cpu and devices (link)
 	- [] mmu (+mapping)
@@ -25,6 +25,7 @@ Here are some non-goal:
 	- [x] keyboard
 	- [] link (+socket)
 	- [x] battery (+battery_state, +battery_remove_check)
+- Nomenclature: the asic is a _device_, the z80 cpu communicates with _peripherals_ via _ports_
 - Refactor `mmu` and `mapping` into spans that forward a `read`/`write` interface?
 - Refactor `ti_device_type` into functions that assemble and configure the components
 - Debugger proper breakpoints

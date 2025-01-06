@@ -22,7 +22,7 @@ void mapping_reload(mapping_device_t mapping) {
 			page2 |= 1;
 
 		mmu_configure(mmu, 1, mapping->a & 0xFE, mapping->flashA);
-		mmu_configure(mmu, 2, mapping->a, mapping->flashA);
+		mmu_configure(mmu, 2, page2, mapping->flashA);
 		mmu_configure(mmu, 3, mapping->b, mapping->flashB);
 	} else {
 		uint8_t page3 = 0;
@@ -38,11 +38,8 @@ void mapping_reload(mapping_device_t mapping) {
 		mmu_bank_t bank;
 		if (mmu_validate(mmu, i, &bank))
 			continue;
-		
-		if (bank.flash)
-			z80e_error("memorymapping", "ERROR: Flash page 0x%02X doesn't exist! (at 0x%04X)", bank.page, mapping->asic->cpu.registers.PC);
-		else
-			z80e_error("memorymapping", "ERROR: RAM page 0x%02X doesn't exist! (at 0x%04X)", bank.page, mapping->asic->cpu.registers.PC);
+
+		z80e_error("memorymapping", "%s page 0x%02X doesn't exist! (at 0x%04X)", bank.flash ? "flash" : "ram", bank.page, mapping->asic->cpu.registers.PC);
 	}
 }
 
@@ -57,7 +54,7 @@ static void __mapping_status_write(device_t device, unsigned char value) {
 	mapping_device_t mapping = device->data;
 	mapping->mode = value;
 
-	z80e_debug("memorymapping", "Set mapping mode to %d (at 0x%04X)", mapping->mode, mapping->asic->cpu.registers.PC);
+	z80e_debug("memorymapping", "set mapping mode to %d (at 0x%04X)", mapping->mode, mapping->asic->cpu.registers.PC);
 	mapping_reload(mapping);
 
 	static double timer1[2][4] = {

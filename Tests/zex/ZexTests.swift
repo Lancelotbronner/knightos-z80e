@@ -35,7 +35,7 @@ func write_text(_ device: UnsafeMutablePointer<device>) -> CUnsignedChar {
 final class ZexTests: XCTestCaseAsic {
 
 	func zex(_ resource: String, _ ext: String) {
-		guard let url = Bundle.module.url(forResource: resource, withExtension: ext, subdirectory: "zex") else {
+		guard let url = Bundle.module.url(forResource: resource, withExtension: ext) else {
 			XCTFail("Couldn't find testsuite \(resource).\(ext)")
 			return
 		}

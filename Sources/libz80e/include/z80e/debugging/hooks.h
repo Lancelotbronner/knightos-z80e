@@ -12,10 +12,6 @@
 
 #include <stdint.h>
 
-// Note: All `hook_<domain>` structs have the following assumptions:
-// - callback is the first field
-// - Their size is at most 3 `void*`
-
 typedef struct hook {
 	void *list;
 	void *callback;
@@ -35,6 +31,8 @@ struct hook_memory {
 	uint16_t range_start;
 	uint16_t range_end;
 };
+
+//static_assert(sizeof(struct hook_memory) <= sizeof(void*) * 3);
 
 struct hooks_memory {
 	int count;
@@ -58,6 +56,8 @@ struct hook_register {
 	void *data;
 	enum z80_registers registers;
 };
+
+//static_assert(sizeof(struct hook_register) <= sizeof(void*) * 3);
 
 struct hooks_register {
 	int count;
@@ -83,6 +83,8 @@ struct hook_port {
 	uint8_t range_end;
 };
 
+//static_assert(sizeof(struct hook_port) <= sizeof(void*) * 3);
+
 struct hooks_port {
 	int count;
 	int capacity;
@@ -105,6 +107,8 @@ struct hook_execution {
 	void *data;
 };
 
+//static_assert(sizeof(struct hook_execution) <= sizeof(void*) * 3);
+
 struct hooks_execution {
 	int count;
 	int capacity;
@@ -126,6 +130,8 @@ struct hook_lcd {
 	hook_lcd_callback_t callback;
 	void *data;
 };
+
+//static_assert(sizeof(struct hook_lcd) <= sizeof(void*) * 3);
 
 struct hooks_lcd {
 	int count;

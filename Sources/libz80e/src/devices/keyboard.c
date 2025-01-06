@@ -8,7 +8,7 @@
 
 void keyboard_init(keyboard_device_t keyboard) {
 	*keyboard = (struct keyboard_device){
-		.mask = 0,
+		.group_mask = 0,
 		.keys = ~0,
 	};
 }
@@ -29,7 +29,7 @@ void keyboard_release(keyboard_device_t keyboard, unsigned char keycode) {
 
 static unsigned char __keyboard_read(const device_t device) {
 	keyboard_device_t keyboard = device->data;
-	unsigned char mask = keyboard->mask;
+	unsigned char mask = keyboard->group_mask;
 
 	unsigned char value = 0;
 	for (int i = 7; i >= 0; i--) {
@@ -43,10 +43,10 @@ static unsigned char __keyboard_read(const device_t device) {
 static void __keyboard_write(const device_t device, unsigned char value) {
 	keyboard_device_t keyboard = device->data;
 	if (value == 0xFF) {
-		keyboard->mask = 0;
+		keyboard->group_mask = 0;
 		return;
 	}
-	keyboard->mask |= ~value;
+	keyboard->group_mask |= ~value;
 }
 
 void port_keyboard(device_t device, const keyboard_device_t keyboard) {

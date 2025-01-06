@@ -34,7 +34,7 @@ static mmu_bank_t __mmu_bank(ti_mmu_t const mmu, unsigned int bank) {
 
 static uint32_t __mmu_address(ti_mmu_t const mmu, mmu_bank_t bank, uint16_t address) {
 	uint32_t mapped_address = address;
-	mapped_address %= 0x4000;
+	mapped_address = mapped_address % 0x4000;
 	mapped_address += bank.page * 0x4000;
 	return mapped_address;
 }
@@ -108,6 +108,10 @@ void mmu_init(ti_mmu_t mmu, ti_device_type device_type) {
 		mmu->settings.ram_pages = 3;
 		mmu->settings.flash_pages = 0x100;
 		break;
+	case TI84pCE:
+		mmu->settings.ram_pages = 8;
+		mmu->settings.flash_pages = 0x200;
+		break;
 	}
 	mmu->ram = calloc(mmu->settings.ram_pages, 0x4000);
 	mmu->flash = malloc(mmu->settings.flash_pages * 0x4000);
@@ -165,13 +169,13 @@ void chip_erase(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 
 unsigned char mmu_read(ti_mmu_t mmu, uint16_t address) {
 	mmu_bank_t bank = mmu_bank(mmu, address / 0x4000);
-	uint8_t mapped_address = __mmu_address(mmu, bank, address);
+	uint32_t mapped_address = __mmu_address(mmu, bank, address);
 	uint8_t *destination = bank.flash ? mmu->flash : mmu->ram;
 
 	if (bank.flash)
 		chip_reset(mmu, mapped_address, 0);
 
-	uint8_t value = destination[mapped_address];;
+	uint8_t value = destination[mapped_address];
 	value = hook_memory_trigger(&mmu->hook.memory_read, address, value);
 	return value;
 }

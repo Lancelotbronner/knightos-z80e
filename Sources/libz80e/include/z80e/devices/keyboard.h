@@ -10,7 +10,7 @@
 #include <z80e/types.h>
 
 struct keyboard_device {
-	unsigned char mask;
+	unsigned char group_mask;
 	union {
 		unsigned char groups[8];
 		unsigned long long keys;

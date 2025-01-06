@@ -18,7 +18,10 @@ struct link_device {
 			bool rx : 1;
 			bool tx : 1;
 			bool error : 1;
-			unsigned char : 4;
+			bool : 1;
+			bool : 1;
+			bool : 1;
+			bool : 1;
 			bool disabled : 1;
 		};
 	} interrupts;
@@ -43,7 +46,10 @@ struct link_device {
 
 	union {
 		struct {
-			unsigned char : 4;
+			bool : 1;
+			bool : 1;
+			bool : 1;
+			bool : 1;
 			bool la_ready : 1;
 		};
 		struct {
@@ -51,7 +57,8 @@ struct link_device {
 			bool ring : 1;
 		} them;
 		struct {
-			unsigned char : 2;
+			bool : 1;
+			bool : 1;
 			bool tip : 1;
 			bool ring : 1;
 		} us;

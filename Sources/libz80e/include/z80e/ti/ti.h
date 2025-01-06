@@ -19,10 +19,11 @@
  */
 
 typedef enum {
-	TI73 = 0,
-	TI83p = 1,
-	TI83pSE = 2,
-	TI84p = 3,
-	TI84pSE = 4,
-	TI84pCSE = 5
+	TI73,
+	TI83p,
+	TI83pSE,
+	TI84p,
+	TI84pSE,
+	TI84pCSE,
+	TI84pCE,
 } ti_device_type;

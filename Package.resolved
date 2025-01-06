@@ -1,12 +1,11 @@
 {
-  "originHash" : "d85c25f783b005e56dbd950f123b02016a654b3dac0edac276a6e75fc8802e41",
+  "originHash" : "acb0598f3c1fbc9ed902325c2226e85c62326834d8e417ed6e6c098e382b34ea",
   "pins" : [
     {
       "identity" : "scas",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lancelotbronner/scas",
       "state" : {
-        "branch" : "f333a1d",
         "revision" : "f333a1d3a6c16bb7d5c40d920edba31399294874"
       }
     }

@@ -240,7 +240,7 @@ final class ControlTests: XCTestCaseTI83p {
 		let test: [UInt8] = [0xFB] // EI
 		flash(test)
 		let cycles = cpu_execute(&asic.cpu, 4)
-		XCTAssertEqual(asic.cpu.IFF1, 1)
+		XCTAssertTrue(asic.cpu.IFF1)
 		XCTAssertEqual(cycles, 0)
 	}
 
@@ -248,10 +248,10 @@ final class ControlTests: XCTestCaseTI83p {
 
 	func test_DI() {
 		let test2: [UInt8] = [0xF3] // DI
-		asic.cpu.IFF1 = 1;
+		asic.cpu.IFF1 = true;
 		flash(test2)
 		let cycles = cpu_execute(&asic.cpu, 4)
-		XCTAssertEqual(asic.cpu.IFF1, 0)
+		XCTAssertFalse(asic.cpu.IFF1)
 		XCTAssertEqual(cycles, 0)
 	}
 

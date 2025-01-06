@@ -20,14 +20,21 @@ typedef void (*memory16_write8_t)(void * _Null_unspecified data, uint16_t addres
 struct z80_cpu {
 	struct device devices[0x100];
 	struct z80_state registers;
-	struct {
-		uint8_t IFF1 : 1;
-		uint8_t IFF2 : 1;
-		uint8_t int_mode : 2;
-		// Internal use:
-		uint8_t IFF_wait : 1;
-		uint8_t halted : 1;
-		uint8_t interrupt : 1;
+	union {
+		struct {
+			uint8_t : 2;
+			uint8_t int_mode : 2;
+		};
+		struct {
+			bool IFF1 : 1;
+			bool IFF2 : 1;
+			bool : 1;
+			bool : 1;
+			// Internal use:
+			bool IFF_wait : 1;
+			bool halted : 1;
+			bool interrupt : 1;
+		};
 	};
 	uint8_t bus;
 	uint16_t prefix;
@@ -45,17 +52,17 @@ struct z80_cpu {
 };
 
 int parity(uint8_t x);
-void print_state(z80_cpu_t _Nonnull);
+void print_state(const z80_cpu_t _Nonnull);
 
-uint8_t cpu_read_register_byte(z80_cpu_t _Nonnull, enum z80_registers);
-uint16_t cpu_read_register_word(z80_cpu_t _Nonnull, enum z80_registers);
+uint8_t cpu_read_register_byte(const z80_cpu_t _Nonnull, enum z80_registers);
+uint16_t cpu_read_register_word(const z80_cpu_t _Nonnull, enum z80_registers);
 
-uint8_t cpu_write_register_byte(z80_cpu_t _Nonnull, enum z80_registers, uint8_t);
-uint16_t cpu_write_register_word(z80_cpu_t _Nonnull, enum z80_registers, uint16_t);
+uint8_t cpu_write_register_byte(const z80_cpu_t _Nonnull, enum z80_registers, uint8_t);
+uint16_t cpu_write_register_word(const z80_cpu_t _Nonnull, enum z80_registers, uint16_t);
 
-device_t _Nonnull cpu_device( z80_cpu_t _Nonnull cpu, unsigned char i);
-uint8_t cpu_read_byte(z80_cpu_t _Nonnull cpu, uint16_t address);
-void cpu_write_byte(z80_cpu_t _Nonnull cpu, uint16_t address, uint8_t value);
-uint16_t cpu_read_word(z80_cpu_t _Nonnull cpu, uint16_t address);
-void cpu_write_word(z80_cpu_t _Nonnull cpu, uint16_t address, uint16_t value);
-int cpu_execute(z80_cpu_t _Nonnull cpu, int cycles);
+device_t _Nonnull cpu_device(const z80_cpu_t _Nonnull cpu, unsigned char i);
+uint8_t cpu_read_byte(const z80_cpu_t _Nonnull cpu, uint16_t address);
+void cpu_write_byte(const z80_cpu_t _Nonnull cpu, uint16_t address, uint8_t value);
+uint16_t cpu_read_word(const z80_cpu_t _Nonnull cpu, uint16_t address);
+void cpu_write_word(const z80_cpu_t _Nonnull cpu, uint16_t address, uint16_t value);
+int cpu_execute(const z80_cpu_t _Nonnull cpu, int cycles);

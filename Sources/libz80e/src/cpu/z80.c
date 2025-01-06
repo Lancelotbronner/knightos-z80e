@@ -26,7 +26,7 @@ struct ExecutionContext {
 	int8_t (*d)(struct ExecutionContext *);
 };
 
-struct device *cpu_device(z80_cpu_t cpu, unsigned char i) {
+struct device *cpu_device(const z80_cpu_t cpu, unsigned char i) {
 	return &cpu->devices[i];
 }
 
@@ -941,7 +941,7 @@ int cpu_execute(z80_cpu_t cpu, int cycles) {
 		uint8_t old; uint16_t old16;
 		uint8_t new; uint16_t new16;
 		uint8_t op; uint16_t op16;
-		int reset_prefix = 1;
+		bool reset_prefix = 1;
 
 		z80_registers_t *r = &cpu->registers;
 

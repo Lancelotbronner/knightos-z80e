@@ -118,8 +118,8 @@ final class DeviceTests: XCTestCaseTI83p {
 		var device = device()
 		port_status(&device, _asic)
 
-		asic.battery = BATTERIES_GOOD
-		asic.battery_remove_check = false
+		asic.battery.state = BATTERIES_GOOD
+		asic.battery.remove_check = false
 		let value = device_read(&device) & 0x1
 		XCTAssertEqual(value, 0x1)
 	}

@@ -66,7 +66,12 @@ let package = Package(
 			name: "z80eInstructionSetExerciser",
 			dependencies: ["XCTz80e"],
 			path: "Tests/zex",
-			resources: [.copy("resources")]),
+			resources: [
+				.copy("zexall.com"),
+				.copy("zexall.src"),
+				.copy("zexdoc.com"),
+				.copy("zexdoc.src"),
+			]),
 	],
 	cLanguageStandard: .c2x
 )

@@ -109,7 +109,7 @@ final class LoadTests: XCTestCaseTI83p {
 	func test_LD_A_I() {
 		let test: [UInt8] = [0xED, 0x57] // LD A, I
 		asic.cpu.registers.I = 0x34;
-		asic.cpu.IFF2 = 1;
+		asic.cpu.IFF2 = true;
 		flash(test)
 		let cycles = cpu_execute(&asic.cpu, 9)
 		XCTAssertEqual(asic.cpu.registers.flags.PV, 1)
