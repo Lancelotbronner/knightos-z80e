@@ -72,3 +72,16 @@ bool mmu_validate(ti_mmu_t mmu, unsigned int bank, mmu_bank_t *info);
 unsigned char mmu_read(ti_mmu_t mmu, uint16_t address);
 void mmu_write(ti_mmu_t mmu, uint16_t address, uint8_t value);
 void mmu_force_write(ti_mmu_t mmu, uint16_t address, uint8_t value);
+
+/// Calculates the address relative to the specified bank.
+/// - Parameters:
+///   - mmu: The MMU to interface with.
+///   - bank: The bank in which to select the address
+///   - address: The address to remap into a bank
+uint32_t mmu_address(ti_mmu_t const mmu, mmu_bank_t bank, uint16_t address);
+
+/// Provides an *unsafe* pointer to the physical memory represented by the provided address.
+/// - Parameters:
+///   - mmu: The MMU to interface with.
+///   - address: The address to point to.
+uint8_t *mmu_destination(ti_mmu_t const mmu, uint16_t address);

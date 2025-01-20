@@ -32,17 +32,17 @@ static mmu_bank_t __mmu_bank(ti_mmu_t const mmu, unsigned int bank) {
 	};
 }
 
-static uint32_t __mmu_address(ti_mmu_t const mmu, mmu_bank_t bank, uint16_t address) {
+uint32_t mmu_address(ti_mmu_t const mmu, mmu_bank_t bank, uint16_t address) {
 	uint32_t mapped_address = address;
 	mapped_address = mapped_address % 0x4000;
 	mapped_address += bank.page * 0x4000;
 	return mapped_address;
 }
 
-static uint8_t *__mmu_destination(ti_mmu_t const mmu, uint16_t address) {
+uint8_t *mmu_destination(ti_mmu_t const mmu, uint16_t address) {
 	mmu_bank_t bank = __mmu_bank(mmu, address / 0x4000);
 	uint8_t *destination = bank.flash ? mmu->flash : mmu->ram;
-	return &destination[__mmu_address(mmu, bank, address)];
+	return &destination[mmu_address(mmu, bank, address)];
 }
 
 //MARK: - Bank Management
@@ -169,7 +169,7 @@ void chip_erase(ti_mmu_t mmu, uint32_t address, uint8_t value) {
 
 unsigned char mmu_read(ti_mmu_t mmu, uint16_t address) {
 	mmu_bank_t bank = mmu_bank(mmu, address / 0x4000);
-	uint32_t mapped_address = __mmu_address(mmu, bank, address);
+	uint32_t mapped_address = mmu_address(mmu, bank, address);
 	uint8_t *destination = bank.flash ? mmu->flash : mmu->ram;
 
 	if (bank.flash)
@@ -230,7 +230,7 @@ static struct flash_pattern Patterns[] = {
 void mmu_write(ti_mmu_t mmu, uint16_t address, uint8_t value) {
 	value = hook_memory_trigger(&mmu->hook.memory_write, address, value);
 	mmu_bank_t bank = mmu_bank(mmu, address / 0x4000);
-	uint32_t mapped_address = __mmu_address(mmu, bank, address);
+	uint32_t mapped_address = mmu_address(mmu, bank, address);
 
 	if (!bank.flash) {
 		mmu->ram[mapped_address] = value;
@@ -270,5 +270,5 @@ void mmu_write(ti_mmu_t mmu, uint16_t address, uint8_t value) {
 
 void mmu_force_write(ti_mmu_t mmu, uint16_t address, uint8_t value) {
 	value = hook_memory_trigger(&mmu->hook.memory_write, address, value);
-	__mmu_destination(mmu, address)[0] = value;
+	mmu_destination(mmu, address)[0] = value;
 }
