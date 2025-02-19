@@ -45,5 +45,8 @@ void lcd_t6a04_init(lcd_t6a04_t lcd);
 void lcd_t6a04_clear(lcd_t6a04_t lcd);
 void lcd_t6a04_reset(lcd_t6a04_t lcd);
 
+size_t lcd_t6a04_size(lcd_t6a04_t lcd);
+void *lcd_t6a04_memory(lcd_t6a04_t lcd);
+
 bool lcd_t6a04_read(lcd_t6a04_t lcd, int x, int y);
 bool lcd_t6a04_write(lcd_t6a04_t lcd, int x, int y, bool value);

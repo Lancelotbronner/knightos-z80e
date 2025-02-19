@@ -229,6 +229,16 @@ void lcd_t6a04_clear(lcd_t6a04_t lcd) {
 	memset(lcd->ram, 0, LCD_T6A04_RAM);
 }
 
+#pragma mark - Memory Management
+
+size_t lcd_t6a04_size(lcd_t6a04_t lcd) {
+	return LCD_T6A04_RAM;
+}
+
+void *lcd_t6a04_memory(lcd_t6a04_t lcd) {
+	return &lcd->ram;
+}
+
 //MARK: - Device Management (Status)
 
 static unsigned char __status_read(peripheral_t peripheral) {
