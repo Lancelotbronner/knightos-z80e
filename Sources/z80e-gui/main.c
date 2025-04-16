@@ -177,6 +177,7 @@ int main(int argc, char **argv) {
 	SDL_CreateWindowAndRenderer(Scale * 96, Scale * 64, SDL_WINDOW_RESIZABLE, &Window, &Renderer);
 	SDL_SetWindowTitle(Window, "z80e");
 	SDL_RenderSetLogicalSize(Renderer, 96, 64);
+	SDL_ShowWindow(Window);
 
 	z80e_hook_lcd(60, lcd_update);
 	asic_add_timer(z80e_asic(), 0, 100, sdl_update, nullptr);
