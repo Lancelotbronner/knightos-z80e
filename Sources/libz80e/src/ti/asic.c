@@ -42,7 +42,7 @@ void asic_init(asic_t asic, ti_device_type type) {
 
 	// Configure timers
 	asic->timers.capacity = 20;
-	asic->timers.head = calloc(20, sizeof(z80_timer_t));
+	asic->timers.head = calloc(20, sizeof(struct z80_hardware_timer));
 
 	// Configure the runloop
 	runloop_init(asic);
